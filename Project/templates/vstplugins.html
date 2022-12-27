@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Vst Plugins
+{% endblock %}
+
+{% block content %}
+<h1>VST PLUGINS</h1>
+
+<form action="/vstplugins" method="post">
+    <input type="submit" value="submit">
+</form>
+
+{% if bool_open_vst %}
+    <p>jooo</p>
+    <object type="vst" data="C:\Program Files\Common Files\VST3\Boogex.vst3" width="300" height="200"></object>
+    <object
+        data="https://wiki.selfhtml.org/local/Kaleidoskop.svg"
+        type="image/svg+xml">
+        <param name="src" value="/local/Kaleidoskop.svg">
+        <!-- Fallback -->
+        <img src="kaleidoskop.gif" alt="Blick in ein Kaleidoskop">
+    </object>
+{% endif %}
+
+
+
+<!--<form action="/sumcpp" method="post">-->
+<!--&lt;!&ndash;    <label for="number">Number 1:</label>&ndash;&gt;-->
+<!--&lt;!&ndash;    <input type="text" name="number" id="number" value="{{ a }}" />&ndash;&gt;-->
+<!--&lt;!&ndash;    <label for="number2">Number 2:</label>&ndash;&gt;-->
+<!--&lt;!&ndash;    <input type="text" name="number2" id="number2" value="{{ b }}" />&ndash;&gt;-->
+<!--    <input type="submit" value="open_vst">-->
+<!--</form>-->
+
+<!--    {% if sum %}-->
+<!--        <p>Result: {{ sum }}</p>-->
+<!--    {% endif %}-->
+
+{% endblock %}

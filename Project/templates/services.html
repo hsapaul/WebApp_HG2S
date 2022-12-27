@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Services
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-content">
+          <h1>Services</h1>
+          <div>
+            <h4>Download YT Video</h4>
+            <form action="/services" method="post">
+                <input type="text" name="url" placeholder="YT URL">
+                <input type="text" name="path" placeholder="DOWNLOAD PATH">
+                <input type="submit" name="btn" value="Download">
+            </form>
+          </div>
+          <div>
+            <h4>Get Song Metadata</h4>
+            <form action="/services" method="post">
+                <input type="text" name="song" placeholder="SONG NAME">
+                <input type="text" name="artist" placeholder="ARTIST NAME">
+                <input type="text" name="path" placeholder="PATH FOR JSON">
+                <input type="submit" name="btn" value="Scrape">
+            </form>
+              <ul>
+                {% for item in song_json %}
+                    <li>{{item, song_json[item]}}</li>
+                {% endfor %}
+<!--                <li>{{ chord_progression }}</li>-->
+              </ul>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}

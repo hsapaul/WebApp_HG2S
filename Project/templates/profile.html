@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Profile
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-content">
+        <h1>Profile</h1> <br>
+        <h2>Your Username: </h2> <p>{{ session_user }}</p>
+        <a href='/logout'>Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Stretch Audio
+{% endblock %}
+
+{% block content %}
+
+<form action="/sumcpp" method="post">
+    <label for="number">Audio Path</label>
+    <input type="text" name="number" id="audio_path" value="{{ audio_path }}" />
+    <label for="number2">Stretch Factor</label>
+    <input type="text" name="number2" id="stretch_factor" value="{{ stretch_factor }}" />
+    <input type="submit" value="VALUE1" name="action1"/>
+</form>
+
+    {% if sum %}
+        <p>Result: {{ sum }}</p>
+    {% endif %}
+
+{% endblock %}

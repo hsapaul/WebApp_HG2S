@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Text Prompt Song Generation
+{% endblock %}
+
+{% block content %}
+        <h1>Welcome {{ session_user }}</h1>
+        <h5>Text to Music Generation Tool</h5>
+        <form action="#" method="post">
+          <div class="form-group">
+<!--            <label for="">Start with a detailed description of the Song you wanna hear</label>-->
+            <input type="text_prompt" name="text_prompt" placeholder="Start with a detailed description of the Song you wanna hear" class="form-control">
+<!--            <small id="emailHelp" class="form-text text-muted">Try sth like "Green Day playing a Ballad with a flute sample on top.</small>-->
+            <button type="submit" name="submit" value="Generate" class="btn mt-2 own-btn">Submit</button>
+          </div>
+        </form>
+
+        </br>
+        <!-- STEP 1 - Show Results of nlp.py -->
+        {% if text_prompt %}
+        <h3>"{{ text_prompt }}"</h3><br>
+        <h4 class="mb-3"> <strong>Step 1 - Text Understanding </strong> ({{ end_time }} seconds)</h4><br>
+
+          <ul>
+
+            {% for key, value in song_info.items() %}
+              <li>{{ key }} --> {{ value }}</li><br>
+            {% endfor %}
+
+            {% for key, value in word_classification_dict.items() %}
+              <li>{{ key }} --> {{ value }}</li><br>
+            {% endfor %}
+            <br>
+
+          </ul>
+        {% endif %}
+        </br>
+        <!-- STEP 2 - Show Results of alg.py -->
+<!--        {% if text_prompt %}-->
+<!--        <h3>"{{ text_prompt }}"</h3><br>-->
+<!--        <h4 class="mb-3"> <strong>Step 1 - Text Understanding </strong> ({{ end_time }} seconds)</h4><br>-->
+
+<!--          <ul>-->
+
+<!--            {% for key, value in song_info.items() %}-->
+<!--              <li>{{ key }} &ndash;&gt; {{ value }}</li><br>-->
+<!--            {% endfor %}-->
+
+<!--            {% for key, value in word_classification_dict.items() %}-->
+<!--              <li>{{ key }} &ndash;&gt; {{ value }}</li><br>-->
+<!--            {% endfor %}-->
+<!--            <br>-->
+
+<!--          </ul>-->
+<!--        {% endif %}-->
+<!--        </br>-->
+
+        <!-- Indicate Text Prompt Spectrum -->
+        <h4 class="mt-4">Allowed Word Categories</h4>
+        <ul>
+          <li>Artist {{ artist }}</li>
+          <li>Instrument {{ instrument }}</li>
+          <li>Genre {{ genre }}</li>
+          <li>Decade {{ decade }}</li>
+          <li>year {{ year }}</li>
+          <li>location {{ location }}</li>
+          <li>musical key {{ musical_key }}</li>
+          <li>bpm {{ bpm }}</li>
+        </ul>
+
+
+<!--        &lt;!&ndash; ***** Banner Start ***** &ndash;&gt;-->
+<!--        <div class="main-banner">-->
+<!--          <div class="row">-->
+<!--            <div class="col-lg-7">-->
+<!--              <div class="header-text">-->
+<!--                <h6>Manifest your Creativity</h6>-->
+<!--                <h4><em>SONG</em> Profiler</h4>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        -->
+<!--        <div class="most-popular">-->
+<!--          <div class="row">-->
+<!--            <div class="col-lg-12">-->
+<!--              <div class="heading-section">-->
+<!--                <h4><em>Most Popular</em> Right Now</h4>-->
+<!--              </div>-->
+<!--              <div class="row">-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-01.jpg" alt="">-->
+<!--                    <h4>Fortnite<br><span>Sandbox</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-02.jpg" alt="">-->
+<!--                    <h4>PubG<br><span>Battle S</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-03.jpg" alt="">-->
+<!--                    <h4>Dota2<br><span>Steam-X</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-04.jpg" alt="">-->
+<!--                    <h4>CS-GO<br><span>Legendary</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-6">-->
+<!--                  <div class="item">-->
+<!--                    <div class="row">-->
+<!--                      <div class="col-lg-6 col-sm-6">-->
+<!--                        <div class="item inner-item">-->
+<!--                          <img src="/static/img/popular-05.jpg" alt="">-->
+<!--                          <h4>Mini Craft<br><span>Legendary</span></h4>-->
+<!--                          <ul>-->
+<!--                            <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                            <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                          </ul>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                      <div class="col-lg-6 col-sm-6">-->
+<!--                        <div class="item">-->
+<!--                          <img src="/static/img/popular-06.jpg" alt="">-->
+<!--                          <h4>Eagles Fly<br><span>Matrix Games</span></h4>-->
+<!--                          <ul>-->
+<!--                            <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                            <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                          </ul>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-07.jpg" alt="">-->
+<!--                    <h4>Warface<br><span>Max 3D</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-08.jpg" alt="">-->
+<!--                    <h4>Warcraft<br><span>Legend</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-12">-->
+<!--                  <div class="main-button">-->
+<!--                    <a href="browse.html">Discover Popular</a>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+
+
+
+
+
+<!--        &lt;!&ndash; ***** Banner End ***** &ndash;&gt;-->
+
+<!--        &lt;!&ndash; ***** Most Popular Start ***** &ndash;&gt;-->
+<!--        <div class="most-popular">-->
+<!--          <div class="row">-->
+<!--            <div class="col-lg-12">-->
+<!--              <div class="heading-section">-->
+<!--                <h4><em>Most Popular</em> Right Now</h4>-->
+<!--              </div>-->
+<!--              <div class="row">-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-01.jpg" alt="">-->
+<!--                    <h4>Fortnite<br><span>Sandbox</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-02.jpg" alt="">-->
+<!--                    <h4>PubG<br><span>Battle S</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-03.jpg" alt="">-->
+<!--                    <h4>Dota2<br><span>Steam-X</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-04.jpg" alt="">-->
+<!--                    <h4>CS-GO<br><span>Legendary</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-6">-->
+<!--                  <div class="item">-->
+<!--                    <div class="row">-->
+<!--                      <div class="col-lg-6 col-sm-6">-->
+<!--                        <div class="item inner-item">-->
+<!--                          <img src="/static/img/popular-05.jpg" alt="">-->
+<!--                          <h4>Mini Craft<br><span>Legendary</span></h4>-->
+<!--                          <ul>-->
+<!--                            <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                            <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                          </ul>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                      <div class="col-lg-6 col-sm-6">-->
+<!--                        <div class="item">-->
+<!--                          <img src="/static/img/popular-06.jpg" alt="">-->
+<!--                          <h4>Eagles Fly<br><span>Matrix Games</span></h4>-->
+<!--                          <ul>-->
+<!--                            <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                            <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                          </ul>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-07.jpg" alt="">-->
+<!--                    <h4>Warface<br><span>Max 3D</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-3 col-sm-6">-->
+<!--                  <div class="item">-->
+<!--                    <img src="/static/img/popular-08.jpg" alt="">-->
+<!--                    <h4>Warcraft<br><span>Legend</span></h4>-->
+<!--                    <ul>-->
+<!--                      <li><i class="fa fa-star"></i> 4.8</li>-->
+<!--                      <li><i class="fa fa-download"></i> 2.3M</li>-->
+<!--                    </ul>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="col-lg-12">-->
+<!--                  <div class="main-button">-->
+<!--                    <a href="browse.html">Discover Popular</a>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; ***** Most Popular End ***** &ndash;&gt;-->
+
+<!--        &lt;!&ndash; ***** Gaming Library Start ***** &ndash;&gt;-->
+<!--        <div class="gaming-library">-->
+<!--          <div class="col-lg-12">-->
+<!--            <div class="heading-section">-->
+<!--              <h4><em>Your Gaming</em> Library</h4>-->
+<!--            </div>-->
+<!--            <div class="item">-->
+<!--              <ul>-->
+<!--                <li><img src="/static/img/game-01.jpg" alt="" class="templatemo-item"></li>-->
+<!--                <li><h4>Dota 2</h4><span>Sandbox</span></li>-->
+<!--                <li><h4>Date Added</h4><span>24/08/2036</span></li>-->
+<!--                <li><h4>Hours Played</h4><span>634 H 22 Mins</span></li>-->
+<!--                <li><h4>Currently</h4><span>Downloaded</span></li>-->
+<!--                <li><div class="main-border-button border-no-active"><a href="#">Donwloaded</a></div></li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--            <div class="item">-->
+<!--              <ul>-->
+<!--                <li><img src="/static/img/game-02.jpg" alt="" class="templatemo-item"></li>-->
+<!--                <li><h4>Fortnite</h4><span>Sandbox</span></li>-->
+<!--                <li><h4>Date Added</h4><span>22/06/2036</span></li>-->
+<!--                <li><h4>Hours Played</h4><span>740 H 52 Mins</span></li>-->
+<!--                <li><h4>Currently</h4><span>Downloaded</span></li>-->
+<!--                <li><div class="main-border-button"><a href="#">Donwload</a></div></li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--            <div class="item last-item">-->
+<!--              <ul>-->
+<!--                <li><img src="/static/img/game-03.jpg" alt="" class="templatemo-item"></li>-->
+<!--                <li><h4>CS-GO</h4><span>Sandbox</span></li>-->
+<!--                <li><h4>Date Added</h4><span>21/04/2036</span></li>-->
+<!--                <li><h4>Hours Played</h4><span>892 H 14 Mins</span></li>-->
+<!--                <li><h4>Currently</h4><span>Downloaded</span></li>-->
+<!--                <li><div class="main-border-button border-no-active"><a href="#">Donwloaded</a></div></li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="col-lg-12">-->
+<!--            <div class="main-button">-->
+<!--              <a href="profile.html">View Your Library</a>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+{% endblock %}
