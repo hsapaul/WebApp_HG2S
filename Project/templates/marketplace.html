@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Marketplace
+{% endblock %}
+
+{% block content %}
+
+<h1 class="">Marketplace</h1>
+<p class="mb-4">See what others prompted</p>
+<!-- Render all Marketplace posts -->
+{% if posts %}
+    {% for post in posts %}
+        <div class="post border rounded p-2">
+            <h4>"{{ post.text_prompt }}"</h4>
+            <p>Post_nr: {{ post.id }}</p>
+            <p>Step 1: {{ post.step1 }}</p>
+            <p>Step 2: {{ post.step2 }}</p>
+            <p>Step 3: {{ post.step3 }}</p>
+            <p class="d-inline">Time: {{ post.execution_time }}</p>
+            {% if session['session_user'] == post.user_name %}
+                <a href="/delete_post/{{post.id}}"><button class="d-inline float-end">delete</button></a>
+                <p class="d-inline float-end">Author: YOU</p>
+            {% else %}
+                <p class="d-inline float-end">Author: {{ post.user_name }}</p>
+            {% endif %}
+
+        </div>
+    {% endfor %}
+{% else %}
+    <p>There are no items in the marketplace.</p>
+{% endif %}
+
+{% endblock %}
+

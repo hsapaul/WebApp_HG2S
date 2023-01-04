@@ -6,13 +6,13 @@ HG2S - Text Prompt Song Generation
 
 {% block content %}
         <h1>Welcome {{ session_user }}</h1>
-        <h5>Text to Music Generation Tool</h5>
+        <h5>Text-to-Music Generation Tool</h5>
         <form action="#" method="post">
-          <div class="form-group">
+          <div class="form-group_1">
 <!--            <label for="">Start with a detailed description of the Song you wanna hear</label>-->
             <input type="text_prompt" name="text_prompt" placeholder="Start with a detailed description of the Song you wanna hear" class="form-control">
 <!--            <small id="emailHelp" class="form-text text-muted">Try sth like "Green Day playing a Ballad with a flute sample on top.</small>-->
-            <button type="submit" name="submit" value="Generate" class="btn mt-2 own-btn">Submit</button>
+            <button type="submit" name="submit_button" value="Generate" class="btn mt-2 own-btn">Submit</button>
           </div>
         </form>
 
@@ -21,9 +21,7 @@ HG2S - Text Prompt Song Generation
         {% if text_prompt %}
         <h3>"{{ text_prompt }}"</h3><br>
         <h4 class="mb-3"> <strong>Step 1 - Text Understanding </strong> ({{ end_time }} seconds)</h4><br>
-
           <ul>
-
             {% for key, value in song_info.items() %}
               <li>{{ key }} --> {{ value }}</li><br>
             {% endfor %}
@@ -34,27 +32,17 @@ HG2S - Text Prompt Song Generation
             <br>
 
           </ul>
+
+        <form action="#" method="post">
+            <div class="form-group_2">
+                <button type="submit" name="post_button" value="Generate" class="btn mt-2 own-btn">Post to Marketplace</button>
+            </div>
+        </form>
+              {% if saved_to_db %}
+                <p>Item saved to database.</p>
+              {% endif %}
         {% endif %}
         </br>
-        <!-- STEP 2 - Show Results of alg.py -->
-<!--        {% if text_prompt %}-->
-<!--        <h3>"{{ text_prompt }}"</h3><br>-->
-<!--        <h4 class="mb-3"> <strong>Step 1 - Text Understanding </strong> ({{ end_time }} seconds)</h4><br>-->
-
-<!--          <ul>-->
-
-<!--            {% for key, value in song_info.items() %}-->
-<!--              <li>{{ key }} &ndash;&gt; {{ value }}</li><br>-->
-<!--            {% endfor %}-->
-
-<!--            {% for key, value in word_classification_dict.items() %}-->
-<!--              <li>{{ key }} &ndash;&gt; {{ value }}</li><br>-->
-<!--            {% endfor %}-->
-<!--            <br>-->
-
-<!--          </ul>-->
-<!--        {% endif %}-->
-<!--        </br>-->
 
         <!-- Indicate Text Prompt Spectrum -->
         <h4 class="mt-4">Allowed Word Categories</h4>

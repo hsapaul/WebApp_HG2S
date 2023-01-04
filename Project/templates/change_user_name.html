@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Change User Name
+{% endblock %}
+
+{% block content %}
+
+<h1 class="">Change User Name</h1>
+
+<form action="/change_user_name" method="POST">
+    <label for="new_user_name">New User Name:</label>
+    <input type="text" name="new_user_name" id="new_user_name" required>
+    <label for="password">Type in Password</label>
+    <input type="text" name="password" id="password" value="">
+    <button type="submit">Change User Name</button>
+</form>
+
+{% endblock %}
+

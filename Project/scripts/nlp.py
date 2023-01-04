@@ -84,23 +84,28 @@ def word_categories(keywords):
 
 
 def main(text_prompt):
+    return {"test": "asdf"}, {"test": "asdf"}, 1
     start_time = time.time()
     # Check if input is part of database
-    list = check_database_for_input(text_prompt)
+    # list = check_database_for_input(text_prompt)
     print(list)
     print("--- %s seconds ---" % round(time.time() - start_time, 2))
-    # # Timer Start
-    # start_time = time.time()
-    # filtered_text_prompt, song_info = check_for_key_and_bpm(text_prompt)
-    # print(song_info)
-    # key_words = get_key_words(filtered_text_prompt)
-    # classified_word_dict = word_categories(key_words)
-    # print(classified_word_dict)
-    # end_time = time.time() - start_time
+    # Timer Start
+    start_time = time.time()
+    filtered_text_prompt, song_info = check_for_key_and_bpm(text_prompt)
+    print(time.time() - start_time)
+    print(song_info)
+    key_words = get_key_words(filtered_text_prompt)
+    print(time.time() - start_time)
+    classified_word_dict = word_categories(key_words)
+    print(time.time() - start_time)
+    print(classified_word_dict)
+    end_time = time.time() - start_time
     # return classified_word_dict, song_info, int(end_time)
+    # return {"test":"asdf"}, {"test":"asdf"}, 1
 
 
 if __name__ == "__main__":
-    main("Rihanna")
+    main("Rihanna playing the Flute in b Minor with the beatles in the 80s")
 
 

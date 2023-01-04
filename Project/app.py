@@ -1,5 +1,5 @@
 # Imports
-from flask import Flask, g, render_template, request, redirect, url_for, session
+from flask import Flask, g, render_template, request, redirect, url_for, session, flash
 import sqlite3
 
 # Import Service Scripts
@@ -41,23 +41,129 @@ def close_db(error):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # Increase Scope for Variables
+    text_prompt = "local"
+    word_classification_dict = {}
+    song_info = {}
+    end_time = 0
     if request.method == 'POST':
-        text_prompt = request.form['text_prompt']
-        # Call NLP Task
-        word_classification_dict, song_info, end_time = nlp_task(text_prompt)
-        return render_template('index.html', text_prompt=text_prompt, word_classification_dict=word_classification_dict,
-                               song_info=song_info, end_time=end_time)
+        # Check which button was pressed
+        if 'submit_button' in request.form:
+            text_prompt = request.form['text_prompt']
+            # Call NLP Task
+            word_classification_dict, song_info, end_time = nlp_task(text_prompt)
+            # Save Session Data
+            session['text_prompt'] = text_prompt
+            session['word_classification_dict'] = word_classification_dict
+            session['song_info'] = song_info
+            session['end_time'] = end_time
+            return render_template('index.html', text_prompt=text_prompt,
+                                   word_classification_dict=word_classification_dict,
+                                   song_info=song_info, end_time=end_time)
+        elif 'post_button' in request.form:
+            text_prompt, word_classification_dict, song_info, end_time = session['text_prompt'], session[
+                'word_classification_dict'], session['song_info'], session['end_time']
+            step1, step2, step3 = "Not yet", "Not yet", "Not yet"
+            # Save data to database
+            db = get_db()
+            # Get if user is logged in
+            if session['session_user'] != "None":
+                user_name = session['session_user']
+            else:
+                user_name = "Guest"
+            db.execute(
+                'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, step1 TEXT, step2 TEXT, step3 TEXT, execution_time INTEGER)')
+            db.execute(
+                f'insert into marketplace_posts (id, text_prompt, user_name, step1, step2, step3, execution_time) values (null, "{text_prompt}", "{user_name}", "{step1}", "{step2}", "{step3}", {end_time})')
+            db.commit()
+            return redirect(url_for('index'))
+
     if 'session_user' in session:
         return render_template('index.html', session_user=session['session_user'])
     else:
         return render_template('index.html')
 
 
+@app.route('/marketplace', methods=['GET', 'POST'])
+def marketplace():
+    # Get data from database
+    db = get_db()
+    cur = db.execute('select * from marketplace_posts')
+    posts = cur.fetchall()
+    return render_template('marketplace.html', posts=posts)
+
+
+"""
+CRUD Operations
+"""
+
+
+@app.route('/delete_post/<int:id>')
+def delete(id):
+    try:
+        db = get_db()
+        db.execute(f'delete from marketplace_posts where id = {id}')
+        db.commit()
+        return redirect(url_for('marketplace'))
+    except:
+        return "There was a problem deleting that post"
+
+@app.route('/change_user_name', methods=['GET', 'POST'])
+def change_user_name():
+    if request.method == 'POST':
+        if request.form['password'] == session['session_password']:
+            try:
+                db = get_db()
+                db.execute(f'update nutzer set username = "{request.form["new_user_name"]}" where username = "{session["session_user"]}"')
+                session['session_user'] = request.form['new_user_name']
+                db.commit()
+                flash("Username changed successfully")
+                return redirect(url_for('profile'))
+            except:
+                flash("There was a problem changing your username")
+                return redirect(url_for('profile'))
+        else:
+            flash("Wrong Password")
+            return redirect(url_for('change_user_name'))
+    else:
+        return render_template('change_user_name.html')
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        old_password, new_password, reapeat_password = request.form['old_password'], request.form['new_password'], request.form['repeat_password']
+        if old_password == session['session_password']:
+            if new_password == reapeat_password:
+                try:
+                    db = get_db()
+                    db.execute(f'update nutzer set password = "{new_password}" where username = "{session["session_user"]}"')
+                    session['session_password'] = new_password
+                    db.commit()
+                    flash("Password changed successfully")
+                    return redirect(url_for('profile'))
+                except:
+                    flash("There was a problem changing your password")
+                    return redirect(url_for('profile'))
+            else:
+                flash("Passwords don't match")
+                return redirect(url_for('change_password'))
+        else:
+            flash("Please Type in your exact old Password")
+            return redirect(url_for('change_password'))
+    else:
+        return render_template('change_password.html')
+
+
+"""
+Authentication Logic & Routing
+"""
+
+
 @app.route('/users')
 def users():
     db = get_db()
     db_nutzer = db.execute('SELECT username, password FROM nutzer').fetchall()
-    return render_template('login.html')
+    return render_template('auth_login.html')
 
 
 @app.route('/sign_up', methods=['POST', 'GET'])
@@ -67,34 +173,39 @@ def sign_up():
         db_nutzer = db.execute('SELECT username, password FROM nutzer').fetchall()
         for n in db_nutzer:
             if request.form['username'] == n['username']:
-                return render_template('sign_up.html', error='Username already taken!')
+                return render_template('auth_signup.html', error='Username already taken!')
         db.execute('INSERT INTO nutzer (username, password) VALUES (?, ?)',
                    [request.form['username'], request.form['password']])
         db.commit()
         session['session_user'] = request.form['username']
         return redirect(url_for('profile'))
-    return render_template('sign_up.html')
+    return render_template('auth_signup.html')
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         db = get_db()
-        db_nutzer = db.execute('SELECT username, password FROM nutzer').fetchall()
+        db_nutzer = db.execute('SELECT id, username, password FROM nutzer').fetchall()
         for nutzer in db_nutzer:
             if nutzer['username'] == request.form['username'] and nutzer['password'] == request.form['password']:
                 session['session_user'] = request.form['username']
+                session['session_id'] = nutzer['id']
+                session['session_password'] = request.form['password']
+                flash("You were successfully logged in")
                 return redirect(url_for('profile'))
-        return "user or password incorrect <br> <a href='/login'>Try again</a>"
+        flash("Wrong Username or Password")
+        return render_template('auth_login.html')
     else:
         if 'session_user' in session:
             return redirect(url_for('profile'))
-        return render_template('login.html')
+        return render_template('auth_login.html')
 
 
 @app.route('/logout')
 def logout():
     session.pop('session_user', None)
+    session.pop('session_id', None)
     return redirect(url_for('login'))
 
 
@@ -104,6 +215,24 @@ def profile():
         return render_template('profile.html', session_user=session['session_user'])
     else:
         return redirect(url_for('login'))
+
+
+@app.route('/admin')
+def admin():
+    if 'session_user' in session:
+        if session['session_id'] == 1:
+            return render_template('admin.html')
+        else:
+            flash('You are not allowed to access this page!')
+            return redirect(url_for('profile'))
+    else:
+        flash('You are not logged in')
+        return redirect(url_for('login'))
+
+
+"""
+EXTRA ROUTES
+"""
 
 
 @app.route('/services')
@@ -146,9 +275,10 @@ def research():
 @app.route('/vstplugins', methods=['POST', 'GET'])
 def vstplugins():
     if request.method == 'POST':
-        #open_vst()
+        # open_vst()
         return render_template('vstplugins.html', bool_open_vst=True)
     return render_template('vstplugins.html')
+
 
 @app.route('/jstest')
 def jstest():
