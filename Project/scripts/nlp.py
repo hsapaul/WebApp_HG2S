@@ -3,26 +3,41 @@ from transformers import pipeline
 import time
 import pandas as pd
 
-tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb', ' a ', ' a# ', ' ab', ' b ', ' bb']
+from Artist_Information.ArtistSearch_WikipediaInformation import wikipedia_search as wikipedia_search
+
+tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb', ' a ',
+         ' a# ', ' ab', ' b ', ' bb']
 mode = ['major', 'minor', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian']
 
 
-def check_database_for_input(text_prompt):
+def check_for_artists(text_input):
+    text_prompt = text_input
     # Check for artists
+    found_artists = []
     for index in range(1, 5):
         list_path = fr"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\1. Natural Language Processing\artists\10000-MTV-Music-Artists-page-{index}.csv"
         df = pd.read_csv(list_path)
         namen = df["name"].tolist()
         for name in namen:
             if str(name).strip().lower() in text_prompt.lower():
-                print(f"Found artist: {name}")
-                #return name
-    return "Not found"
+                found_artists.append(str(name).strip())
+    found_artists = list(set([x.lower() for x in found_artists]))
+    found_artists = [str(artist).capitalize() for artist in found_artists]
+
+    # Call Artist_Information Module if artists are found
+    if len(found_artists) > 0:
+        for artist in found_artists:
+            print("")
+            wikipedia_search(artist)
+            # chord_progressions(artist)
+            print("")
+
+
+    return found_artists
 
 
 # Filter musical information out of the text prompt
 def check_for_key_and_bpm(text_prompt):
-
     song_info = {}
 
     # Check for musical key: Tonic (Grundton) and Mode (Tonart)
@@ -46,7 +61,6 @@ def check_for_key_and_bpm(text_prompt):
 
 # NLP - TOKEN CLASSIFICATION
 def get_key_words(filtered_text):
-
     model_name = "vblagoje/bert-english-uncased-finetuned-pos"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForTokenClassification.from_pretrained(model_name)
@@ -68,8 +82,10 @@ def word_categories(keywords):
     classifier = pipeline("zero-shot-classification",
                           model="facebook/bart-large-mnli")
 
-    candidate_labels = ['Band', 'Singer', 'Vocalist', 'Rock Band', 'Composer', 'Pianist', 'Musician', 'DJ', 'Record Producer', 'Guitarist', 'Drummer', 'Artist', 'Songwriter',  # Artists
-                        'Musical Instrument', 'Instrument', 'Keyboard instrument', 'string instrument', 'Percussion Instrument', 'Fretted Instrument',  # Instruments
+    candidate_labels = ['Band', 'Singer', 'Vocalist', 'Rock Band', 'Composer', 'Pianist', 'Musician', 'DJ',
+                        'Record Producer', 'Guitarist', 'Drummer', 'Artist', 'Songwriter',  # Artists
+                        'Musical Instrument', 'Instrument', 'Keyboard instrument', 'string instrument',
+                        'Percussion Instrument', 'Fretted Instrument',  # Instruments
                         'Genre', 'musical style',  # Categories
                         'Decade', 'year', 'era',  # Time
                         'city', 'country', 'continent', 'culture',  # Locations
@@ -78,34 +94,31 @@ def word_categories(keywords):
     classified_word_dict = {}
     for entity in keywords:
         classes = classifier(entity, candidate_labels)
-        classified_word_dict[entity] = classes['labels'][0:3]#[0]
+        classified_word_dict[entity] = classes['labels'][0:3]  # [0]
 
     return classified_word_dict
 
 
 def main(text_prompt):
-    return {"test": "asdf"}, {"test": "asdf"}, 1
     start_time = time.time()
-    # Check if input is part of database
-    # list = check_database_for_input(text_prompt)
-    print(list)
-    print("--- %s seconds ---" % round(time.time() - start_time, 2))
-    # Timer Start
-    start_time = time.time()
-    filtered_text_prompt, song_info = check_for_key_and_bpm(text_prompt)
-    print(time.time() - start_time)
-    print(song_info)
-    key_words = get_key_words(filtered_text_prompt)
-    print(time.time() - start_time)
-    classified_word_dict = word_categories(key_words)
-    print(time.time() - start_time)
-    print(classified_word_dict)
-    end_time = time.time() - start_time
+    list = check_for_artists(text_prompt)
+    return {"Artists": list}, {"test": "asdf"}, 1
+    # print(list)
+    # print("--- %s seconds ---" % round(time.time() - start_time, 2))
+    # # Timer Start
+    # start_time = time.time()
+    # filtered_text_prompt, song_info = check_for_key_and_bpm(text_prompt)
+    # print(time.time() - start_time)
+    # print(song_info)
+    # key_words = get_key_words(filtered_text_prompt)
+    # print(time.time() - start_time)
+    # classified_word_dict = word_categories(key_words)
+    # print(time.time() - start_time)
+    # print(classified_word_dict)
+    # end_time = time.time() - start_time
     # return classified_word_dict, song_info, int(end_time)
     # return {"test":"asdf"}, {"test":"asdf"}, 1
 
 
 if __name__ == "__main__":
     main("Rihanna playing the Flute in b Minor with the beatles in the 80s")
-
-

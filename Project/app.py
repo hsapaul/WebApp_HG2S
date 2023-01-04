@@ -1,6 +1,14 @@
 # Imports
 from flask import Flask, g, render_template, request, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+import datetime
+
 import sqlite3
+import os
+
+import jinja2
 
 # Import Service Scripts
 from scripts.step_metadata import get_song_key_and_bpm as metadata
@@ -9,7 +17,11 @@ from scripts.step_chords.get_chords_url import main as chords_url
 from scripts.step_chords.parse_chords import main as chords_2
 from scripts.nlp import main as nlp_task
 
+from dotenv import load_dotenv
+
 from scripts.open_vst import open as open_vst
+
+load_dotenv()
 
 app = Flask(__name__)
 db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\database.db"
@@ -17,9 +29,9 @@ db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\database.db"
 # Encrypt and Decrypt Session Data
 app.secret_key = "123"
 
-
 # Connect to database
 def connect_db():
+    # Connect to database with .env variable
     sql = sqlite3.connect(db_path)
     sql.row_factory = sqlite3.Row
     return sql
@@ -64,19 +76,21 @@ def index():
             text_prompt, word_classification_dict, song_info, end_time = session['text_prompt'], session[
                 'word_classification_dict'], session['song_info'], session['end_time']
             step1, step2, step3 = "Not yet", "Not yet", "Not yet"
+            # Get date and time
+            datum = str(datetime.datetime.now())[:-10]
             # Save data to database
             db = get_db()
             # Get if user is logged in
-            if session['session_user'] != "None":
+            if 'session_user' in session:
                 user_name = session['session_user']
             else:
                 user_name = "Guest"
             db.execute(
                 'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, step1 TEXT, step2 TEXT, step3 TEXT, execution_time INTEGER)')
-            db.execute(
-                f'insert into marketplace_posts (id, text_prompt, user_name, step1, step2, step3, execution_time) values (null, "{text_prompt}", "{user_name}", "{step1}", "{step2}", "{step3}", {end_time})')
+            db.execute(f'insert into marketplace_posts (text_prompt, user_name, datum) values ("{text_prompt}", "{user_name}", "{datum}")')
             db.commit()
-            return redirect(url_for('index'))
+            flash("Your post was successfully submitted!")
+            return redirect(url_for('marketplace'))
 
     if 'session_user' in session:
         return render_template('index.html', session_user=session['session_user'])
@@ -84,13 +98,13 @@ def index():
         return render_template('index.html')
 
 
-@app.route('/marketplace', methods=['GET', 'POST'])
+@app.route('/marketplace')
 def marketplace():
     # Get data from database
     db = get_db()
     cur = db.execute('select * from marketplace_posts')
     posts = cur.fetchall()
-    return render_template('marketplace.html', posts=posts)
+    return render_template('marketplace.html', posts=posts, today=str(datetime.datetime.now())[:10])
 
 
 """
@@ -107,6 +121,7 @@ def delete(id):
         return redirect(url_for('marketplace'))
     except:
         return "There was a problem deleting that post"
+
 
 @app.route('/change_user_name', methods=['GET', 'POST'])
 def change_user_name():
@@ -127,6 +142,7 @@ def change_user_name():
             return redirect(url_for('change_user_name'))
     else:
         return render_template('change_user_name.html')
+
 
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
@@ -169,16 +185,28 @@ def users():
 @app.route('/sign_up', methods=['POST', 'GET'])
 def sign_up():
     if request.method == 'POST':
-        db = get_db()
-        db_nutzer = db.execute('SELECT username, password FROM nutzer').fetchall()
-        for n in db_nutzer:
-            if request.form['username'] == n['username']:
-                return render_template('auth_signup.html', error='Username already taken!')
-        db.execute('INSERT INTO nutzer (username, password) VALUES (?, ?)',
-                   [request.form['username'], request.form['password']])
-        db.commit()
-        session['session_user'] = request.form['username']
-        return redirect(url_for('profile'))
+        username, email, password, repeat_password = request.form['username'], request.form['email'], request.form['password'], request.form['repeat_password']
+        role = "admin"
+        if password == repeat_password:
+            db = get_db()
+            db_nutzer = db.execute('SELECT username, password, email FROM nutzer').fetchall()
+            for n in db_nutzer:
+                if request.form['username'] == n['username']:
+                    return render_template('auth_signup.html', error='Username already taken!')
+                elif request.form['email'] == n['email']:
+                    return render_template('auth_signup.html', error='Email already taken!')
+            db.execute('INSERT INTO nutzer (username, email, password, role) VALUES (?, ?, ?, ?)',
+                       [request.form['username'], request.form['email'], request.form['password'], role])
+            db.commit()
+            session['session_user'] = request.form['username']
+            session['session_password'] = request.form['password']
+            session['session_role'] = role
+            session['session_email'] = request.form['email']
+            flash("Signed up successfully!")
+            return redirect(url_for('profile'))
+        else:
+            flash("Passwords don't match")
+            return render_template('auth_signup.html')
     return render_template('auth_signup.html')
 
 
@@ -186,13 +214,16 @@ def sign_up():
 def login():
     if request.method == 'POST':
         db = get_db()
-        db_nutzer = db.execute('SELECT id, username, password FROM nutzer').fetchall()
+        db_nutzer = db.execute('SELECT id, email, username, password FROM nutzer').fetchall()
+        username_or_email = request.form['username_or_email']
         for nutzer in db_nutzer:
-            if nutzer['username'] == request.form['username'] and nutzer['password'] == request.form['password']:
-                session['session_user'] = request.form['username']
-                session['session_id'] = nutzer['id']
-                session['session_password'] = request.form['password']
-                flash("You were successfully logged in")
+            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form['password']:
+                user, password, email, role = db.execute(f'select username, password, email, role from nutzer where id = {nutzer["id"]}').fetchone()
+                session['session_user'] = user
+                session['session_password'] = password
+                session['session_email'] = email
+                session['session_role'] = role
+                flash(f"You were successfully logged in {session['session_email']}")
                 return redirect(url_for('profile'))
         flash("Wrong Username or Password")
         return render_template('auth_login.html')

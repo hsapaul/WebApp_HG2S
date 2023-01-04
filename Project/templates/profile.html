@@ -8,16 +8,36 @@ HG2S - Profile
 
 <h1>Profile</h1> <br>
 
-<h4 class="d-inline">Username: </h4>
-<p class="d-inline">{{ session_user }}</p>
-<a href="/change_user_name"><button>Change User Name</button></a>
+<!-- Profile Picture -->
 
-<br>
+<div class="user-profile">
+    <div class="">
+        <img class="" width="150" height="150" src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}" alt="user">
+    </div>
 
-<h4 class="d-inline">Password: </h4>
-<p class="d-inline">************</p>
-<a href="/change_password"><button>Change Password</button></a>
+    <h4 class="d-inline">Username: </h4>
+    <p class="d-inline">{{ session_user }}</p>
+    <a href="/change_user_name"><button>Change User Name</button></a>
 
-<a class="d-block" href='/logout'>Logout</a>
+    <br>
+
+    <h4 class="d-inline">E-Mail: </h4>
+    {% if session['session_email'] %}
+    <p class="d-inline">{{ session['session_email'] }}</p>
+    <!--<a href="" class="d-inline"><button>Change E-Mail</button></a>-->
+    {% else %}
+    <p class="d-inline">No E-Mail given</p>
+    <a href=""><button>Add</button></a>
+    {% endif %}
+
+    <br>
+
+    <h4 class="d-inline">Password: </h4>
+    <p class="d-inline">************</p>
+    <a href="/change_password"><button>Change Password</button></a>
+
+    <a class="d-block" href='/logout'>Logout</a>
+
+</div>
 
 {% endblock %}
