@@ -131,19 +131,19 @@ def word_categories(keywords):
 def main(text_prompt):
     start_time = time.time()
     filtered_text, found_genres = check_for_genres(text_prompt)
-    print(filtered_text)
     filtered_text, found_instruments = check_for_instruments(filtered_text)
     found_time = check_for_time_information(filtered_text)
     # filtered_text = get_key_words(filtered_text)
     found_artists = check_for_artists(filtered_text)
-    print("Found Instruments: ", found_instruments)
-    print("Found Artists: ", found_artists)
-    print("Found Genres: ", found_genres)
-    print("Found Time: ", found_time)
+    # print("Found Instruments: ", found_instruments)
+    # print("Found Artists: ", found_artists)
+    # print("Found Genres: ", found_genres)
+    # print("Found Time: ", found_time)
     filtered_text_prompt, key_and_bpm = check_for_key_and_bpm(text_prompt)
-    print("Found Key and BPM: ", key_and_bpm)
+    # print("Found Key and BPM: ", key_and_bpm)
     end_time = round(time.time() - start_time, 2)
-    return found_artists, found_instruments, found_genres, found_time, key_and_bpm, end_time
+    # print(found_artists, found_instruments, found_genres, found_time, key_and_bpm)
+    return found_artists, found_instruments, found_genres, found_time, key_and_bpm
     # print(list)
     # print("--- %s seconds ---" % round(time.time() - start_time, 2))
     # # Timer Start
@@ -162,4 +162,4 @@ def main(text_prompt):
 
 
 if __name__ == "__main__":
-    main("b major 140 bpm")
+    main("Sia")

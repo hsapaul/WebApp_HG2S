@@ -123,7 +123,7 @@ def wikipedia_search(artist):
     start_time = time.time()
     try:
         artist = " ".join([word.capitalize() for word in artist.split(" ")])
-        print(artist)
+        # print(artist)
         print(f'-------{str(artist)}-------')
         html = get_wiki_html(artist)
         # print(html.text())
@@ -150,7 +150,7 @@ def scrape_artist_names():
 
 
 if __name__ == "__main__":
-    list = wikipedia_search("jazz")
+    list = wikipedia_search("sia")
 
 # Bug Fixing:
 # Nirvana --> wrong page

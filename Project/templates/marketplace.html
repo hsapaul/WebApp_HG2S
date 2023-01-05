@@ -8,6 +8,23 @@ HG2S - Marketplace
 
 <h1 class="m-0">Prompt-Post-Marketplace</h1>
 <p class="mb-4">See what other Users prompted</p>
+
+<form action="" method="sort_alg">
+<div class="dropdown show">
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Dropdown link
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <a class="dropdown-item" href="#">Action</a>
+    <a class="dropdown-item" href="#">Another action</a>
+    <a class="dropdown-item" href="#">Something else here</a>
+  </div>
+</div>
+</form>
+
+
+
 <!-- Render all Marketplace posts -->
 {% if posts %}
     {% for post in posts %}
@@ -35,6 +52,8 @@ HG2S - Marketplace
             {% else %}
                 <p class="d-inline">{{ post.datum[:10] }}</p>
             {% endif %}
+            <a href="/upvote_post/{{post.id}}"><button>Upvote ({{post.popularity}})</button></a>
+            <a href="/playground/{{post.id}}"><button>Enter Dimension</button></a>
             {% if session['session_user'] == post.user_name %}
                 <p class="d-inline float-end">Author: YOU</p>
                 <a href="/delete_post/{{post.id}}"><button class="d-inline float-end">delete</button></a>

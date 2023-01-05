@@ -61,12 +61,14 @@ def index():
         if 'submit_button' in request.form:
             text_prompt = request.form['text_prompt']
             # Call NLP Task
-            found_artists, found_instruments, found_genres, found_time, key_and_bpm, end_time = nlp_task(text_prompt)
+            found_artists, found_instruments, found_genres, found_time, key_and_bpm = nlp_task(text_prompt)
             artist_objects = []
             instrument_objects = []
-            for artist in found_artists:
-                artist_objects.append(artist_wiki.wikipedia_search(artist))
-            # Clear out empty artist objects
+            if len(found_artists) >= 1:
+                for artist in found_artists:
+                    print(artist)
+                    artist_objects.append(artist_wiki.wikipedia_search(artist))
+                # Clear out empty artist objects
             artist_objects = [x for x in artist_objects if x != None]
             # Save Session Data so it can be accessed when posting to marketplace/databse
             session['text_prompt'] = text_prompt
@@ -90,8 +92,8 @@ def index():
             else:
                 user_name = "Guest"
             db.execute(
-                'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, datum TEXT, instruments TEXT, genres TEXT, key_and_bpm TEXT)')
-            db.execute(f'insert into marketplace_posts (text_prompt, user_name, datum, artists, instruments, genres, key_and_bpm) values ("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", "{instruments}", "{genres}", "{key_and_bpm}")')
+                'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, datum TEXT, instruments TEXT, genres TEXT, key_and_bpm TEXT, popularity INTEGER)')
+            db.execute(f'insert into marketplace_posts (text_prompt, user_name, datum, artists, instruments, genres, key_and_bpm, popularity) values ("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", "{instruments}", "{genres}", "{key_and_bpm}", 0)')
             # Create table for each artist
             # db.execute('CREATE TABLE IF NOT EXISTS artists (id INTEGER PRIMARY KEY, name TEXT, genres TEXT, instruments TEXT, occupation TEXT, year TEXT)')
             for artist in artists:
@@ -134,6 +136,27 @@ def delete(id):
         return redirect(url_for('marketplace'))
     except:
         return "There was a problem deleting that post"
+
+@app.route('/upvote_post/<int:id>')
+def upvote(id):
+    # try:
+    db = get_db()
+    # Look if user has already upvoted
+    if 'session_user' not in session:
+        flash("You need to be logged in to upvote!")
+        return redirect(url_for('login'))
+    else:
+        cur = db.execute(f'select liked_post_ids from nutzer where id = "{session["session_id"]}"')
+        if str(id) in str(cur).split(","):
+            flash("You have already upvoted this post!")
+            return redirect(url_for('marketplace'))
+        else:
+            db.execute(f'update marketplace_posts set popularity = popularity + 1 where id = {id}')
+            db.execute(f'update nutzer set liked_post_ids = "{str(cur) + str(id) + ","}" where id = "{session["session_id"]}"')
+            db.commit()
+        return redirect(url_for('marketplace'))
+    # except:
+    #     return "There was a problem upvoting that post"
 
 
 @app.route('/change_user_name', methods=['GET', 'POST'])
@@ -206,11 +229,12 @@ def sign_up():
             for n in db_nutzer:
                 if request.form['username'] == n['username']:
                     return render_template('auth_signup.html', error='Username already taken!')
-                elif request.form['email'] == n['email']:
+                elif request.form['email'] == n['email'] and request.form['email'] != "":
                     return render_template('auth_signup.html', error='Email already taken!')
-            db.execute('INSERT INTO nutzer (username, email, password, role) VALUES (?, ?, ?, ?)',
-                       [request.form['username'], request.form['email'], request.form['password'], role])
+            db.execute('INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids) VALUES (?, ?, ?, ?, ?, ?)',
+                       [request.form['username'], request.form['email'], request.form['password'], role, None, None])
             db.commit()
+            session['session_id'] = db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
             session['session_role'] = role
@@ -232,6 +256,7 @@ def login():
         for nutzer in db_nutzer:
             if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form['password']:
                 user, password, email, role = db.execute(f'select username, password, email, role from nutzer where id = {nutzer["id"]}').fetchone()
+                session['session_id'] = nutzer['id']
                 session['session_user'] = user
                 session['session_password'] = password
                 session['session_email'] = email
@@ -309,6 +334,14 @@ def service_download():
         song_json = song_json | textdata_json
         # return render_template("songprofiler.html", song_json=song_json, chord_progression=chords)
         return render_template("services.html", song_json=song_json)
+
+
+@app.route('/playground/<int:id>')
+def playground(id):
+    db = get_db()
+    text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
+    popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]
+    return render_template('js_test.html', id=id, text_prompt=text_prompt, popularity=popularity)
 
 
 @app.route('/research')
