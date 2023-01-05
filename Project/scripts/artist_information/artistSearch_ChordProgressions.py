@@ -1,6 +1,6 @@
 """ --------------------------------- '''
 
-ArtistSearch_ChordProgressions.py
+artistSearch_ChordProgressions.py
 Input: Artist Name
 Output: List of Chord Dictionaries
 

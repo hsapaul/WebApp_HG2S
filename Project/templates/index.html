@@ -5,57 +5,109 @@ HG2S - Text Prompt Song Generation
 {% endblock %}
 
 {% block content %}
-        <h1>Welcome {{ session_user }}</h1>
-        <h5>Text-to-Music Generation Tool</h5>
-        <form action="#" method="post">
-          <div class="form-group_1">
-<!--            <label for="">Start with a detailed description of the Song you wanna hear</label>-->
-            <input type="text_prompt" name="text_prompt" placeholder="Start with a detailed description of the Song you wanna hear" class="form-control">
-<!--            <small id="emailHelp" class="form-text text-muted">Try sth like "Green Day playing a Ballad with a flute sample on top.</small>-->
-            <button type="submit" name="submit_button" value="Generate" class="btn mt-2 own-btn">Submit</button>
-          </div>
-        </form>
+<h1>Welcome {{ session_user }}</h1>
+<h5>Text-to-Music Tool</h5>
+<form action="#" method="post">
+    <div class="form-group_1">
+        <!--            <label for="">Start with a detailed description of the Song you wanna hear</label>-->
+        <input type="text_prompt" name="text_prompt"
+               placeholder="Start with a detailed description of the Song you wanna hear" class="form-control">
+        <!--            <small id="emailHelp" class="form-text text-muted">Try sth like "Green Day playing a Ballad with a flute sample on top.</small>-->
+        <button type="submit" name="submit_button" value="Generate" class="btn mt-2 own-btn">Submit</button>
+    </div>
+</form>
 
-        </br>
-        <!-- STEP 1 - Show Results of nlp.py -->
-        {% if text_prompt %}
-        <h3>"{{ text_prompt }}"</h3><br>
-        <h4 class="mb-3"> <strong>Step 1 - Text Understanding </strong> ({{ end_time }} seconds)</h4><br>
-          <ul>
-            {% for key, value in song_info.items() %}
-              <li>{{ key }} --> {{ value }}</li><br>
-            {% endfor %}
-
-            {% for key, value in word_classification_dict.items() %}
-              <li>{{ key }} --> {{ value }}</li><br>
-            {% endfor %}
-            <br>
-
-          </ul>
-
-        <form action="#" method="post">
-            <div class="form-group_2">
-                <button type="submit" name="post_button" value="Generate" class="btn mt-2 own-btn">Post to Marketplace</button>
+</br>
+<!-- STEP 1 - Show Results of nlp.py -->
+{% if text_prompt %}
+<h3><em>Prompt - </em> "{{ text_prompt }}"</h3><br>
+<h2 class="mb-1"><strong>Step 1 - Text Comprehension </strong> ({{ end_time }} seconds)</h2><br>
+<ul>
+    {% if artist_objects %}
+    <h3>- Artist(s):</h3>
+    <div class="container">
+        <div class="row">
+            {% for artist in artist_objects %}
+            <div class="d-inline-block border p-1 col-6">
+                <h5 class="">{{ artist_objects[loop.index - 1].name }}: </h5>
+                <p class=""><em>year:</em> {{ artist_objects[loop.index - 1].year }}</p>
+                <p class=""><em>occupations:</em> {{ artist_objects[loop.index - 1].occupation }}</p>
+                <p class=""><em>genres:</em> {{ artist_objects[loop.index - 1].genres }}</p>
+                <p class=""><em>instruments:</em> {{ artist_objects[loop.index - 1].instruments }}</p>
             </div>
-        </form>
-              {% if saved_to_db %}
-                <p>Item saved to database.</p>
-              {% endif %}
-        {% endif %}
-        </br>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% if instruments %}
+    <h3>- Instrument(s):</h3>
+    <div class="container">
+        <div class="row">
+            {% for instrument in instruments %}
+            <div class="d-inline-block border p-1 col-6">
+                <h5 class="">{{ instrument}} </h5>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% if genres %}
+    <h3>- Genre(s):</h3>
+    <div class="container">
+        <div class="row">
+            {% for genre in genres %}
+            <div class="d-inline-block border p-1 col-6">
+                <h5 class="">{{ genre }} </h5>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% if key_and_bpm %}
+    <h3>- Key and BPM:</h3>
+    <div class="container">
+            {% if key_and_bpm["Tonic"]%}
+            <div class="row border p-1 col-3">
+                <h5 class="">Tonic: {{ key_and_bpm["Tonic"] }} </h5>
+            </div>
+            {% endif %}
+            {% if key_and_bpm["Mode"]%}
+            <div class="row border p-1 col-3">
+                <h5 class="">Mode: {{ key_and_bpm["Mode"] }} </h5>
+            </div>
+            {% endif %}
+            {% if key_and_bpm["BPM"]%}
+            <div class="row border p-1 col-3">
+                <h5 class="">BPM: {{ key_and_bpm["BPM"] }} </h5>
+            </div>
+            {% endif %}
+    </div>
+    {% endif %}
+</ul>
 
-        <!-- Indicate Text Prompt Spectrum -->
-        <h4 class="mt-4">Allowed Word Categories</h4>
-        <ul>
-          <li>Artist {{ artist }}</li>
-          <li>Instrument {{ instrument }}</li>
-          <li>Genre {{ genre }}</li>
-          <li>Decade {{ decade }}</li>
-          <li>year {{ year }}</li>
-          <li>location {{ location }}</li>
-          <li>musical key {{ musical_key }}</li>
-          <li>bpm {{ bpm }}</li>
-        </ul>
+<form action="#" method="post">
+    <div class="form-group_2">
+        <button type="submit" name="post_button" value="Generate" class="btn mt-2 own-btn">Post to Marketplace</button>
+    </div>
+</form>
+{% if saved_to_db %}
+<p>Item saved to database.</p>
+{% endif %}
+{% endif %}
+</br>
+
+<!-- Indicate Text Prompt Spectrum -->
+<h4 class="mt-4">Recommended Word Categories</h4>
+<ul>
+    <li>Artist {{ artist }}</li>
+    <li>Instrument {{ instrument }}</li>
+    <li>Genre {{ genre }}</li>
+    <li>Decade {{ decade }}</li>
+    <li>year {{ year }}</li>
+    <li>location {{ location }}</li>
+    <li>musical key {{ musical_key }}</li>
+    <li>bpm {{ bpm }}</li>
+</ul>
 
 
 <!--        &lt;!&ndash; ***** Banner Start ***** &ndash;&gt;-->
@@ -173,10 +225,6 @@ HG2S - Text Prompt Song Generation
 <!--            </div>-->
 <!--          </div>-->
 <!--        </div>-->
-
-
-
-
 
 
 <!--        &lt;!&ndash; ***** Banner End ***** &ndash;&gt;-->

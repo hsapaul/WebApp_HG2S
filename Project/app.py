@@ -4,10 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 import datetime
-
 import sqlite3
 import os
-
 import jinja2
 
 # Import Service Scripts
@@ -16,10 +14,10 @@ from scripts.step_textdata import main as textdata
 from scripts.step_chords.get_chords_url import main as chords_url
 from scripts.step_chords.parse_chords import main as chords_2
 from scripts.nlp import main as nlp_task
+import scripts.artist_information.artistSearch_ChordProgressions as artist_chords
+import scripts.artist_information.artistSearch_WikipediaInformation as artist_wiki
 
 from dotenv import load_dotenv
-
-from scripts.open_vst import open as open_vst
 
 load_dotenv()
 
@@ -63,19 +61,25 @@ def index():
         if 'submit_button' in request.form:
             text_prompt = request.form['text_prompt']
             # Call NLP Task
-            word_classification_dict, song_info, end_time = nlp_task(text_prompt)
-            # Save Session Data
+            found_artists, found_instruments, found_genres, found_time, key_and_bpm, end_time = nlp_task(text_prompt)
+            artist_objects = []
+            instrument_objects = []
+            for artist in found_artists:
+                artist_objects.append(artist_wiki.wikipedia_search(artist))
+            # Clear out empty artist objects
+            artist_objects = [x for x in artist_objects if x != None]
+            # Save Session Data so it can be accessed when posting to marketplace/databse
             session['text_prompt'] = text_prompt
-            session['word_classification_dict'] = word_classification_dict
-            session['song_info'] = song_info
-            session['end_time'] = end_time
-            return render_template('index.html', text_prompt=text_prompt,
-                                   word_classification_dict=word_classification_dict,
-                                   song_info=song_info, end_time=end_time)
+            session['artists'] = artist_objects
+            session['instruments'] = found_instruments
+            session['genres'] = found_genres
+            session['key_and_bpm'] = key_and_bpm
+            return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects, instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres, end_time=end_time)
         elif 'post_button' in request.form:
-            text_prompt, word_classification_dict, song_info, end_time = session['text_prompt'], session[
-                'word_classification_dict'], session['song_info'], session['end_time']
-            step1, step2, step3 = "Not yet", "Not yet", "Not yet"
+            text_prompt, artists, instruments, genres, key_and_bpm = session['text_prompt'], \
+                session['artists'], session['instruments'], session['genres'], session['key_and_bpm']
+            # Get names out of the dictionary
+            artist_names = [artist["name"] for artist in artists]
             # Get date and time
             datum = str(datetime.datetime.now())[:-10]
             # Save data to database
@@ -86,8 +90,15 @@ def index():
             else:
                 user_name = "Guest"
             db.execute(
-                'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, step1 TEXT, step2 TEXT, step3 TEXT, execution_time INTEGER)')
-            db.execute(f'insert into marketplace_posts (text_prompt, user_name, datum) values ("{text_prompt}", "{user_name}", "{datum}")')
+                'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, datum TEXT, instruments TEXT, genres TEXT, key_and_bpm TEXT)')
+            db.execute(f'insert into marketplace_posts (text_prompt, user_name, datum, artists, instruments, genres, key_and_bpm) values ("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", "{instruments}", "{genres}", "{key_and_bpm}")')
+            # Create table for each artist
+            # db.execute('CREATE TABLE IF NOT EXISTS artists (id INTEGER PRIMARY KEY, name TEXT, genres TEXT, instruments TEXT, occupation TEXT, year TEXT)')
+            for artist in artists:
+                print(artist)
+                name, genres, instruments, occupation, year = artist["name"], artist["genres"], artist["instruments"], artist["occupation"], artist["year"]
+                db.execute(f'insert into artists (name, genres, instruments, occupations, year) values ("{name}", "{genres}", "{instruments}", "{occupation}", "{year}")')
+            #db.execute('insert into artists (name) values ("test")')
             db.commit()
             flash("Your post was successfully submitted!")
             return redirect(url_for('marketplace'))
@@ -103,8 +114,10 @@ def marketplace():
     # Get data from database
     db = get_db()
     cur = db.execute('select * from marketplace_posts')
+    cur2 = db.execute('select * from artists')
     posts = cur.fetchall()
-    return render_template('marketplace.html', posts=posts, today=str(datetime.datetime.now())[:10])
+    artists = cur2.fetchall()
+    return render_template('marketplace.html', posts=posts, artists_db=artists, today=str(datetime.datetime.now())[:10])
 
 
 """

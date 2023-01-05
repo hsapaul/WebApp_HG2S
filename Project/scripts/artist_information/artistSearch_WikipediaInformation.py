@@ -34,6 +34,8 @@ def get_band_instruments_and_occupations(href):
     resp = httpx.get(url, headers={"User-Agent": "Mozilla/5.0"})
     html = HTMLParser(resp.text)
     info_box = html.css_first("tbody")
+    if info_box is None:
+        return None, None
     info_rows = info_box.css("tr")
     new_instruments = []
     new_occupations = []
@@ -119,14 +121,22 @@ def add_to_database(artist_object):
 
 def wikipedia_search(artist):
     start_time = time.time()
-    print(f'-------{str(artist)}-------')
-    html = get_wiki_html(artist)
-    # print(html.text())
-    artist_object = parse_data(html, artist)
-    print_artist_object(artist_object)
-    add_to_database(artist_object)
-    print(f"✅ [{round(time.time() - start_time, 2)}s] - Scraping of '{artist.upper()}'-Data ")
-    print('------------------------')
+    try:
+        artist = " ".join([word.capitalize() for word in artist.split(" ")])
+        print(artist)
+        print(f'-------{str(artist)}-------')
+        html = get_wiki_html(artist)
+        # print(html.text())
+        artist_object = parse_data(html, artist)
+        print_artist_object(artist_object)
+        # add_to_database(artist_object)
+        print(f"✅ [{round(time.time() - start_time, 2)}s] - Scraping of '{artist.upper()}'-Data ")
+        print('------------------------')
+        return artist_object
+    except Exception as e:
+        print(e)
+        print("Error")
+        return None
 
 
 def scrape_artist_names():
@@ -140,7 +150,7 @@ def scrape_artist_names():
 
 
 if __name__ == "__main__":
-    wikipedia_search("Frank Sinatra")
+    list = wikipedia_search("jazz")
 
 # Bug Fixing:
 # Nirvana --> wrong page

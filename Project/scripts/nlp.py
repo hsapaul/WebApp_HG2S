@@ -3,11 +3,14 @@ from transformers import pipeline
 import time
 import pandas as pd
 
-from Artist_Information.ArtistSearch_WikipediaInformation import wikipedia_search as wikipedia_search
-
 tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb', ' a ',
          ' a# ', ' ab', ' b ', ' bb']
 mode = ['major', 'minor', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian']
+decades_year_era = ['1920s', '1930s', '1940s', '1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s',
+                    '20s', '30s', '40s', '50s', '60s', '70s', '80s', '90s',
+                    "30's", "40's", "50's", "60's", "70's", "80's", "90's", "00's", "10's", "20's",
+                    '18th century', '19th century', '20th century', '21st century',
+                    'Anno Dominini', 'Before Christ', 'BC', 'AD', 'CE', 'BCE']
 
 
 def check_for_artists(text_input):
@@ -23,17 +26,43 @@ def check_for_artists(text_input):
                 found_artists.append(str(name).strip())
     found_artists = list(set([x.lower() for x in found_artists]))
     found_artists = [str(artist).capitalize() for artist in found_artists]
-
-    # Call Artist_Information Module if artists are found
-    if len(found_artists) > 0:
-        for artist in found_artists:
-            print("")
-            wikipedia_search(artist)
-            # chord_progressions(artist)
-            print("")
-
-
     return found_artists
+
+
+def check_for_instruments(text_input):
+    text_prompt = text_input
+    # Check for instruments
+    found_instruments = []
+    list_path = fr"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\1. Natural Language Processing\instruments\top100instruments.csv"
+    # Read the csv file without pandas
+    with open(list_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            if line.strip().lower() in text_prompt.lower():
+                found_instruments.append(line.strip())
+                text_prompt = text_prompt.replace(line.strip().lower(), "")
+    return text_prompt, found_instruments
+
+
+def check_for_genres(text_input):
+    text_prompt = text_input
+    found_genres = []
+    list_path = fr"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\1. Natural Language Processing\genres\top75genres.csv"
+    # Read the csv file without pandas
+    with open(list_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            if line.strip().lower() in text_prompt.lower():
+                found_genres.append(line.strip())
+                text_prompt = text_prompt.replace(line.strip().lower(), "")
+    return text_prompt, found_genres
+
+
+def check_for_time_information(text_prompt):
+    # Check for time information
+    found_time_information = []
+    for decade in decades_year_era:
+        if decade.lower() in text_prompt.lower():
+            found_time_information.append(decade)
+    return found_time_information
 
 
 # Filter musical information out of the text prompt
@@ -73,8 +102,8 @@ def get_key_words(filtered_text):
     )
     result = ner(filtered_text)
     # Filtere alle Namen und Nomen aus dem Text
-    keywords = [word['word'] for word in result if word["entity_group"] == "PROPN" or word["entity_group"] == "NOUN"]
-    return keywords
+    keywords = [word['word'] for word in result if word["entity_group"] == "PROPN" or word["entity_group"] == "NOUN" or word["entity_group"] == "DET"]
+    return " ".join(keywords)
 
 
 # NLP - ZERO SHOT CLASSIFICATION
@@ -101,8 +130,20 @@ def word_categories(keywords):
 
 def main(text_prompt):
     start_time = time.time()
-    list = check_for_artists(text_prompt)
-    return {"Artists": list}, {"test": "asdf"}, 1
+    filtered_text, found_genres = check_for_genres(text_prompt)
+    print(filtered_text)
+    filtered_text, found_instruments = check_for_instruments(filtered_text)
+    found_time = check_for_time_information(filtered_text)
+    # filtered_text = get_key_words(filtered_text)
+    found_artists = check_for_artists(filtered_text)
+    print("Found Instruments: ", found_instruments)
+    print("Found Artists: ", found_artists)
+    print("Found Genres: ", found_genres)
+    print("Found Time: ", found_time)
+    filtered_text_prompt, key_and_bpm = check_for_key_and_bpm(text_prompt)
+    print("Found Key and BPM: ", key_and_bpm)
+    end_time = round(time.time() - start_time, 2)
+    return found_artists, found_instruments, found_genres, found_time, key_and_bpm, end_time
     # print(list)
     # print("--- %s seconds ---" % round(time.time() - start_time, 2))
     # # Timer Start
@@ -121,4 +162,4 @@ def main(text_prompt):
 
 
 if __name__ == "__main__":
-    main("Rihanna playing the Flute in b Minor with the beatles in the 80s")
+    main("b major 140 bpm")
