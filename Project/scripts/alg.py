@@ -34,10 +34,25 @@ import spotipy
 import re
 import json
 import wikipedia
+import requests
+from urllib.parse import urlparse, parse_qs
 
 # «──────────── « ⋅ʚ GLOBAL VARIABLES ɞ⋅ » ────────────»
 SPOTIPY_CLIENT_ID = "219ba74a35424294b39fb87b279d137b"
 SPOTIPY_CLIENT_SECRET = "cfc5da6d3e9e482ebf3900f81b4f04d9"
+GET_SONG_KEY_API_KEY = "d3f9654fb2153c3b40c89c676bab2871"
+
+
+def get_song_key(*search_info):
+    search_term = " ".join(search_info)
+    # # Get song key from API with "Web API base url", "method"=get and authorization as api key or x-api-key
+    # url_params = {"method": "track.search", "track": search_term, "format": "json", "api_key": GET_SONG_KEY_API_KEY}
+    # response = requests.get("https://api.getsongbpm.com", params=url_params)
+    # # Get the key from the response
+    # print(response)
+    response = requests.get(f"https://api.getsongbpm.com/track/search/?api_key={GET_SONG_KEY_API_KEY}&format=json&track={search_term}",
+                            params={"key": GET_SONG_KEY_API_KEY})
+    print(response)
 
 
 def get_top_songs_from_genre(genre):
@@ -150,16 +165,19 @@ def algorithm_genre(song_info_dict):
     return calc_probabilities(genre_dict)
 
 
-def main(song_info_dict):
-    # if "Tonic" not in song_info_dict:
-    #     decide_on_tonic(song_info_dict)
-    # genre_dict = algorithm_genre(song_info_dict)
+def main(found_entities):
+    # # if "Tonic" not in song_info_dict:
+    # #     decide_on_tonic(song_info_dict)
+    # genre_dict = algorithm_genre(found_entities)
     #
     # print(json.dumps(genre_dict, indent=4))
-
-
-    top_songs_of_genre = get_top_songs_from_genre("classic rock")
-    print(json.dumps(top_songs_of_genre, indent=4))
+    #
+    # song_dict = {}
+    #
+    #
+    # top_songs_of_genre = get_top_songs_from_genre("classic rock")
+    # print(json.dumps(top_songs_of_genre, indent=4))
+    get_song_key("The Beatles", "Yesterday", "Let it Be")
 
 
 if __name__ == "__main__":

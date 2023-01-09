@@ -6,35 +6,50 @@ HG2S - Text Prompt Song Generation
 
 {% block content %}
 {% if id %}
-    <h1 class="m-0">Playground</h1>
-    <p class="mb-4">You just entered the individual Playground Dimension of text prompt {{id}}</p>
-    <div class="post border rounded p-2">
-        {% if text_prompt %}
-            <h4>"{{ text_prompt }}"</h4>
-        {% endif %}
-        <a href="/upvote_post/{{id}}"><button>Upvote ({{popularity}})</button></a>
-    </div>
+<h1 class="m-0">Playground</h1>
+<p class="mb-4">You just entered the individual Playground Dimension of text prompt {{id}}</p>
+<div class="post border rounded p-2">
+    {% if text_prompt %}
+    <h4>"{{ text_prompt }}"</h4>
+    {% endif %}
+    <a href="/upvote_post/{{id}}">
+        <button>Upvote ({{popularity}})</button>
+    </a>
+</div>
 {% endif %}
 
-
-
-<button onclick="random_key()">Random Key</button>
-<h1>Key: C Major</h1>
-<button onclick=play(note_1)>C</button>
-<button onclick=play(note_2)>D</button>
-<button onclick=play(note_3)>E</button>
-<button onclick=play(note_4)>F</button>
-<button onclick=play(note_5)>G</button>
-<button onclick=play(note_6)>A</button>
-<button onclick=play(note_7)>B</button>
-<h3>Try different Sounds</h3>
-<button onclick="change_sound()">Change Sound</button>
-<button onclick="play_soundfont()">Play Soundfont</button>
-<button onclick="change_soundfont_instrument()">Random Soundfont</button>
-<h4>acoustic_grand_piano</h4>
-
+<div class="container">
+    <h1>Drum Rack</h1>
+    <div class="row">
+        {% for kick in kick_paths %}
+        <div class="col-2">
+            <button id="audio" class="d-inline" onclick="playKick('{{static_url}}', '{{kick_names[loop.index - 1]}}')">
+                kick {{loop.index - 1}}
+            </button>
+        </div>
+<!--            <button class="btn btn-primary" onclick="">{{kick}}</button>-->
+        {% endfor %}
+    </div>
+</div>
+<div class="container">
+    <button onclick="random_key()">Random Key</button>
+    <h1>Key: C Major</h1>
+    <button onclick=play(note_1)>C</button>
+    <button onclick=play(note_2)>D</button>
+    <button onclick=play(note_3)>E</button>
+    <button onclick=play(note_4)>F</button>
+    <button onclick=play(note_5)>G</button>
+    <button onclick=play(note_6)>A</button>
+    <button onclick=play(note_7)>B</button>
+    <h3>Try different Sounds</h3>
+    <button onclick="change_sound()">Change Sound</button>
+    <button onclick="play_soundfont()">Play Soundfont</button>
+    <button onclick="change_soundfont_instrument()">Random Soundfont</button>
+    <h4>acoustic_grand_piano</h4>
+</div>
 
 <script>
+
     let play_now = false;
     const audioContext = new AudioContext();
 
@@ -79,6 +94,12 @@ HG2S - Text Prompt Song Generation
 
     oscillator_types = ["sine", "square", "sawtooth", "triangle"];
     let oscillator_type = oscillator_types[0];
+
+    function playKick(static_url, kick) {
+        let path = static_url + "/kicks/" + kick;
+        let audio = new Audio(path);
+        audio.play();
+    }
 
     function random_key() {
         key = Object.keys(tonic)[Math.floor(Math.random() * Object.keys(tonic).length)];

@@ -38,6 +38,18 @@ HG2S - Profile
 
     <a class="d-block" href='/logout'>Logout</a>
 
+    <h1 class="mt-5">Prompt History</h1>
+     {% if prompt_history %}
+        {% for prompt in prompt_history %}
+            <p>{{ prompt }}</p>
+        {% endfor %}
+        <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
+    {% else %}
+        <a class="d-block" href="{{ url_for('index')}}">Start Prompting right now!</a>
+    {% endif %}
+
+
+
 </div>
 
 {% endblock %}

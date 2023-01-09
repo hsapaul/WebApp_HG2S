@@ -1,12 +1,9 @@
 # Imports
 from flask import Flask, g, render_template, request, redirect, url_for, session, flash
+import datetime  # Saving time on clock to db with every Post
+import sqlite3  # Connect to database
+import time  # Measuring of Execution Times
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
-import datetime
-import sqlite3
-import os
-import jinja2
 
 # Import Service Scripts
 from scripts.step_metadata import get_song_key_and_bpm as metadata
@@ -21,24 +18,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Create Flask App
 app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+
 db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\database.db"
+sample_db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\music_gallery.db"
 
 # Encrypt and Decrypt Session Data
 app.secret_key = "123"
 
+
 # Connect to database
-def connect_db():
+def connect_db(db_path_new):
     # Connect to database with .env variable
-    sql = sqlite3.connect(db_path)
+    sql = sqlite3.connect(db_path_new)
     sql.row_factory = sqlite3.Row
     return sql
 
 
 # Check if variable g has attribute db
-def get_db():
+def get_db(db_path):
     if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
+        g.sqlite_db = connect_db(db_path)
     return g.sqlite_db
 
 
@@ -59,6 +61,7 @@ def index():
     if request.method == 'POST':
         # Check which button was pressed
         if 'submit_button' in request.form:
+            start_time = time.time()
             text_prompt = request.form['text_prompt']
             # Call NLP Task
             found_artists, found_instruments, found_genres, found_time, key_and_bpm = nlp_task(text_prompt)
@@ -76,10 +79,14 @@ def index():
             session['instruments'] = found_instruments
             session['genres'] = found_genres
             session['key_and_bpm'] = key_and_bpm
-            return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects, instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres, end_time=end_time)
+            execution_time = round(time.time() - start_time, 2)
+            return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
+                                   instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
+                                   end_time=execution_time)
         elif 'post_button' in request.form:
             text_prompt, artists, instruments, genres, key_and_bpm = session['text_prompt'], \
-                session['artists'], session['instruments'], session['genres'], session['key_and_bpm']
+                                                                     session['artists'], session['instruments'], \
+                                                                     session['genres'], session['key_and_bpm']
             # Get names out of the dictionary
             artist_names = [artist["name"] for artist in artists]
             # Get date and time
@@ -93,14 +100,17 @@ def index():
                 user_name = "Guest"
             db.execute(
                 'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, datum TEXT, instruments TEXT, genres TEXT, key_and_bpm TEXT, popularity INTEGER)')
-            db.execute(f'insert into marketplace_posts (text_prompt, user_name, datum, artists, instruments, genres, key_and_bpm, popularity) values ("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", "{instruments}", "{genres}", "{key_and_bpm}", 0)')
+            db.execute(
+                f'insert into marketplace_posts (text_prompt, user_name, datum, artists, instruments, genres, key_and_bpm, popularity) values ("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", "{instruments}", "{genres}", "{key_and_bpm}", 0)')
             # Create table for each artist
             # db.execute('CREATE TABLE IF NOT EXISTS artists (id INTEGER PRIMARY KEY, name TEXT, genres TEXT, instruments TEXT, occupation TEXT, year TEXT)')
             for artist in artists:
                 print(artist)
-                name, genres, instruments, occupation, year = artist["name"], artist["genres"], artist["instruments"], artist["occupation"], artist["year"]
-                db.execute(f'insert into artists (name, genres, instruments, occupations, year) values ("{name}", "{genres}", "{instruments}", "{occupation}", "{year}")')
-            #db.execute('insert into artists (name) values ("test")')
+                name, genres, instruments, occupation, year = artist["name"], artist["genres"], artist["instruments"], \
+                                                              artist["occupation"], artist["year"]
+                db.execute(
+                    f'insert into artists (name, genres, instruments, occupations, year) values ("{name}", "{genres}", "{instruments}", "{occupation}", "{year}")')
+            # db.execute('insert into artists (name) values ("test")')
             db.commit()
             flash("Your post was successfully submitted!")
             return redirect(url_for('marketplace'))
@@ -109,6 +119,11 @@ def index():
         return render_template('index.html', session_user=session['session_user'])
     else:
         return render_template('index.html')
+
+
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
 
 
 @app.route('/marketplace')
@@ -137,6 +152,7 @@ def delete(id):
     except:
         return "There was a problem deleting that post"
 
+
 @app.route('/upvote_post/<int:id>')
 def upvote(id):
     # try:
@@ -152,7 +168,8 @@ def upvote(id):
             return redirect(url_for('marketplace'))
         else:
             db.execute(f'update marketplace_posts set popularity = popularity + 1 where id = {id}')
-            db.execute(f'update nutzer set liked_post_ids = "{str(cur) + str(id) + ","}" where id = "{session["session_id"]}"')
+            db.execute(
+                f'update nutzer set liked_post_ids = "{str(cur) + str(id) + ","}" where id = "{session["session_id"]}"')
             db.commit()
         return redirect(url_for('marketplace'))
     # except:
@@ -165,7 +182,8 @@ def change_user_name():
         if request.form['password'] == session['session_password']:
             try:
                 db = get_db()
-                db.execute(f'update nutzer set username = "{request.form["new_user_name"]}" where username = "{session["session_user"]}"')
+                db.execute(
+                    f'update nutzer set username = "{request.form["new_user_name"]}" where username = "{session["session_user"]}"')
                 session['session_user'] = request.form['new_user_name']
                 db.commit()
                 flash("Username changed successfully")
@@ -183,12 +201,14 @@ def change_user_name():
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     if request.method == 'POST':
-        old_password, new_password, reapeat_password = request.form['old_password'], request.form['new_password'], request.form['repeat_password']
+        old_password, new_password, reapeat_password = request.form['old_password'], request.form['new_password'], \
+                                                       request.form['repeat_password']
         if old_password == session['session_password']:
             if new_password == reapeat_password:
                 try:
                     db = get_db()
-                    db.execute(f'update nutzer set password = "{new_password}" where username = "{session["session_user"]}"')
+                    db.execute(
+                        f'update nutzer set password = "{new_password}" where username = "{session["session_user"]}"')
                     session['session_password'] = new_password
                     db.commit()
                     flash("Password changed successfully")
@@ -221,7 +241,8 @@ def users():
 @app.route('/sign_up', methods=['POST', 'GET'])
 def sign_up():
     if request.method == 'POST':
-        username, email, password, repeat_password = request.form['username'], request.form['email'], request.form['password'], request.form['repeat_password']
+        username, email, password, repeat_password = request.form['username'], request.form['email'], request.form[
+            'password'], request.form['repeat_password']
         role = "admin"
         if password == repeat_password:
             db = get_db()
@@ -231,10 +252,12 @@ def sign_up():
                     return render_template('auth_signup.html', error='Username already taken!')
                 elif request.form['email'] == n['email'] and request.form['email'] != "":
                     return render_template('auth_signup.html', error='Email already taken!')
-            db.execute('INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids) VALUES (?, ?, ?, ?, ?, ?)',
-                       [request.form['username'], request.form['email'], request.form['password'], role, None, None])
+            db.execute(
+                'INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids) VALUES (?, ?, ?, ?, ?, ?)',
+                [request.form['username'], request.form['email'], request.form['password'], role, None, None])
             db.commit()
-            session['session_id'] = db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
+            session['session_id'] = \
+            db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
             session['session_role'] = role
@@ -254,8 +277,10 @@ def login():
         db_nutzer = db.execute('SELECT id, email, username, password FROM nutzer').fetchall()
         username_or_email = request.form['username_or_email']
         for nutzer in db_nutzer:
-            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form['password']:
-                user, password, email, role = db.execute(f'select username, password, email, role from nutzer where id = {nutzer["id"]}').fetchone()
+            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form[
+                'password']:
+                user, password, email, role = db.execute(
+                    f'select username, password, email, role from nutzer where id = {nutzer["id"]}').fetchone()
                 session['session_id'] = nutzer['id']
                 session['session_user'] = user
                 session['session_password'] = password
@@ -306,7 +331,11 @@ EXTRA ROUTES
 
 @app.route('/services')
 def services():
-    return render_template('services.html')
+    # Check if user logged in
+    if 'session_user' in session:
+        return render_template('services.html', logged_in=True)
+    else:
+        return render_template('services.html', logged_in=False)
 
 
 @app.route('/services', methods=['POST'])
@@ -359,7 +388,19 @@ def vstplugins():
 
 @app.route('/jstest')
 def jstest():
-    return render_template('js_test.html')
+    # Get sample_paths from database
+    conn = sqlite3.connect(sample_db_path)
+    c = conn.cursor()
+    sample_paths = c.execute('SELECT sample_path FROM sample_kick_gallery').fetchall()
+    sample_names = c.execute('SELECT sample_name FROM sample_kick_gallery').fetchall()
+    print(sample_paths)
+    sample_names = [str(name[0]).replace("('", "").replace("',)", "") for name in sample_names]
+    sample_paths = [str(path[0]).replace("('", "").replace("',)", "") for path in sample_paths]
+    print(sample_paths)
+    conn.close()
+    static_url = url_for('static', filename='samples/drum_samples/')
+    # {{ url_for('static', filename='samples/drum_samples/kick/' + kick) }}
+    return render_template('js_test.html', kick_paths=sample_paths, kick_names=sample_names, static_url=static_url)
 
 
 if __name__ == "__main__":

@@ -46,6 +46,20 @@ p {
   font-family: Arial;
 }
 
+.headline {
+  font-size: 50px;
+  margin-bottom: 0;
+}
+.subheadline {
+  line-height: 0;
+  font-size: 15px;
+  margin-bottom: 2.5em;
+}
+
+.second-font {
+  font-family: Arial !important;
+}
+
 /*---------------------------------------------*/
 /*                  FOOTER                     */
 /*---------------------------------------------*/
