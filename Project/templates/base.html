@@ -21,9 +21,15 @@
 <!--        &lt;!&ndash; JAVASCRIPT &ndash;&gt;-->
         <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js')}}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+
         <script type="text/javascript" src="{{ url_for('static', filename = 'node_modules/@popperjs/core/dist/umd/popper.min.js')}}"></script>
         <script type="module" src="{{ url_for('static', filename = 'node_modules/@popperjs/core/lib/popper.js')}}"></script>
+
+        <script id="tone_module" type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}" async></script>
+
         <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+
+
 <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/custom.min.js')}}"></script>-->
 <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/isotope.js/isotope.min.js')}}"></script>-->
 <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/own-carousel.js')}}"></script>-->
@@ -31,6 +37,7 @@
 <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/tabs.js')}}"></script>-->
 <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/popup.js')}}"></script>-->
         <script type="text/javascript" src="{{ url_for('static', filename='js/soundfont-player.min.js')}}"></script>
+
         {% block extra_head_configs %}
         {% endblock %}
     </head>
