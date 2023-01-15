@@ -13,6 +13,27 @@ HG2S - Text Prompt Song Generation
 
 {% block content %}
 
+<div class="col-12">
+    <div class="card-deck" style="border-radius: 10px;">
+        <div class="card p-2 col-4 bg-dark text-white d-inline-block">
+            <div class="card-title">Song Configurations</div>
+            <div class="card-body">
+                <p>BPM</p>
+                <input type="number" id="bpm" name="bpm" min="1" max="300" value="120">
+                <button id="play_icon" class="rounded-circle d-inline"><img class="icon_set_imgs"
+                                                                            src="{{ url_for('static', filename='img/icons/volume.png') }}"
+                                                                            alt=""></button>
+            </div>
+        </div>
+        <div class="card p-2 col-4 bg-dark text-white d-inline-block">
+            <div class="card-title">Song Configurations</div>
+            <div class="card-body">
+                <p>BPM</p>
+                <input type="number" id="bpms" name="bpm" min="1" max="300" value="120">
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row py-5 h-100">
     <div class="col-2">
         <div class="card bg-dark text-white" style="border-radius: 10px;">
@@ -24,8 +45,8 @@ HG2S - Text Prompt Song Generation
                 {% for kick in kick_paths %}
                 <div class="">
                     <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"
-                            style="font-size:13px">
-                        {{kick_names[loop.index - 1][:22]}}
+                            style="font-size:8px">
+                        {{kick_names[loop.index - 1]}}
                     </button>
                 </div>
                 {% endfor %}
@@ -35,14 +56,17 @@ HG2S - Text Prompt Song Generation
     <div class="col-10">
         <div class="card bg-dark text-white" style="border-radius: 10px;">
             <div class="card-body p-2 h-100">
-                <h4>Musikantor</h4>
+                <div class="d-inline">
+                    <h4 class="mb-0 d-inline">Musikantor</h4>
+                    <p class="subheadline mt-1 block">Drag&Drop that!</p>
+                </div>
                 <div class="row border rounded-1 m-2">
                     {% for i in range(4) %}
                     {% set list = ['', '', '', ''] %}
                     <div class="sequencer-row row">
                         <div class="col-3 border draggables">
-<!--                            <h6 class="d-inline mx-2">{{list[loop.index-1]}}</h6>-->
-<!--                            <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
+                            <!--                            <h6 class="d-inline mx-2">{{list[loop.index-1]}}</h6>-->
+                            <!--                            <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
                         </div>
                         <div class="col-7">
                             {% for i in range(16) %}
@@ -197,6 +221,10 @@ HG2S - Text Prompt Song Generation
 
 <script type="text/javascript">
 
+    //////////////////////////////////////////
+    /////////// DRAGGING ITEMS ///////////////
+    //////////////////////////////////////////
+
     // Gallery Items
     var gallery_items = document.getElementsByClassName("gallery_items");
     var dragItem = null;
@@ -206,9 +234,10 @@ HG2S - Text Prompt Song Generation
     }
 
     function dragStart() {
+        // drag start but duplicate the element
         dragItem = this;
         setTimeout(() => {
-            this.style.display = "none";
+            this.style.color = "red";
         }, 0);
         console.log("dragStart" + this.id);
     }
@@ -232,20 +261,83 @@ HG2S - Text Prompt Song Generation
 
     function drop() {
         console.log("drop" + this.id);
+        this.style.backgroundColor = "var(--black)";
         this.append(dragItem);
     }
 
     function dragOver(e) {
         e.preventDefault();
-        this.style.border = "2px solid #000";
+        this.style.backgroundColor = "var(--light-grey)";
     }
 
-    function dragEnter() {
+    function dragEnter(e) {
         e.preventDefault();
     }
 
     function dragLeave() {
         this.style.border = "none";
+        this.style.backgroundColor = "var(--black)";
+    }
+
+    //////////////////////////////////////////
+    /////////// PLAYING MUSIC ////////////////
+    //////////////////////////////////////////
+
+    var onoff_button = document.getElementById("play_icon");
+    var playing = false;
+    onoff_button.addEventListener("click", function () {
+        if (playing) {
+            // console.log("stop");
+            playing = false;
+            onoff_button.style.backgroundColor = "var(--white)";
+
+        } else {
+            playing = true;
+            onoff_button.style.backgroundColor = "var(--green)";
+            // console.log("play");
+            play_loop();
+        }
+    });
+
+
+    function play_loop() {
+
+        // Get names of the rows
+        var row_names = document.getElementsByClassName("draggables");
+
+        const drum_samples = [
+            new Tone.Player(),
+            new Tone.Player(),
+            new Tone.Player(),
+            new Tone.Player(),
+        ]
+
+        console.log("row samples", row_names);
+
+        function* enumerate(iterable) {
+            let i = 0;
+
+            for (const x of iterable) {
+                yield [i, x];
+                i++;
+            }
+        }
+
+        for (const [i, obj] of enumerate(row_names)) {
+            if (obj.innerText !== "") {
+                element_name = obj.innerText;
+                element_category = "kicks";
+                element_path = "{{static_url}}/" + element_category + "/" + element_name + ".wav";
+                console.log(i, element_path);
+            }
+        }
+
+        // const drum_samples = [
+        //     new Tone.Player("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Rumble_Massive.wav").toDestination(),
+        //     new Tone.Player("{{static_url}}/snares/ff_bt_snare_one_shot_low_rud.wav").toDestination(),
+        //     new Tone.Player("{{static_url}}/hihats/KSHMR_Acoustic_Closed_Hat_04_Clean.wav").toDestination(),
+        //     new Tone.Player("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Rumble_Thud.wav").toDestination()
+        // ];
     }
 
 
