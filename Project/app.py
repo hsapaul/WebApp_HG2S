@@ -92,7 +92,7 @@ def index():
             # Get date and time
             datum = str(datetime.datetime.now())[:-10]
             # Save data to database
-            db = get_db()
+            db = get_db(db_path)
             # Get if user is logged in
             if 'session_user' in session:
                 user_name = session['session_user']
@@ -126,15 +126,23 @@ def documentation():
     return render_template('documentation.html')
 
 
-@app.route('/marketplace')
+@app.route('/marketplace', methods=['GET', 'POST'])
 def marketplace():
     # Get data from database
-    db = get_db()
+    db = get_db(db_path)
     cur = db.execute('select * from marketplace_posts')
     cur2 = db.execute('select * from artists')
     posts = cur.fetchall()
     artists = cur2.fetchall()
-    return render_template('marketplace.html', posts=posts, artists_db=artists, today=str(datetime.datetime.now())[:10])
+    if request.method == 'GET':
+        return render_template('marketplace.html', posts=posts, artists_db=artists, today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
+    elif request.method == 'POST':
+        sort_alg = request.form.get('form-select')
+        if sort_alg == 'Recently Posted':
+            posts = sorted(posts, key=lambda x: x[3], reverse=True)
+        elif sort_alg == 'Most Popular':
+            posts = sorted(posts, key=lambda x: x[8], reverse=True)
+        return render_template('marketplace.html', posts=posts, artists_db=artists, today=str(datetime.datetime.now())[:10], sort_alg=sort_alg)
 
 
 """
@@ -145,7 +153,7 @@ CRUD Operations
 @app.route('/delete_post/<int:id>')
 def delete(id):
     try:
-        db = get_db()
+        db = get_db(db_path)
         db.execute(f'delete from marketplace_posts where id = {id}')
         db.commit()
         return redirect(url_for('marketplace'))
@@ -156,7 +164,7 @@ def delete(id):
 @app.route('/upvote_post/<int:id>')
 def upvote(id):
     # try:
-    db = get_db()
+    db = get_db(db_path)
     # Look if user has already upvoted
     if 'session_user' not in session:
         flash("You need to be logged in to upvote!")
@@ -176,12 +184,25 @@ def upvote(id):
     #     return "There was a problem upvoting that post"
 
 
+@app.route('/change_theme/<int:theme_id>')
+def change_theme(theme_id):
+    theme = theme_id
+    return redirect(url_for('profile', theme=theme, username=session['session_user']))
+    # session['theme'] = request.args.get('theme')
+    # db = get_db(db_path)
+    # db.execute(f'update nutzer set theme = "{session["theme"]}" where id = "{session["session_id"]}"')
+    # db.commit()
+    #
+    # return redirect(url_for('index'
+    # session['theme'] = ))
+
+
 @app.route('/change_user_name', methods=['GET', 'POST'])
 def change_user_name():
     if request.method == 'POST':
         if request.form['password'] == session['session_password']:
             try:
-                db = get_db()
+                db = get_db(db_path)
                 db.execute(
                     f'update nutzer set username = "{request.form["new_user_name"]}" where username = "{session["session_user"]}"')
                 session['session_user'] = request.form['new_user_name']
@@ -206,7 +227,7 @@ def change_password():
         if old_password == session['session_password']:
             if new_password == reapeat_password:
                 try:
-                    db = get_db()
+                    db = get_db(db_path)
                     db.execute(
                         f'update nutzer set password = "{new_password}" where username = "{session["session_user"]}"')
                     session['session_password'] = new_password
@@ -233,9 +254,9 @@ Authentication Logic & Routing
 
 @app.route('/users')
 def users():
-    db = get_db()
-    db_nutzer = db.execute('SELECT username, password FROM nutzer').fetchall()
-    return render_template('auth_login.html')
+    db = get_db(db_path)
+    db_nutzer = db.execute('SELECT username, password, theme FROM nutzer').fetchall()
+    return render_template('auth_login.html', theme=session['theme'])
 
 
 @app.route('/sign_up', methods=['POST', 'GET'])
@@ -245,7 +266,7 @@ def sign_up():
             'password'], request.form['repeat_password']
         role = "admin"
         if password == repeat_password:
-            db = get_db()
+            db = get_db(db_path)
             db_nutzer = db.execute('SELECT username, password, email FROM nutzer').fetchall()
             for n in db_nutzer:
                 if request.form['username'] == n['username']:
@@ -253,17 +274,18 @@ def sign_up():
                 elif request.form['email'] == n['email'] and request.form['email'] != "":
                     return render_template('auth_signup.html', error='Email already taken!')
             db.execute(
-                'INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids) VALUES (?, ?, ?, ?, ?, ?)',
-                [request.form['username'], request.form['email'], request.form['password'], role, None, None])
+                'INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [request.form['username'], request.form['email'], request.form['password'], role, None, None, "default", 0])
             db.commit()
             session['session_id'] = \
-            db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
+                db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
             session['session_role'] = role
             session['session_email'] = request.form['email']
+            session['session_theme'] = "default"
             flash("Signed up successfully!")
-            return redirect(url_for('profile'))
+            return redirect(url_for('profile', username=session['session_user']))
         else:
             flash("Passwords don't match")
             return render_template('auth_signup.html')
@@ -273,27 +295,29 @@ def sign_up():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        db = get_db()
+        db = get_db(db_path)
         db_nutzer = db.execute('SELECT id, email, username, password FROM nutzer').fetchall()
         username_or_email = request.form['username_or_email']
         for nutzer in db_nutzer:
-            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form[
-                'password']:
-                user, password, email, role = db.execute(
-                    f'select username, password, email, role from nutzer where id = {nutzer["id"]}').fetchone()
+            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form['password']:
+                user, password, email, role, theme, appearance_mode = db.execute(
+                    f'select username, password, email, role, theme, appearance_mode from nutzer where id = {nutzer["id"]}').fetchone()
                 session['session_id'] = nutzer['id']
                 session['session_user'] = user
                 session['session_password'] = password
                 session['session_email'] = email
                 session['session_role'] = role
+                session['session_theme'] = theme
+                session['appearance_mode'] = appearance_mode
                 flash(f"You were successfully logged in {session['session_email']}")
-                return redirect(url_for('profile'))
+                return redirect(url_for('profile', username=session['session_user']))
         flash("Wrong Username or Password")
         return render_template('auth_login.html')
     else:
         if 'session_user' in session:
-            return redirect(url_for('profile'))
-        return render_template('auth_login.html')
+            return redirect(url_for('profile', username=session['session_user']))
+        else:
+            return render_template('auth_login.html')
 
 
 @app.route('/logout')
@@ -303,12 +327,32 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/user')
-def profile():
-    if 'session_user' in session:
-        return render_template('profile.html', session_user=session['session_user'])
-    else:
-        return redirect(url_for('login'))
+@app.route('/users/<username>', methods=['GET', 'POST'])
+def profile(username):
+    # Chech if post and if submit name is submit_theme
+    if request.method == 'POST':
+        # Requests
+        theme = request.form.get('form-select')
+        light_mode = request.form.get('dark_mode_checkbox')
+        print(light_mode)
+        # DB Executions
+        db = get_db(db_path)
+        if light_mode is None:
+            db.execute(f'update nutzer set appearance_mode = 1 where username = "{session["session_user"]}"')
+        elif light_mode == "on":
+            db.execute(f'update nutzer set appearance_mode = 0 where username = "{session["session_user"]}"')
+        db.execute(f'update nutzer set theme = "{theme}" where username = "{session["session_user"]}"')
+        db.commit()
+        session['session_theme'] = theme
+        session['appearance_mode'] = light_mode
+        flash("Appearance Changed Successfully")
+        return render_template('profile.html', session_user=session['session_user'], light_mode=light_mode)
+    if request.method == 'GET':
+        if 'session_user' in session:
+            return render_template('profile.html', session_user=session['session_user'])
+        else:
+            return redirect(url_for('login'))
+
 
 
 @app.route('/admin')
@@ -367,7 +411,7 @@ def service_download():
 
 @app.route('/playground/<int:id>')
 def playground(id):
-    db = get_db()
+    db = get_db(db_path)
     text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
     popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]
     return render_template('js_test.html', id=id, text_prompt=text_prompt, popularity=popularity)
@@ -401,6 +445,11 @@ def jstest():
     static_url = url_for('static', filename='samples/drum_samples/')
     # {{ url_for('static', filename='samples/drum_samples/kick/' + kick) }}
     return render_template('js_test.html', kick_paths=sample_paths, kick_names=sample_names, static_url=static_url)
+
+
+@app.route('/jstest2')
+def jstest2():
+    return render_template('js_test_2.html')
 
 
 if __name__ == "__main__":

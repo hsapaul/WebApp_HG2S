@@ -11,62 +11,72 @@ HG2S - Marketplace
     <p class="subheadline">See what other Users prompted</p>
 </div>
 
-<form action="" method="sort_alg">
-<div class="dropdown show">
-  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Dropdown link
-  </a>
-
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-    <a class="dropdown-item" href="#">Action</a>
-    <a class="dropdown-item" href="#">Another action</a>
-    <a class="dropdown-item" href="#">Something else here</a>
-  </div>
+<div class="col-3">
+    <form action="#" method="post">
+        <select class="form-select w-70" name="form-select" aria-label="Default select example">
+            <option selected>{{ sort_alg }}</option>
+            {% if sort_alg == "Popular Posts" %}
+                <option>Recently Posted</option>
+            {% elif sort_alg == "Recently Posted" %}
+                <option>Popular Posts</option>
+            {% endif %}
+        </select>
+        <button class="btn btn-outline-light btn-lg px-5 w-70" id="submit_sort" name="submit_theme" type="submit">
+            Sort
+        </button>
+    </form>
 </div>
-</form>
-
 
 
 <!-- Render all Marketplace posts -->
 {% if posts %}
-    {% for post in posts %}
-        <div class="post border rounded p-2">
-            <h4>"{{ post.text_prompt }}"</h4>
-            <h5 class="d-inline">Artists - </h5>
-            {% set artists = post.artists.split("', '") %}
-            {% for artist in artists %}
-                <!-- Find artists in artists_db -->
-                {% for artist_db in artists_db %}
-                    {% if artist_db.name == artist.replace("[", "").replace("]", "").replace("'", "") %}
-                        <h6>{{ artist_db.name }}</>
-                        <p><em>genres: </em> {{ artist_db.genres.replace("[", "").replace("]", "").replace("'", "") }}</p>
-                        <p><em>occupations: </em>{{ artist_db.occupations.replace("[", "").replace("]", "").replace("'", "") }}</p>
-                        <p><em>instruments: </em>{{ artist_db.instruments.replace("[", "").replace("]", "").replace("'", "") }}</p>
-                        <p><em>year: </em>{{ artist_db.year.replace("[", "").replace("]", "").replace("'", "") }}</p>
-                    {% endif %}
-                {% endfor %}
-            {% endfor %}
-            <h5 class="d-inline">Instruments - </h5><p class="d-inline">{{ post.instruments }}</p><br>
-            <h5 class="d-inline">Genres - </h5><p class="d-inline">{{ post.genres }}</p><br>
-            <h5 class="d-inline">Key & BPM - </h5><p class="d-inline">{{ post.key_and_bpm }}</p><br>
-            {% if post.datum[:10] == today %}
-                <p class="d-inline">{{ post.datum[10:] }}</p>
-            {% else %}
-                <p class="d-inline">{{ post.datum[:10] }}</p>
-            {% endif %}
-            <a href="/upvote_post/{{post.id}}"><button>Upvote ({{post.popularity}})</button></a>
-            <a href="/playground/{{post.id}}"><button>Enter Dimension</button></a>
-            {% if session['session_user'] == post.user_name %}
-                <p class="d-inline float-end">Author: YOU</p>
-                <a href="/delete_post/{{post.id}}"><button class="d-inline float-end">delete</button></a>
-            {% else %}
-                <p class="d-inline float-end">Author: {{ post.user_name }}</p>
-            {% endif %}
-
-        </div>
+{% for post in posts %}
+<div class="post border rounded p-2">
+    <h4>"{{ post.text_prompt }}"</h4>
+    <h5 class="d-inline">Artists - </h5>
+    {% set artists = post.artists.split("', '") %}
+    {% for artist in artists %}
+    <!-- Find artists in artists_db -->
+    {% for artist_db in artists_db %}
+    {% if artist_db.name == artist.replace("[", "").replace("]", "").replace("'", "") %}
+    <h6>{{ artist_db.name }}</>
+    <p><em>genres: </em> {{ artist_db.genres.replace("[", "").replace("]", "").replace("'", "") }}</p>
+    <p><em>occupations: </em>{{ artist_db.occupations.replace("[", "").replace("]", "").replace("'", "") }}</p>
+    <p><em>instruments: </em>{{ artist_db.instruments.replace("[", "").replace("]", "").replace("'", "") }}</p>
+    <p><em>year: </em>{{ artist_db.year.replace("[", "").replace("]", "").replace("'", "") }}</p>
+    {% endif %}
     {% endfor %}
+    {% endfor %}
+    <h5 class="d-inline">Instruments - </h5>
+    <p class="d-inline">{{ post.instruments }}</p><br>
+    <h5 class="d-inline">Genres - </h5>
+    <p class="d-inline">{{ post.genres }}</p><br>
+    <h5 class="d-inline">Key & BPM - </h5>
+    <p class="d-inline">{{ post.key_and_bpm }}</p><br>
+    {% if post.datum[:10] == today %}
+    <p class="d-inline">{{ post.datum[10:] }}</p>
+    {% else %}
+    <p class="d-inline">{{ post.datum[:10] }}</p>
+    {% endif %}
+    <a href="/upvote_post/{{post.id}}">
+        <button>Upvote ({{post.popularity}})</button>
+    </a>
+    <a href="/playground/{{post.id}}">
+        <button>Enter Dimension</button>
+    </a>
+    {% if session['session_user'] == post.user_name %}
+    <p class="d-inline float-end">Author: YOU</p>
+    <a href="/delete_post/{{post.id}}">
+        <button class="d-inline float-end">delete</button>
+    </a>
+    {% else %}
+    <p class="d-inline float-end">Author: {{ post.user_name }}</p>
+    {% endif %}
+
+</div>
+{% endfor %}
 {% else %}
-    <p>There are no items in the marketplace.</p>
+<p>There are no items in the marketplace.</p>
 {% endif %}
 
 {% endblock %}

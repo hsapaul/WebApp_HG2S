@@ -1,112 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{% block title %}{% endblock %}</title>
-        <!-- FONTS -->
-        <link rel="stylesheet" href="https://use.typekit.net/hti8epd.css">
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-        <!-- STYLESHEET -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- FONTS -->
+    <link rel="stylesheet" href="https://use.typekit.net/hti8epd.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+    <!-- STYLESHEET -->
 
-        <!-- Include popper.js before bootstrap.js -->
+    <!-- Include popper.js before bootstrap.js -->
 
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/bootstrap.min.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/WebApp_Main.css') }}">
-<!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/animate.css') }}">-->
-<!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/flex-slider.css') }}">-->
-<!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/fontawesome.css') }}">-->
-<!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/owl.css') }}">-->
-<!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/https://unpkg.com/swiper@7/swiper-bundle.min.css') }}">-->
-<!--        &lt;!&ndash; JAVASCRIPT &ndash;&gt;-->
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js')}}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/WebApp_Main.css') }}">
+    <!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/animate.css') }}">-->
+    <!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/flex-slider.css') }}">-->
+    <!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/fontawesome.css') }}">-->
+    <!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/owl.css') }}">-->
+    <!--        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/https://unpkg.com/swiper@7/swiper-bundle.min.css') }}">-->
+    <!--        &lt;!&ndash; JAVASCRIPT &ndash;&gt;-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
 
-        <script type="text/javascript" src="{{ url_for('static', filename = 'node_modules/@popperjs/core/dist/umd/popper.min.js')}}"></script>
-        <script type="module" src="{{ url_for('static', filename = 'node_modules/@popperjs/core/lib/popper.js')}}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename = 'node_modules/@popperjs/core/dist/umd/popper.min.js')}}"></script>
+    <script type="module" src="{{ url_for('static', filename = 'node_modules/@popperjs/core/lib/popper.js')}}"></script>
 
-        <script id="tone_module" type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}" async></script>
+    <script id="tone_module" type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}"
+            async></script>
 
-        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
-
-
-<!--        <script type="text/javascript" src="{{ url_for('static', filename='js/custom.min.js')}}"></script>-->
-<!--        <script type="text/javascript" src="{{ url_for('static', filename='js/isotope.js/isotope.min.js')}}"></script>-->
-<!--        <script type="text/javascript" src="{{ url_for('static', filename='js/own-carousel.js')}}"></script>-->
-<!--        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.slim.js/jquery.slim.min.js')}}"></script>-->
-<!--        <script type="text/javascript" src="{{ url_for('static', filename='js/tabs.js')}}"></script>-->
-<!--        <script type="text/javascript" src="{{ url_for('static', filename='js/popup.js')}}"></script>-->
-        <script type="text/javascript" src="{{ url_for('static', filename='js/soundfont-player.min.js')}}"></script>
-
-        {% block extra_head_configs %}
-        {% endblock %}
-    </head>
-
-    <body>
-      <header class="header-area header-sticky">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <nav class="main-nav">
-                        <a href="{{ url_for('index')}}" class="logo">
-                            <img src="static/img/logo.png" alt="">
-                        </a>
-                        <ul class="nav">
-                            <!-- Menu Items - Base -->
-                            <li><a href="{{ url_for('services')}}">Services</a></li>
-                            <li><a href="{{ url_for('marketplace')}}">Marketplace</a></li>
-                            <li><a href="{{ url_for('research')}}">Research</a></li>
-                            <li><a href="{{ url_for('documentation')}}">Documentation</a></li>
-                            <!-- Menu Items - Logic -->
-                            {% if session['session_user'] %}
-                                <li><a href="{{ url_for('profile')}}">Profile</a></li>
-                                {% if session['session_id'] == 1 %}
-                                    <li><a href="{{ url_for('admin')}}">Admin</a></li>
-                                {% endif %}
-                                <li><a href="{{ url_for('logout')}}">Logout</a></li>
-                            {% else %}
-                                <li><a href="{{ url_for('login')}}">Login</a></li>
-                                <li><a href="{{ url_for('sign_up')}}">Sign Up</a></li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-      </header>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
 
 
+    <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/custom.min.js')}}"></script>-->
+    <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/isotope.js/isotope.min.js')}}"></script>-->
+    <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/own-carousel.js')}}"></script>-->
+    <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.slim.js/jquery.slim.min.js')}}"></script>-->
+    <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/tabs.js')}}"></script>-->
+    <!--        <script type="text/javascript" src="{{ url_for('static', filename='js/popup.js')}}"></script>-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/soundfont-player.min.js')}}"></script>
+
+    {% block extra_head_configs %}
+    {% endblock %}
+</head>
+
+<body>
+<header class="header-area header-sticky">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="page-content">
-              {% with messages = get_flashed_messages() %}
-                  {% if messages %}
-                      {% for message in messages %}
-                          <div class="alert alert-success" role="alert">
-                              {{ message }}
-                          </div>
-                      {% endfor %}
-                  {% endif %}
-              {% endwith %}
-      <!-- SITE INSERT -->
-      {% block content %}
-      {% endblock %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-      <!-- GLOBAL FOOTER -->
-      <footer>
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12">
-              <p>No Copyright © 2022 <a href="#">Song Scraper</a> All rights reserved.
-              <br>WebApp <a href="url_for{{ 'login' }}" target="_blank">Paul Hitzler</a></p>
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <a href="{{ url_for('index')}}" class="logo">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+                    </a>
+                    <ul class="nav">
+                        <!-- Menu Items - Base -->
+                        <li><a href="{{ url_for('services')}}">Services</a></li>
+                        <li><a href="{{ url_for('marketplace')}}">Marketplace</a></li>
+                        <li><a href="{{ url_for('research')}}">Research</a></li>
+                        <li><a href="{{ url_for('documentation')}}">Documentation</a></li>
+                        <!-- Menu Items - Logic -->
+                        {% if session['session_user'] %}
+                        <li><a href="{{ url_for('profile', username=session['session_user'])}}">Profile</a></li>
+                        {% if session['session_id'] == 1 %}
+                        <li><a href="{{ url_for('admin')}}">Admin</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('logout')}}">Logout</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('login')}}">Login</a></li>
+                        <li><a href="{{ url_for('sign_up')}}">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
             </div>
-          </div>
         </div>
-      </footer>
-    </body>
+    </div>
+</header>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="page-content">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                <!-- SITE INSERT -->
+                {% block content %}
+                {% endblock %}
+            </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- GLOBAL FOOTER -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <p>No Copyright © 2022 <a href="#">Song Scraper</a> All rights reserved.
+                    <br>WebApp <a href="url_for{{ 'login' }}" target="_blank">Paul Hitzler</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</body>
+<!-- Invisible Elements for Variable Exchange with JavaScript -->
+<p id="theme_exchange_with_js" style="display: none">{{ session['session_theme'] }}</p>
+<p id="mode_exchange_with_js" style="display: none">{{ session['appearance_mode'] }}</p>
+<script>
+
+    ///////////////////////////////////////////////
+    //////////// THEME CONFIGURATION //////////////
+    ///////////////////////////////////////////////
+
+    function ThemeConfigurator() {
+        // Get theme from session
+        let theme = document.getElementById('theme_exchange_with_js').innerHTML;
+        let light_mode = document.getElementById('mode_exchange_with_js').innerHTML;
+        console.log("ThemeConfigurator()");
+        console.log("theme: " + theme);
+        console.log("light mode: " + light_mode);
+
+        if (theme == "HG2S Original") {
+            document.body.classList.remove("bgcolor_purple", "bgcolor_avenue");
+            document.body.classList.add('bgcolor_original');
+        } else if (theme == "Purple Darkness") {
+            document.body.classList.remove("bgcolor_original", "bgcolor_avenue");
+            document.body.classList.add('bgcolor_purple');
+        } else if (theme == "Sunlight Avenue") {
+            document.body.classList.remove("bgcolor_original", "bgcolor_purple");
+            document.body.classList.add('bgcolor_avenue');
+        }
+
+        if (light_mode == "None") {
+            document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--black)";
+            document.getElementsByClassName("page-content")[0].style.color = "var(--white)";
+            document.getElementsByClassName("card")[0].style.backgroundColor = "var(--light-grey)";
+            paragraphs = document.getElementsByTagName("p")
+            for (var i = 0; i < paragraphs.length; i++) {
+                paragraphs[i].style.color = "var(--white)";
+            }
+        } else if (light_mode == "on") {
+            document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--white)";
+            document.getElementsByClassName("page-content")[0].style.color = "var(--black)";
+            document.getElementsByClassName("card")[0].style.backgroundColor = "var(--light-grey)";
+            paragraphs = document.getElementsByTagName("p")
+            for (var i = 0; i < paragraphs.length; i++) {
+                paragraphs[i].style.color = "var(--black)";
+            }
+        }
+    }
+
+    // Call Function
+    ThemeConfigurator();
+
+</script>
 </html>

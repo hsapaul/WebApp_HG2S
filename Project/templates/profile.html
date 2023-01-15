@@ -6,50 +6,187 @@ HG2S - Profile
 
 {% block content %}
 
-<h1>Profile</h1> <br>
+<div class="">
+    <h1 class="headline">Your Profile</h1>
+    <p class="subheadline">Welcome <em>{{session['session_user']}}</em>. Have fun customizing your experience.</p>
+</div>
 
 <!-- Profile Picture -->
 
 <div class="user-profile">
-    <div class="">
-        <img class="" width="150" height="150" src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}" alt="user">
+
+    <br>
+
+    <div class="row py-5 h-100">
+        <div class="col-6">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                <div class="card-body p-5">
+                    <h4>User Settings</h4>
+                    <div class="">
+                        <img class="" width="150" height="150"
+                             src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}"
+                             alt="user">
+                    </div>
+                    <h4 class="d-inline">Username: </h4>
+                    <p class="d-inline">{{ session_user }}</p>
+                    <a href="/change_user_name">
+                        <button>Change User Name</button>
+                    </a>
+                    <br>
+                    <h4 class="d-inline">E-Mail: </h4>
+                    {% if session['session_email'] %}
+                    <p class="d-inline">{{ session['session_email'] }}</p>
+                    <!--<a href="" class="d-inline"><button>Change E-Mail</button></a>-->
+                    {% else %}
+                    <p class="d-inline">No E-Mail given</p>
+                    <a href="">
+                        <button>Add</button>
+                    </a>
+                    {% endif %}
+                    <br>
+                    <h4 class="d-inline">Password: </h4>
+                    <p class="d-inline">************</p>
+                    <a href="/change_password">
+                        <button>Change Password</button>
+                    </a>
+                    </form>
+                    <a class="d-block mt-5" href='/logout'>Logout</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                <div class="card-body p-5">
+                    <h4>Appearence</h4>
+                    <form action="#" method="post">
+                        <div class="outer_dark_mode_class mb-4 mt-3">
+                            <div class="dark_mode_class">
+                                <input id="dark_mode_switch" type="checkbox" name="dark_mode_checkbox" class="mx-2" checked>
+                                <label id="dark_mode_label" for="dark_mode_switch" class="mx-5">Dark Mode</label>
+                            </div>
+                        </div>
+                        <select class="form-select" name="form-select" aria-label="Default select example">
+                            <option id="selected_sort_alg" selected>{{ session['session_theme'] }}</option>
+                            {% set theme_list = ["HG2S Original", "Purple Darkness", "Sunlight Avenue"] %}
+                            {% for theme in theme_list %}
+                            {% if theme != session['session_theme'] %}
+                            <option value="{{theme}}">{{ theme }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-outline-light btn-lg px-5 mt-4" id="submit_theme"
+                                name="submit_theme" type="submit">
+                            Commit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                <div class="card-body p-5">
+                    <h1 class="mt-5">Prompt History</h1>
+                    {% if prompt_history %}
+                    {% for prompt in prompt_history %}
+                    <p>{{ prompt }}</p>
+                    {% endfor %}
+                    <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
+                    {% else %}
+                    <a class="d-block" href="{{ url_for('index')}}">Start Prompting right now!</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-
-    <h4 class="d-inline">Username: </h4>
-    <p class="d-inline">{{ session_user }}</p>
-    <a href="/change_user_name"><button>Change User Name</button></a>
-
-    <br>
-
-    <h4 class="d-inline">E-Mail: </h4>
-    {% if session['session_email'] %}
-    <p class="d-inline">{{ session['session_email'] }}</p>
-    <!--<a href="" class="d-inline"><button>Change E-Mail</button></a>-->
-    {% else %}
-    <p class="d-inline">No E-Mail given</p>
-    <a href=""><button>Add</button></a>
-    {% endif %}
-
-    <br>
-
-    <h4 class="d-inline">Password: </h4>
-    <p class="d-inline">************</p>
-    <a href="/change_password"><button>Change Password</button></a>
-
-    <a class="d-block" href='/logout'>Logout</a>
-
-    <h1 class="mt-5">Prompt History</h1>
-     {% if prompt_history %}
-        {% for prompt in prompt_history %}
-            <p>{{ prompt }}</p>
-        {% endfor %}
-        <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
-    {% else %}
-        <a class="d-block" href="{{ url_for('index')}}">Start Prompting right now!</a>
-    {% endif %}
-
-
-
 </div>
+<p id="exchange_appearance_js" display="none">{{ session['appearance_mode'] }}</p>
+
+<script>
+
+    // Temporary Theme Selection
+    var selected_theme = document.getElementById("selected_theme");
+
+    // check if selected_theme is not null
+    if (selected_theme != null) {
+        selected_theme.addEventListener("change", function () {
+            console.log("Change detected: " + selected_theme.value);
+            var selected_theme = document.getElementById("selected_theme");
+            if (this.innerHTML == "HG2S Original") {
+                document.body.classList.remove("bgcolor_purple", "bgcolor_avenue");
+                document.body.classList.add('bgcolor_original');
+            } else if (this.innerHTML == "Purple Darkness") {
+                document.body.classList.remove("bgcolor_original", "bgcolor_avenue");
+                document.body.classList.add('bgcolor_purple');
+            } else if (this.innerHTML == "Sunlight Avenue") {
+                document.body.classList.remove("bgcolor_original", "bgcolor_purple");
+                document.body.classList.add('bgcolor_avenue');
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////
+    //////////// DARK MODE SWITCH /////////////////
+    ///////////////////////////////////////////////
+
+    // Get Dark Mode Switch
+    const darkModeSwitch = document.getElementById("dark_mode_switch");
+    // Get Dark Mode Label
+    const darkModeLabel = document.getElementById('dark_mode_label');
+    // Get Dark Mode Class
+    const darkModeClass = document.getElementsByClassName('dark_mode_class');
+
+    // if (light_mode == "True") {
+    //     darkModeSwitch.checked = false;
+    //     darkModeLabel.innerHTML = "Light Mode";
+    //     darkModeClass[0].classList.remove("dark_mode_class");
+    //     darkModeClass[0].classList.add("light_mode_class");
+    // } else {
+    //     darkModeSwitch.checked = true;
+    //     darkModeLabel.innerHTML = "Dark Mode";
+    //     darkModeClass[0].classList.remove("light_mode_class");
+    //     darkModeClass[0].classList.add("dark_mode_class");
+    // }
+    //
+
+
+    // Toggle to the right State when loading page
+    const lightmode = document.getElementById("exchange_appearance_js");
+    if (lightmode.innerHTML == "on") {
+        darkModeSwitch.checked = true;
+        darkModeLabel.innerHTML = "Light Mode";
+        // darkModeClass[0].classList.remove("dark_mode_class_off");
+        // darkModeClass[0].classList.add("dark_mode_class_on");
+    } else if (lightmode.innerHTML == "None") {
+        darkModeSwitch.checked = false;
+        darkModeLabel.innerHTML = "Dark Mode";
+        // darkModeClass[0].classList.remove("dark_mode_class_on");
+        // darkModeClass[0].classList.add("dark_mode_class_off");
+    }
+
+    darkModeSwitch.addEventListener("change", function () {
+        console.log("Dark Mode State: " + darkModeSwitch.checked);
+        // Change Dark Mode Label
+        if (darkModeSwitch.checked == false) {
+            darkModeClass[0].classList.remove('dark_mode_class_dark');
+            document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--black)";
+            document.getElementsByClassName("page-content")[0].style.color = "var(--white)";
+            paragraphs = document.getElementsByTagName("p")
+            for (var i = 0; i < paragraphs.length; i++) {
+                paragraphs[i].style.color = "var(--white)";
+            }
+            darkModeLabel.innerHTML = "Dark Mode";
+        } else {
+            darkModeClass[0].classList.add('dark_mode_class_dark');
+            document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--white)";
+            document.getElementsByClassName("page-content")[0].style.color = "var(--black)";
+            paragraphs = document.getElementsByTagName("p")
+            for (var i = 0; i < paragraphs.length; i++) {
+                paragraphs[i].style.color = "var(--black)";
+            }
+            darkModeLabel.innerHTML = "Light Mode";
+        }
+    });
+
+</script>
 
 {% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+HG2S - Piano Roll
+{% endblock %}
+
+{% block extra_head_configs %}
+<script src="https://g200kg.github.io/webaudio-pianoroll/webaudio-pianoroll.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Piano Roll -->
+
+
+
+<webaudio-pianoroll width="300" height="200" xrange="64" markend="64" collt="#33f" coldk="#338" editmode="dragmono"></webaudio-pianoroll>
+<button id="play_button">Plaay</button>
+
+
+<script>
+
+    // get webaudio-pianoroll and create audio context
+    var pr = document.querySelector('webaudio-pianoroll');
+    var play_button = document.querySelector('#play_button');
+    var ctx = new AudioContext();
+
+    // create oscillator
+    var osc = ctx.createOscillator();
+    osc.frequency.value = 440;
+    osc.connect(ctx.destination);
+
+    // play piano roll when play button is clicked
+    play_button.addEventListener('click', function() {
+        pr.play(ctx, function(ev) {
+            osc.frequency.setValueAtTime(440 * Math.pow(2, (ev.n - 69) / 12), ev.t);
+            osc.start(ev.t);
+            osc.stop(ev.g);
+        });
+    });
+
+
+
+
+</script>
+{% endblock %}
