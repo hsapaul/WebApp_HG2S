@@ -81,7 +81,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-12">
             <div class="page-content">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
@@ -96,10 +96,10 @@
                 {% block content %}
                 {% endblock %}
             </div>
-            </main>
         </div>
     </div>
 </div>
+
 
 <!-- GLOBAL FOOTER -->
 <footer>
@@ -112,11 +112,10 @@
         </div>
     </div>
 </footer>
-</div>
-</body>
 <!-- Invisible Elements for Variable Exchange with JavaScript -->
 <p id="theme_exchange_with_js" style="display: none">{{ session['session_theme'] }}</p>
 <p id="mode_exchange_with_js" style="display: none">{{ session['appearance_mode'] }}</p>
+</body>
 <script>
 
     ///////////////////////////////////////////////
@@ -163,6 +162,7 @@
 
     // Call Function
     ThemeConfigurator();
+
 
 </script>
 </html>
