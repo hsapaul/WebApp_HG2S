@@ -6,15 +6,26 @@ HG2S - Change User Name
 
 {% block content %}
 
-<h1 class="">Change User Name</h1>
-
-<form action="/change_user_name" method="POST">
-    <label for="new_user_name">New User Name:</label>
-    <input type="text" name="new_user_name" id="new_user_name" required>
-    <label for="password">Type in Password</label>
-    <input type="text" name="password" id="password" value="">
-    <button type="submit">Change User Name</button>
-</form>
+<div class="container h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-md-5 mt-md-4 pb-5">
+                        <h1 class="">Change User Name</h1>
+                        <form action="/change_user_name" method="POST">
+                            <label for="new_user_name">New User Name:</label>
+                            <input type="text" name="new_user_name" id="new_user_name" required>
+                            <label for="password">Type in Password</label>
+                            <input type="text" name="password" id="password" value="">
+                            <button class="btn mt-2 own-btn d-inline px-4" type="submit">Change User Name</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 

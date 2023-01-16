@@ -79,7 +79,17 @@ def index():
             session['instruments'] = found_instruments
             session['genres'] = found_genres
             session['key_and_bpm'] = key_and_bpm
+            user_id = session['session_id']
+            creation_date = str(datetime.datetime.now())[:-10]
             execution_time = round(time.time() - start_time, 2)
+            # Save to Temporary Database "temp_prompt_history"
+            db = get_db(db_path)
+            db.execute(
+                'CREATE TABLE IF NOT EXISTS temp_prompt_history (temp_post_id INTEGER PRIMARY KEY, user_id INTEGER, text_prompt TEXT, creation_date TEXT, saved_to_marketplace INTEGER)')
+            db.execute(
+                f'insert into temp_prompt_history (user_id, text_prompt, creation_date, saved_to_marketplace) values ("{user_id}", "{text_prompt}", "{creation_date}", 0)')
+            db.commit()
+
             return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
                                    instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
                                    end_time=execution_time)
@@ -270,15 +280,16 @@ def sign_up():
             db_nutzer = db.execute('SELECT username, password, email FROM nutzer').fetchall()
             for n in db_nutzer:
                 if request.form['username'] == n['username']:
+                    flash("Username already taken")
                     return render_template('auth_signup.html', error='Username already taken!')
                 elif request.form['email'] == n['email'] and request.form['email'] != "":
+                    flash("Email already taken")
                     return render_template('auth_signup.html', error='Email already taken!')
             db.execute(
                 'INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [request.form['username'], request.form['email'], request.form['password'], role, None, None, "default", 0])
             db.commit()
-            session['session_id'] = \
-                db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
+            session['session_id'] = db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
             session['session_role'] = role
@@ -329,6 +340,9 @@ def logout():
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 def profile(username):
+    # Get Temp Prompt History
+    db = get_db(db_path)
+    prompts_for_user_id = db.execute(f'select temp_post_id, text_prompt, creation_date, saved_to_marketplace from temp_prompt_history where user_id = {session["session_id"]}').fetchall()
     # Chech if post and if submit name is submit_theme
     if request.method == 'POST':
         # Requests
@@ -346,10 +360,10 @@ def profile(username):
         session['session_theme'] = theme
         session['appearance_mode'] = light_mode
         flash("Appearance Changed Successfully")
-        return render_template('profile.html', session_user=session['session_user'], light_mode=light_mode)
+        return render_template('profile.html', session_user=session['session_user'], light_mode=light_mode, your_last_prompts=prompts_for_user_id)
     if request.method == 'GET':
         if 'session_user' in session:
-            return render_template('profile.html', session_user=session['session_user'])
+            return render_template('profile.html', session_user=session['session_user'], your_last_prompts=prompts_for_user_id)
         else:
             return redirect(url_for('login'))
 
@@ -450,6 +464,10 @@ def jstest():
 @app.route('/jstest2')
 def jstest2():
     return render_template('js_test_2.html')
+
+@app.route('/jstest3')
+def jstest3():
+    return render_template('js_test_3.html')
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@
     --white: #EEE;
     --black: #1e1e1e;
     --light-grey: #E9EAEC;
+    --middle-grey: #282828;
     --dark-grey: #27262C;
     --black: #1e1e1e;
     --green: #50FFAF;
@@ -57,8 +58,15 @@ p {
 }
 
 .own-btn {
-    background-color: var(--grey);
+    background-color: var(--middle-grey);
+    color: var(--white);
     /*color: var(--grey) !important;*/
+}
+
+.own-btn:hover {
+    transform: rotate(-2deg);
+    transition: 0.2s;
+    /*outline: 2px solid var(--yellow) !important;*/
 }
 
 p {

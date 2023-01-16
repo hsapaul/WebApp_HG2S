@@ -15,9 +15,7 @@ HG2S - Profile
 
 <div class="user-profile">
 
-    <br>
-
-    <div class="row py-5 h-100">
+    <div class="row h-100">
         <div class="col-6">
             <div class="card bg-dark text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
@@ -87,21 +85,27 @@ HG2S - Profile
         <div class="col-6">
             <div class="card bg-dark text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
-                    <h1 class="mt-5">Prompt History</h1>
-                    {% if prompt_history %}
-                    {% for prompt in prompt_history %}
-                    <p>{{ prompt }}</p>
+                    <h4>Prompt History</h4>
+                    <p style="margin-top: -10px; line-height: 90%">They are only saved for two weeks so make sure to
+                        post to Marketplace</p>
+                    {% if your_last_prompts|length > 0%}
+                    {% for prompt in your_last_prompts %}
+                    <div class="rounded border border-white bg-dark text-light py-1 m-1">
+                        <h6>"{{ prompt.text_prompt }}"</h6>
+                        <p class="" style="font-size: 13px;">{{ prompt.creation_date }}</p>
+                    </div>
                     {% endfor %}
                     <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
                     {% else %}
-                    <a class="d-block" href="{{ url_for('index')}}">Start Prompting right now!</a>
+                    <p class="">You didn't prompted yet!
+                        Consider <a class="d-inline" href="{{ url_for('index')}}">Prompting Right now!</a></p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-<p id="exchange_appearance_js" display="none">{{ session['appearance_mode'] }}</p>
+<p id="exchange_appearance_js" style="display: none">{{ session['appearance_mode'] }}</p>
 
 <script>
 

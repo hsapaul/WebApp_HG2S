@@ -27,8 +27,7 @@
             src="{{ url_for('static', filename = 'node_modules/@popperjs/core/dist/umd/popper.min.js')}}"></script>
     <script type="module" src="{{ url_for('static', filename = 'node_modules/@popperjs/core/lib/popper.js')}}"></script>
 
-    <script id="tone_module" type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}"
-            async></script>
+    <script id="tone_module" type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}"></script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
 
@@ -147,7 +146,7 @@
             document.getElementsByClassName("card")[0].style.backgroundColor = "var(--light-grey)";
             paragraphs = document.getElementsByTagName("p")
             for (var i = 0; i < paragraphs.length; i++) {
-                paragraphs[i].style.color = "var(--white)";
+                paragraphs[i].style.color = "var(--black) !important";
             }
         } else if (light_mode == "on") {
             document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--white)";
@@ -155,7 +154,7 @@
             document.getElementsByClassName("card")[0].style.backgroundColor = "var(--light-grey)";
             paragraphs = document.getElementsByTagName("p")
             for (var i = 0; i < paragraphs.length; i++) {
-                paragraphs[i].style.color = "var(--black)";
+                paragraphs[i].style.color = "var(--white) !important";
             }
         }
     }

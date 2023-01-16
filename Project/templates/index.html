@@ -27,7 +27,7 @@ HG2S - Text Prompt Song Generation
         <input type="text_prompt" name="text_prompt"
                placeholder="Start with a detailed description of the Song you wanna hear" class="form-control">
         <!--            <small id="emailHelp" class="form-text text-muted">Try sth like "Green Day playing a Ballad with a flute sample on top.</small>-->
-        <button type="submit" name="submit_button" value="Generate" class="btn mt-2 own-btn">Submit</button>
+        <button type="submit" name="submit_button" value="Generate" class="btn btn-outline-light own-btn btn-lg px-5 mt-4">Submit</button>
     </div>
 </form>
 
@@ -102,7 +102,7 @@ HG2S - Text Prompt Song Generation
 <form action="#" method="post">
     <div class="form-group_2">
         {% if session['session_user'] %}
-        <button type="submit" name="post_button" value="Generate" class="btn mt-2 own-btn d-inline">Post to
+        <button type="submit" name="post_button" value="Generate" class="btn mt-2 own-btn d-inline px-4 btn-outline-light">Post to
             Marketplace
         </button>
         {% else %}
@@ -111,7 +111,7 @@ HG2S - Text Prompt Song Generation
         <p class="">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
         {% endif %}
         <button title="Play in your individual Configuration" type="submit" name="post_button" value="Generate"
-                class="btn mt-2 own-btn d-inline">Enter Playground
+                class="btn mt-2 own-btn px-4 d-inline">Enter Playground
         </button>
     </div>
 </form>

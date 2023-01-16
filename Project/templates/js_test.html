@@ -9,6 +9,7 @@ HG2S - Text Prompt Song Generation
 <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/extra_playground.css') }}">-->
 <!--&lt;!&ndash; include js files &ndash;&gt;-->
 <!--<script src="{{ url_for('static', filename='js/extra_playground.js') }}"></script>-->
+<!--<script type="text/javascript" src="{{ url_for('static', filename='js/step_sequencer.js') }}"></script>-->
 {% endblock %}
 
 {% block content %}
@@ -20,9 +21,10 @@ HG2S - Text Prompt Song Generation
             <div class="card-body">
                 <p>BPM</p>
                 <input type="number" id="bpm" name="bpm" min="1" max="300" value="120">
-                <button id="play_icon" class="rounded-circle d-inline"><img class="icon_set_imgs"
-                                                                            src="{{ url_for('static', filename='img/icons/volume.png') }}"
-                                                                            alt=""></button>
+                <button id="startSequencerButton" class="rounded-circle d-inline"><img
+                        class="icon_set_imgs"
+                        src="{{ url_for('static', filename='img/icons/volume.png') }}"
+                        alt=""></button>
             </div>
         </div>
         <div class="card p-2 col-4 bg-dark text-white d-inline-block">
@@ -61,14 +63,18 @@ HG2S - Text Prompt Song Generation
                     <p class="subheadline mt-1 block">Drag&Drop that!</p>
                 </div>
                 <div class="row border rounded-1 m-2">
+                    <h6>Drum Sequencer</h6>
                     {% for i in range(4) %}
                     {% set list = ['', '', '', ''] %}
                     <div class="sequencer-row row">
-                        <div class="col-3 border draggables">
+                        <div class="col-3 border rounded draggables m-1">
+                            <p class="draggable_hint"
+                               style="color:var(--light-grey); font-family: Arial; font-size: 10px; opacity: 0.2">
+                                Drag the Samples on the Left in here</p>
                             <!--                            <h6 class="d-inline mx-2">{{list[loop.index-1]}}</h6>-->
                             <!--                            <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
                         </div>
-                        <div class="col-7">
+                        <div class="$row col-7">
                             {% for i in range(16) %}
                             <!-- Make a mx-2 at every fourth element -->
                             {% if i % 4 == 3 %}
@@ -81,7 +87,30 @@ HG2S - Text Prompt Song Generation
                     </div>
                     {% endfor %}
                 </div>
-
+                <div class="row border rounded-1 m-2">
+                    <!--                    <h6>Synth Sequencer</h6>-->
+                    <!--                    <button class="melody-play-button col-2">Play</button>-->
+                    <!--                    {% for i in range(4) %}-->
+                    <!--                    {% set list = ['sine', 'sawtooth', 'square', 'triangle'] %}-->
+                    <!--                    <div class="row">-->
+                    <!--                        <div class="col-3">-->
+                    <!--                            <button onClick="playSynth('{{list[loop.index-1]}}')" class="px-4 m-2">-->
+                    <!--                                {{list[loop.index-1]}} Synth-->
+                    <!--                            </button>-->
+                    <!--                        </div>-->
+                    <!--                        <div class="col-7">-->
+                    <!--                            {% for i in range(16) %}-->
+                    <!--                            &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
+                    <!--                            {% if i % 4 == 3 %}-->
+                    <!--                            <input class="d-inline me-1 bg-danger border-danger melody-sequencer-step" type="checkbox">-->
+                    <!--                            {% else %}-->
+                    <!--                            <input class="d-inline melody-sequencer-step" type="checkbox">-->
+                    <!--                            {% endif %}-->
+                    <!--                            {% endfor %}-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    {% endfor %}-->
+                </div>
             </div>
         </div>
     </div>
@@ -225,7 +254,7 @@ HG2S - Text Prompt Song Generation
     /////////// DRAGGING ITEMS ///////////////
     //////////////////////////////////////////
 
-    // Gallery Items
+
     var gallery_items = document.getElementsByClassName("gallery_items");
     var dragItem = null;
     for (var i of gallery_items) {
@@ -239,14 +268,14 @@ HG2S - Text Prompt Song Generation
         setTimeout(() => {
             this.style.color = "red";
         }, 0);
-        console.log("dragStart" + this.id);
+        // console.log("dragStart" + this.id);
     }
 
     function dragEnd(e) {
         setTimeout(() => {
             this.style.display = "block";
         }, 0);
-        console.log("dragEnd" + this.id);
+        // console.log("dragEnd" + this.id);
         dragItem = null;
     }
 
@@ -260,9 +289,13 @@ HG2S - Text Prompt Song Generation
     }
 
     function drop() {
-        console.log("drop" + this.id);
+        // console.log("drop" + this.id);
         this.style.backgroundColor = "var(--black)";
         this.append(dragItem);
+        var hints = document.getElementsByClassName("draggable_hint");
+        for (var i of hints) {
+            i.style.display = "none";
+        }
     }
 
     function dragOver(e) {
@@ -283,62 +316,106 @@ HG2S - Text Prompt Song Generation
     /////////// PLAYING MUSIC ////////////////
     //////////////////////////////////////////
 
-    var onoff_button = document.getElementById("play_icon");
-    var playing = false;
-    onoff_button.addEventListener("click", function () {
-        if (playing) {
-            // console.log("stop");
-            playing = false;
-            onoff_button.style.backgroundColor = "var(--white)";
+    // Make Samples in Sample Gallery playable via click
+    var sample_gallery_items = document.getElementsByClassName("gallery_items");
+    for (var i of sample_gallery_items) {
+        i.addEventListener("click", play_sample);
+    }
 
-        } else {
-            playing = true;
-            onoff_button.style.backgroundColor = "var(--green)";
-            // console.log("play");
-            play_loop();
-        }
+    function play_sample() {
+        element_name = this.innerText;
+        element_category = "kicks"
+        element_path = "{{static_url}}/" + element_category + "/" + element_name;
+        console.log(element_path);
+        var sample = element_path;
+        var audio = new Audio(sample);
+        audio.play();
+    }
+
+    // ///////////////////////////////////////////////////
+    // ///////////// SYNTH SEQUENCER /////////////////////
+    // ///////////////////////////////////////////////////
+
+    document.documentElement.addEventListener('mousedown', () => {
+        if (Tone.context.state !== 'running') Tone.context.resume();
     });
 
+    // Wait till tone.js is loaded
+    setTimeout(function () {
 
-    function play_loop() {
+            console.log("tone.js hopefully loaded");
 
-        // Get names of the rows
-        var row_names = document.getElementsByClassName("draggables");
-
-        const drum_samples = [
-            new Tone.Player(),
-            new Tone.Player(),
-            new Tone.Player(),
-            new Tone.Player(),
-        ]
-
-        console.log("row samples", row_names);
-
-        function* enumerate(iterable) {
-            let i = 0;
-
-            for (const x of iterable) {
-                yield [i, x];
-                i++;
+            // When New Item is detected in Sequencer --> initialize new Tone.js Player
+            var sequencer_rows = document.getElementsByClassName("draggables");
+            for (var i of sequencer_rows) {
+                i.addEventListener("drop", initializeSamples);
             }
-        }
 
-        for (const [i, obj] of enumerate(row_names)) {
-            if (obj.innerText !== "") {
-                element_name = obj.innerText;
-                element_category = "kicks";
-                element_path = "{{static_url}}/" + element_category + "/" + element_name + ".wav";
-                console.log(i, element_path);
+            // var buffer = new Tone.Buffer("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Deep_F.wav");
+
+            var start_button = document.getElementById("startSequencerButton");
+
+            function startSequencer() {
+                console.log("start sequencer");
+                initializeSamples();
+                Tone.Transport.scheduleRepeat(repeat, '16n');
+                Tone.Transport.start();
             }
-        }
 
-        // const drum_samples = [
-        //     new Tone.Player("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Rumble_Massive.wav").toDestination(),
-        //     new Tone.Player("{{static_url}}/snares/ff_bt_snare_one_shot_low_rud.wav").toDestination(),
-        //     new Tone.Player("{{static_url}}/hihats/KSHMR_Acoustic_Closed_Hat_04_Clean.wav").toDestination(),
-        //     new Tone.Player("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Rumble_Thud.wav").toDestination()
-        // ];
-    }
+            start_button.addEventListener("click", startSequencer);
+
+
+            // Initialize drum samples
+
+            const drum_samples = ["", "", "", ""];
+
+            // synths[0].oscillator.type = 'triangle';
+            // synths[1].oscillator.type = 'sine';
+            // synths[2].oscillator.type = 'sawtooth';
+
+
+            const $rows = document.getElementsByClassName('$row')
+
+            function initializeSamples() {
+                var select_drum_samples = document.querySelectorAll(".draggables");
+                for (var i = 0; i < select_drum_samples.length; i++) {
+                    // console.log(i, select_drum_samples[i].innerText);
+                    // if element has button as a child
+                    if (select_drum_samples[i].querySelector("button")) {
+                        var element_name = select_drum_samples[i].innerText;
+                        console.log(i, element_name);
+                        if (element_name) {
+                            element_url = "{{static_url}}/kicks/" + element_name;
+                            // console.log(element_url);
+                            drum_samples[i] = new Tone.Player(element_url).toDestination();
+                        }
+                    }
+                }
+            }
+
+            let index = 0;
+
+            function repeat(time) {
+                console.log('repeat');
+                let step = index % 16;
+                for (let i = 0; i < $rows.length; i++) {
+                    let sample = drum_samples[i],
+                        $row = $rows[i],
+                        $input = $row.querySelector(`input:nth-child(${step + 1})`);
+                    if ($input.checked) {
+                        drum_samples[i].start(time);
+                    }
+                }
+                index++;
+            }
+
+            // }
+        }
+        , 1000);
+
+    // ///////////////////////////////////////////////////
+    // /////////////////// LOOPER ////////////////////////
+    // ///////////////////////////////////////////////////
 
 
 </script>
