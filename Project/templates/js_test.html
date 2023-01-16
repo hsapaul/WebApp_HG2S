@@ -19,12 +19,18 @@ HG2S - Text Prompt Song Generation
         <div class="card p-2 col-4 bg-dark text-white d-inline-block">
             <div class="card-title">Song Configurations</div>
             <div class="card-body">
-                <p>BPM</p>
-                <input type="number" id="bpm" name="bpm" min="1" max="300" value="120">
                 <button id="startSequencerButton" class="rounded-circle d-inline"><img
                         class="icon_set_imgs"
                         src="{{ url_for('static', filename='img/icons/volume.png') }}"
                         alt=""></button>
+                <div class="slidecontainer">
+                    <input id="bpm_slider" type="range" min="60" max="200" value="100" class="slider">
+                    <label id="bpm_label" for="bpm_slider">100</label>
+                </div>
+                <div class="slidecontainer">
+                    <input id="volume_slider" type="range" min="-60" max="10" value="0" class="slider vertical-slider">
+                    <label id="volume_label" for="bpm_slider">0</label>
+                </div>
             </div>
         </div>
         <div class="card p-2 col-4 bg-dark text-white d-inline-block">
@@ -34,389 +40,473 @@ HG2S - Text Prompt Song Generation
                 <input type="number" id="bpms" name="bpm" min="1" max="300" value="120">
             </div>
         </div>
-    </div>
-</div>
-<div class="row py-5 h-100">
-    <div class="col-2">
-        <div class="card bg-dark text-white" style="border-radius: 10px;">
-            <div class="card-body p-2 h-100">
-                <div>
-                    <h4 class="mb-0">Samples</h4>
-                    <p class="subheadline mt-1">Drag&Drop that!</p>
-                </div>
-                {% for kick in kick_paths %}
-                <div class="">
-                    <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"
-                            style="font-size:8px">
-                        {{kick_names[loop.index - 1]}}
-                    </button>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-    <div class="col-10">
-        <div class="card bg-dark text-white" style="border-radius: 10px;">
-            <div class="card-body p-2 h-100">
-                <div class="d-inline">
-                    <h4 class="mb-0 d-inline">Musikantor</h4>
-                    <p class="subheadline mt-1 block">Drag&Drop that!</p>
-                </div>
-                <div class="row border rounded-1 m-2">
-                    <h6>Drum Sequencer</h6>
-                    {% for i in range(4) %}
-                    {% set list = ['', '', '', ''] %}
-                    <div class="sequencer-row row">
-                        <div class="col-3 border rounded draggables m-1">
-                            <p class="draggable_hint"
-                               style="color:var(--light-grey); font-family: Arial; font-size: 10px; opacity: 0.2">
-                                Drag the Samples on the Left in here</p>
-                            <!--                            <h6 class="d-inline mx-2">{{list[loop.index-1]}}</h6>-->
-                            <!--                            <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
-                        </div>
-                        <div class="$row col-7">
-                            {% for i in range(16) %}
-                            <!-- Make a mx-2 at every fourth element -->
-                            {% if i % 4 == 3 %}
-                            <input class="d-inline me-1 bg-danger border-danger sequencer-step" type="checkbox">
-                            {% else %}
-                            <input class="d-inline sequencer-step" type="checkbox">
-                            {% endif %}
-                            {% endfor %}
-                        </div>
+        <div class="card p-2 col-3 bg-dark text-white d-inline-block">
+            <div class="card-title">Mixer</div>
+            <div class="card-body">
+                <div class="slidecontainer">
+                    <div class="slider">
+                        <input id="slider_volume_sequencer_1" type="range" min="-60" max="10" value="0"
+                               class="slider slider_volume_sequencer"><label>1</label>
+                        <input id="slider_volume_sequencer_2" type="range" min="-60" max="10" value="0"
+                               class="slider slider_volume_sequencer"><label>2</label>
+                        <input id="slider_volume_sequencer_3" type="range" min="-60" max="10" value="0"
+                               class="slider slider_volume_sequencer"><label>3</label>
+                        <input id="slider_volume_sequencer_4" type="range" min="-60" max="10" value="0"
+                               class="slider slider_volume_sequencer"><label>4</label>
                     </div>
-                    {% endfor %}
+
                 </div>
-                <div class="row border rounded-1 m-2">
-                    <!--                    <h6>Synth Sequencer</h6>-->
-                    <!--                    <button class="melody-play-button col-2">Play</button>-->
-                    <!--                    {% for i in range(4) %}-->
-                    <!--                    {% set list = ['sine', 'sawtooth', 'square', 'triangle'] %}-->
-                    <!--                    <div class="row">-->
-                    <!--                        <div class="col-3">-->
-                    <!--                            <button onClick="playSynth('{{list[loop.index-1]}}')" class="px-4 m-2">-->
-                    <!--                                {{list[loop.index-1]}} Synth-->
-                    <!--                            </button>-->
-                    <!--                        </div>-->
-                    <!--                        <div class="col-7">-->
-                    <!--                            {% for i in range(16) %}-->
-                    <!--                            &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
-                    <!--                            {% if i % 4 == 3 %}-->
-                    <!--                            <input class="d-inline me-1 bg-danger border-danger melody-sequencer-step" type="checkbox">-->
-                    <!--                            {% else %}-->
-                    <!--                            <input class="d-inline melody-sequencer-step" type="checkbox">-->
-                    <!--                            {% endif %}-->
-                    <!--                            {% endfor %}-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-                    <!--                    {% endfor %}-->
+
+
+            </div>
+        </div>
+    </div>
+    <div class="row py-5 h-100">
+        <div class="col-2">
+            <div class="card bg-dark text-white" style="border-radius: 10px;">
+                <div class="card-body p-2 h-100">
+                    <div>
+                        <h4 class="mb-0">Samples</h4>
+                        <p class="subheadline mt-1">Drag&Drop that!</p>
+                    </div>
+                    <select id="category-select" class="category-select" name="form-select"
+                            aria-label="Default select example">
+                        {% set category_list = ["Kicks", "Snares", "Claps", "HiHats"] %}
+                        {% for category in category_list %}
+                        {% if category != session['category_list'] %}
+                        <option class="theme_items" value="{{theme}}">{{ category }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    <section id="kick_section">
+                        {% for kick in kick_paths %}
+                        <div class="">
+                            <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"
+                                    style="font-size:8px">
+                                {{kick_names[loop.index - 1]}}
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </section>
+                    <section id="snare_section" style="display: none">
+                        <p>sdags</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="card bg-dark text-white" style="border-radius: 10px;">
+                <div class="card-body p-2 h-100">
+                    <div class="d-inline">
+                        <h4 class="mb-0 d-inline">Musikantor</h4>
+                        <p class="subheadline mt-1 block">Drag&Drop that!</p>
+                    </div>
+                    <div class="row border rounded-1 m-2">
+                        <h6>Drum Sequencer</h6>
+                        {% for i in range(4) %}
+                        {% set list = ['', '', '', ''] %}
+                        <div class="sequencer-row row">
+                            <div class="col-3 border rounded draggables m-1">
+                                <p class="draggable_hint"
+                                   style="color:var(--light-grey); font-family: Arial; font-size: 10px; opacity: 0.2">
+                                    Drag the Samples on the Left in here</p>
+                                <!--                            <h6 class="d-inline mx-2">{{list[loop.index-1]}}</h6>-->
+                                <!--                            <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
+                            </div>
+                            <div class="$row col-7">
+                                {% for i in range(16) %}
+                                <!-- Make a mx-2 at every fourth element -->
+                                {% if i % 4 == 3 %}
+                                <input class="d-inline me-1 bg-danger border-danger sequencer-step" type="checkbox">
+                                {% else %}
+                                <input class="d-inline sequencer-step" type="checkbox">
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row border rounded-1 m-2">
+                        <!--                    <h6>Synth Sequencer</h6>-->
+                        <!--                    <button class="melody-play-button col-2">Play</button>-->
+                        <!--                    {% for i in range(4) %}-->
+                        <!--                    {% set list = ['sine', 'sawtooth', 'square', 'triangle'] %}-->
+                        <!--                    <div class="row">-->
+                        <!--                        <div class="col-3">-->
+                        <!--                            <button onClick="playSynth('{{list[loop.index-1]}}')" class="px-4 m-2">-->
+                        <!--                                {{list[loop.index-1]}} Synth-->
+                        <!--                            </button>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="col-7">-->
+                        <!--                            {% for i in range(16) %}-->
+                        <!--                            &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
+                        <!--                            {% if i % 4 == 3 %}-->
+                        <!--                            <input class="d-inline me-1 bg-danger border-danger melody-sequencer-step" type="checkbox">-->
+                        <!--                            {% else %}-->
+                        <!--                            <input class="d-inline melody-sequencer-step" type="checkbox">-->
+                        <!--                            {% endif %}-->
+                        <!--                            {% endfor %}-->
+                        <!--                        </div>-->
+                        <!--                    </div>-->
+                        <!--                    {% endfor %}-->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<!--{% if id %}-->
-<!--<h1 class="m-0">Playground</h1>-->
-<!--<p class="mb-4">You just entered the individual Playground Dimension of text prompt {{id}}</p>-->
-<!--<div class="post border rounded p-2">-->
-<!--    {% if text_prompt %}-->
-<!--    <h4>"{{ text_prompt }}"</h4>-->
-<!--    {% endif %}-->
-<!--    <a href="/upvote_post/{{id}}">-->
-<!--        <button>Upvote ({{popularity}})</button>-->
-<!--    </a>-->
-<!--</div>-->
-<!--{% endif %}-->
+    <!--{% if id %}-->
+    <!--<h1 class="m-0">Playground</h1>-->
+    <!--<p class="mb-4">You just entered the individual Playground Dimension of text prompt {{id}}</p>-->
+    <!--<div class="post border rounded p-2">-->
+    <!--    {% if text_prompt %}-->
+    <!--    <h4>"{{ text_prompt }}"</h4>-->
+    <!--    {% endif %}-->
+    <!--    <a href="/upvote_post/{{id}}">-->
+    <!--        <button>Upvote ({{popularity}})</button>-->
+    <!--    </a>-->
+    <!--</div>-->
+    <!--{% endif %}-->
 
-<!--<div class="container">-->
-<!--    <h1>Step Sequencer</h1>-->
-<!--    &lt;!&ndash;    <button id="button_start">Start</button>&ndash;&gt;-->
-<!--    &lt;!&ndash; Show Start Button when tone_module is loaded &ndash;&gt;-->
-<!--    <button id="button_start" style="display: none;">Start</button>-->
-<!--    <div class="row border p-1">-->
-<!--        {% for i in range(4) %}-->
-<!--        {% set list = ['kick', 'snare', 'hihat', 'perc'] %}-->
-<!--        <div class="sequencer-row row">-->
-<!--            <div class="col-5">-->
-<!--                <h6 class="d-inline mx-2">{{list[loop.index-1]}}:</h6>-->
-<!--                <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
-<!--            </div>-->
-<!--            <div class="col-7">-->
-<!--                {% for i in range(16) %}-->
-<!--                &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
-<!--                {% if i % 4 == 3 %}-->
-<!--                <input class="d-inline me-1 bg-danger border-danger sequencer-step" type="checkbox">-->
-<!--                {% else %}-->
-<!--                <input class="d-inline sequencer-step" type="checkbox">-->
-<!--                {% endif %}-->
-<!--                {% endfor %}-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        {% endfor %}-->
-<!--    </div>-->
-<!--</div>-->
+    <!--<div class="container">-->
+    <!--    <h1>Step Sequencer</h1>-->
+    <!--    &lt;!&ndash;    <button id="button_start">Start</button>&ndash;&gt;-->
+    <!--    &lt;!&ndash; Show Start Button when tone_module is loaded &ndash;&gt;-->
+    <!--    <button id="button_start" style="display: none;">Start</button>-->
+    <!--    <div class="row border p-1">-->
+    <!--        {% for i in range(4) %}-->
+    <!--        {% set list = ['kick', 'snare', 'hihat', 'perc'] %}-->
+    <!--        <div class="sequencer-row row">-->
+    <!--            <div class="col-5">-->
+    <!--                <h6 class="d-inline mx-2">{{list[loop.index-1]}}:</h6>-->
+    <!--                <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
+    <!--            </div>-->
+    <!--            <div class="col-7">-->
+    <!--                {% for i in range(16) %}-->
+    <!--                &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
+    <!--                {% if i % 4 == 3 %}-->
+    <!--                <input class="d-inline me-1 bg-danger border-danger sequencer-step" type="checkbox">-->
+    <!--                {% else %}-->
+    <!--                <input class="d-inline sequencer-step" type="checkbox">-->
+    <!--                {% endif %}-->
+    <!--                {% endfor %}-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        {% endfor %}-->
+    <!--    </div>-->
+    <!--</div>-->
 
-<!--<div class="container">-->
-<!--    <h1>Drum Rack</h1>-->
-<!--    <div class="row">-->
-<!--        &lt;!&ndash; SAMPLE GALLERY &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-2">-->
-<!--            <h3>SAMPLE GALLERY</h3>-->
-<!--            {% for kick in kick_paths %}-->
-<!--            <div class="">-->
-<!--                <button id="gallery_item_{{loop.index}}" class="gallery_items"-->
-<!--                        onclick="">-->
-<!--                    {{kick_names[loop.index - 1]}}-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--        &lt;!&ndash; PATTERN RACK &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-6">-->
-<!--            <h3>PATTERN RACK</h3>-->
-<!--            <div class="">-->
-<!--                <button class=""></button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; MIDI COLLECTION &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-2">-->
-<!--            <h3>MIDI COLLECTION</h3>-->
-<!--            {% for midi in midi_paths %}-->
-<!--            {{midi}}-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--        &lt;!&ndash; SOUNFONT COLLECTION &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-2">-->
-<!--            <h3>SOUND FONT COLLECTION</h3>-->
-<!--            {% for soundfont in soundfont_paths %}-->
-<!--            {{soundfont}}-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--        <div class="col-8">-->
-<!--            <ul id="piano">-->
-<!--                <li data-note="C4" class="key">-->
-<!--                    <div data-note="C#4" class="black-key">R</div>-->
-<!--                    D-->
-<!--                </li>-->
-<!--                <li data-note="D4" class="key">-->
-<!--                    <div data-note="D#4" class="black-key">T</div>-->
-<!--                    F-->
-<!--                </li>-->
-<!--                <li data-note="E4" class="key">-->
-<!--                    G-->
-<!--                </li>-->
-<!--                <li data-note="F4" class="key">-->
-<!--                    <div data-note="F#4" class="black-key">U</div>-->
-<!--                    H-->
-<!--                </li>-->
-<!--                <li data-note="G4" class="key">-->
-<!--                    <div data-note="G#4" class="black-key">I</div>-->
-<!--                    J-->
-<!--                </li>-->
-<!--                <li data-note="A4" class="key">-->
-<!--                    <div data-note="A#4" class="black-key">O</div>-->
-<!--                    K-->
-<!--                </li>-->
-<!--                <li data-note="B4" class="key">-->
-<!--                    L-->
-<!--                </li>-->
-<!--            </ul>-->
-
-
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-<!--<div class="container">-->
-<!--    <button onclick="random_key()">Random Key</button>-->
-<!--    <h1>Key: C Major</h1>-->
-<!--    <button onclick=play(note_1)>C</button>-->
-<!--    <button onclick=play(note_2)>D</button>-->
-<!--    <button onclick=play(note_3)>E</button>-->
-<!--    <button onclick=play(note_4)>F</button>-->
-<!--    <button onclick=play(note_5)>G</button>-->
-<!--    <button onclick=play(note_6)>A</button>-->
-<!--    <button onclick=play(note_7)>B</button>-->
-<!--    <h3>Try different Sounds</h3>-->
-<!--    <button onclick="change_sound()">Change Sound</button>-->
-<!--    <button onclick="play_soundfont()">Play Soundfont</button>-->
-<!--    <button onclick="change_soundfont_instrument()">Random Soundfont</button>-->
-<!--    <h4>acoustic_grand_piano</h4>-->
-<!--</div>-->
+    <!--<div class="container">-->
+    <!--    <h1>Drum Rack</h1>-->
+    <!--    <div class="row">-->
+    <!--        &lt;!&ndash; SAMPLE GALLERY &ndash;&gt;-->
+    <!--        <div class="d-inline-block border p-1 col-2">-->
+    <!--            <h3>SAMPLE GALLERY</h3>-->
+    <!--            {% for kick in kick_paths %}-->
+    <!--            <div class="">-->
+    <!--                <button id="gallery_item_{{loop.index}}" class="gallery_items"-->
+    <!--                        onclick="">-->
+    <!--                    {{kick_names[loop.index - 1]}}-->
+    <!--                </button>-->
+    <!--            </div>-->
+    <!--            {% endfor %}-->
+    <!--        </div>-->
+    <!--        &lt;!&ndash; PATTERN RACK &ndash;&gt;-->
+    <!--        <div class="d-inline-block border p-1 col-6">-->
+    <!--            <h3>PATTERN RACK</h3>-->
+    <!--            <div class="">-->
+    <!--                <button class=""></button>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        &lt;!&ndash; MIDI COLLECTION &ndash;&gt;-->
+    <!--        <div class="d-inline-block border p-1 col-2">-->
+    <!--            <h3>MIDI COLLECTION</h3>-->
+    <!--            {% for midi in midi_paths %}-->
+    <!--            {{midi}}-->
+    <!--            {% endfor %}-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="row">-->
+    <!--        &lt;!&ndash; SOUNFONT COLLECTION &ndash;&gt;-->
+    <!--        <div class="d-inline-block border p-1 col-2">-->
+    <!--            <h3>SOUND FONT COLLECTION</h3>-->
+    <!--            {% for soundfont in soundfont_paths %}-->
+    <!--            {{soundfont}}-->
+    <!--            {% endfor %}-->
+    <!--        </div>-->
+    <!--        <div class="col-8">-->
+    <!--            <ul id="piano">-->
+    <!--                <li data-note="C4" class="key">-->
+    <!--                    <div data-note="C#4" class="black-key">R</div>-->
+    <!--                    D-->
+    <!--                </li>-->
+    <!--                <li data-note="D4" class="key">-->
+    <!--                    <div data-note="D#4" class="black-key">T</div>-->
+    <!--                    F-->
+    <!--                </li>-->
+    <!--                <li data-note="E4" class="key">-->
+    <!--                    G-->
+    <!--                </li>-->
+    <!--                <li data-note="F4" class="key">-->
+    <!--                    <div data-note="F#4" class="black-key">U</div>-->
+    <!--                    H-->
+    <!--                </li>-->
+    <!--                <li data-note="G4" class="key">-->
+    <!--                    <div data-note="G#4" class="black-key">I</div>-->
+    <!--                    J-->
+    <!--                </li>-->
+    <!--                <li data-note="A4" class="key">-->
+    <!--                    <div data-note="A#4" class="black-key">O</div>-->
+    <!--                    K-->
+    <!--                </li>-->
+    <!--                <li data-note="B4" class="key">-->
+    <!--                    L-->
+    <!--                </li>-->
+    <!--            </ul>-->
 
 
-<script type="text/javascript">
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</div>-->
+    <!--<div class="container">-->
+    <!--    <button onclick="random_key()">Random Key</button>-->
+    <!--    <h1>Key: C Major</h1>-->
+    <!--    <button onclick=play(note_1)>C</button>-->
+    <!--    <button onclick=play(note_2)>D</button>-->
+    <!--    <button onclick=play(note_3)>E</button>-->
+    <!--    <button onclick=play(note_4)>F</button>-->
+    <!--    <button onclick=play(note_5)>G</button>-->
+    <!--    <button onclick=play(note_6)>A</button>-->
+    <!--    <button onclick=play(note_7)>B</button>-->
+    <!--    <h3>Try different Sounds</h3>-->
+    <!--    <button onclick="change_sound()">Change Sound</button>-->
+    <!--    <button onclick="play_soundfont()">Play Soundfont</button>-->
+    <!--    <button onclick="change_soundfont_instrument()">Random Soundfont</button>-->
+    <!--    <h4>acoustic_grand_piano</h4>-->
+    <!--</div>-->
 
-    //////////////////////////////////////////
-    /////////// DRAGGING ITEMS ///////////////
-    //////////////////////////////////////////
+
+    <script type="text/javascript">
+
+        //////////////////////////////////////////
+        //////// SAMPLE GALLERY SHOW /////////////
+        //////////////////////////////////////////
+
+        var category_select = document.getElementById("category-select");
+        var section_list = document.querySelectorAll("#kick_section, #snare_section, #clap_section, #hihat_section");
+
+        category_select.addEventListener("change", function () {
+            // Get the selected option of #category-select
+            var selected_option = document.querySelector("#category-select option:checked").innerText;
+            // console.log(selected_option);
+            for (var i = 0; i < section_list.length; i++) {
+                section_list[i].style.display = "none";
+                section_name = selected_option.toLowerCase().slice(0, -1) + "_section";
+                console.log(section_name);
+                if (section_list[i].id === section_name) {
+                    section_list[i].style.display = "block";
+                }
+            }
+            // // get selected option
+            // var selected_option = category_select.options[category_select.selectedIndex].value;
+            // var new_selection = document.getElementById("category-select");
+            //
+            // console.log(new_selection);
+            // // document.getElementById(category_select.value).style.display = "block";
+        });
 
 
-    var gallery_items = document.getElementsByClassName("gallery_items");
-    var dragItem = null;
-    for (var i of gallery_items) {
-        i.addEventListener("dragstart", dragStart);
-        i.addEventListener("dragend", dragEnd);
-    }
+        //////////////////////////////////////////
+        /////////// DRAGGING ITEMS ///////////////
+        //////////////////////////////////////////
 
-    function dragStart() {
-        // drag start but duplicate the element
-        dragItem = this;
-        setTimeout(() => {
-            this.style.color = "red";
-        }, 0);
-        // console.log("dragStart" + this.id);
-    }
 
-    function dragEnd(e) {
-        setTimeout(() => {
-            this.style.display = "block";
-        }, 0);
-        // console.log("dragEnd" + this.id);
-        dragItem = null;
-    }
-
-    // Sequencer Rows
-    var sequencer_rows = document.getElementsByClassName("draggables");
-    for (var i of sequencer_rows) {
-        i.addEventListener("dragover", dragOver);
-        i.addEventListener("dragenter", dragEnter);
-        i.addEventListener("dragleave", dragLeave);
-        i.addEventListener("drop", drop);
-    }
-
-    function drop() {
-        // console.log("drop" + this.id);
-        this.style.backgroundColor = "var(--black)";
-        this.append(dragItem);
-        var hints = document.getElementsByClassName("draggable_hint");
-        for (var i of hints) {
-            i.style.display = "none";
+        var gallery_items = document.getElementsByClassName("gallery_items");
+        var dragItem = null;
+        for (var i of gallery_items) {
+            i.addEventListener("dragstart", dragStart);
+            i.addEventListener("dragend", dragEnd);
         }
-    }
 
-    function dragOver(e) {
-        e.preventDefault();
-        this.style.backgroundColor = "var(--light-grey)";
-    }
+        function dragStart() {
+            // drag start but duplicate the element
+            dragItem = this;
+            setTimeout(() => {
+                this.style.color = "red";
+            }, 0);
+            // console.log("dragStart" + this.id);
+        }
 
-    function dragEnter(e) {
-        e.preventDefault();
-    }
+        function dragEnd(e) {
+            setTimeout(() => {
+                this.style.display = "block";
+            }, 0);
+            // console.log("dragEnd" + this.id);
+            dragItem = null;
+        }
 
-    function dragLeave() {
-        this.style.border = "none";
-        this.style.backgroundColor = "var(--black)";
-    }
+        // Sequencer Rows
+        var sequencer_rows = document.getElementsByClassName("draggables");
+        for (var i of sequencer_rows) {
+            i.addEventListener("dragover", dragOver);
+            i.addEventListener("dragenter", dragEnter);
+            i.addEventListener("dragleave", dragLeave);
+            i.addEventListener("drop", drop);
+        }
 
-    //////////////////////////////////////////
-    /////////// PLAYING MUSIC ////////////////
-    //////////////////////////////////////////
-
-    // Make Samples in Sample Gallery playable via click
-    var sample_gallery_items = document.getElementsByClassName("gallery_items");
-    for (var i of sample_gallery_items) {
-        i.addEventListener("click", play_sample);
-    }
-
-    function play_sample() {
-        element_name = this.innerText;
-        element_category = "kicks"
-        element_path = "{{static_url}}/" + element_category + "/" + element_name;
-        console.log(element_path);
-        var sample = element_path;
-        var audio = new Audio(sample);
-        audio.play();
-    }
-
-    // ///////////////////////////////////////////////////
-    // ///////////// SYNTH SEQUENCER /////////////////////
-    // ///////////////////////////////////////////////////
-
-    document.documentElement.addEventListener('mousedown', () => {
-        if (Tone.context.state !== 'running') Tone.context.resume();
-    });
-
-    // Wait till tone.js is loaded
-    setTimeout(function () {
-
-            console.log("tone.js hopefully loaded");
-
-            // When New Item is detected in Sequencer --> initialize new Tone.js Player
-            var sequencer_rows = document.getElementsByClassName("draggables");
-            for (var i of sequencer_rows) {
-                i.addEventListener("drop", initializeSamples);
+        function drop() {
+            // console.log("drop" + this.id);
+            this.style.backgroundColor = "var(--black)";
+            this.append(dragItem);
+            var hints = document.getElementsByClassName("draggable_hint");
+            for (var i of hints) {
+                i.style.display = "none";
             }
+        }
 
-            // var buffer = new Tone.Buffer("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Deep_F.wav");
+        function dragOver(e) {
+            e.preventDefault();
+            this.style.backgroundColor = "var(--light-grey)";
+        }
 
-            var start_button = document.getElementById("startSequencerButton");
+        function dragEnter(e) {
+            e.preventDefault();
+        }
 
-            function startSequencer() {
-                console.log("start sequencer");
-                initializeSamples();
-                Tone.Transport.scheduleRepeat(repeat, '16n');
-                Tone.Transport.start();
-            }
+        function dragLeave() {
+            this.style.border = "none";
+            this.style.backgroundColor = "var(--black)";
+        }
 
-            start_button.addEventListener("click", startSequencer);
+        //////////////////////////////////////////
+        /////////// PLAYING MUSIC ////////////////
+        //////////////////////////////////////////
+
+        // Make Samples in Sample Gallery playable via click
+        var sample_gallery_items = document.getElementsByClassName("gallery_items");
+        for (var i of sample_gallery_items) {
+            i.addEventListener("click", play_sample);
+        }
+
+        function play_sample() {
+            element_name = this.innerText;
+            element_category = "kicks"
+            element_path = "{{static_url}}/" + element_category + "/" + element_name;
+            console.log(element_path);
+            var sample = element_path;
+            var audio = new Audio(sample);
+            audio.play();
+        }
+
+        // ///////////////////////////////////////////////////
+        // ///////////// SYNTH SEQUENCER /////////////////////
+        // ///////////////////////////////////////////////////
+
+        document.documentElement.addEventListener('mousedown', () => {
+            if (Tone.context.state !== 'running') Tone.context.resume();
+        });
+
+        // Wait till tone.js is loaded
+        setTimeout(function () {
+
+                console.log("tone.js hopefully loaded");
+
+                // When New Item is detected in Sequencer --> initialize new Tone.js Player
+                var sequencer_rows = document.getElementsByClassName("draggables");
+                for (var i of sequencer_rows) {
+                    i.addEventListener("drop", initializeSamples);
+                }
+
+                // var buffer = new Tone.Buffer("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Deep_F.wav");
+
+                var start_button = document.getElementById("startSequencerButton");
+
+                function startSequencer() {
+                    console.log("start sequencer");
+                    initializeSamples();
+                    Tone.Transport.scheduleRepeat(repeat, '16n');
+                    Tone.Transport.start();
+                }
+
+                start_button.addEventListener("click", startSequencer);
 
 
-            // Initialize drum samples
+                // Initialize drum samples
 
-            const drum_samples = ["", "", "", ""];
+                const drum_samples = ["", "", "", ""];
 
-            // synths[0].oscillator.type = 'triangle';
-            // synths[1].oscillator.type = 'sine';
-            // synths[2].oscillator.type = 'sawtooth';
+                // synths[0].oscillator.type = 'triangle';
+                // synths[1].oscillator.type = 'sine';
+                // synths[2].oscillator.type = 'sawtooth';
 
 
-            const $rows = document.getElementsByClassName('$row')
+                const $rows = document.getElementsByClassName('$row')
 
-            function initializeSamples() {
-                var select_drum_samples = document.querySelectorAll(".draggables");
-                for (var i = 0; i < select_drum_samples.length; i++) {
-                    // console.log(i, select_drum_samples[i].innerText);
-                    // if element has button as a child
-                    if (select_drum_samples[i].querySelector("button")) {
-                        var element_name = select_drum_samples[i].innerText;
-                        console.log(i, element_name);
-                        if (element_name) {
-                            element_url = "{{static_url}}/kicks/" + element_name;
-                            // console.log(element_url);
-                            drum_samples[i] = new Tone.Player(element_url).toDestination();
+                function initializeSamples() {
+                    var select_drum_samples = document.querySelectorAll(".draggables");
+                    for (var i = 0; i < select_drum_samples.length; i++) {
+                        // console.log(i, select_drum_samples[i].innerText);
+                        // if element has button as a child
+                        if (select_drum_samples[i].querySelector("button")) {
+                            var element_name = select_drum_samples[i].innerText;
+                            console.log(i, element_name);
+                            if (element_name) {
+                                element_url = "{{static_url}}/kicks/" + element_name;
+                                // console.log(element_url);
+                                drum_samples[i] = new Tone.Player(element_url).toDestination();
+                            }
                         }
                     }
                 }
-            }
 
-            let index = 0;
+                let index = 0;
 
-            function repeat(time) {
-                console.log('repeat');
-                let step = index % 16;
-                for (let i = 0; i < $rows.length; i++) {
-                    let sample = drum_samples[i],
-                        $row = $rows[i],
-                        $input = $row.querySelector(`input:nth-child(${step + 1})`);
-                    if ($input.checked) {
-                        drum_samples[i].start(time);
+                function repeat(time) {
+                    console.log('repeat');
+                    let step = index % 16;
+                    for (let i = 0; i < $rows.length; i++) {
+                        let sample = drum_samples[i],
+                            $row = $rows[i],
+                            $input = $row.querySelector(`input:nth-child(${step + 1})`);
+                        if ($input.checked) {
+                            drum_samples[i].start(time);
+                        }
                     }
+                    index++;
                 }
-                index++;
+
+                // Mixer Sliders
+                slider_volume_sequencer = document.getElementsByClassName("slider_volume_sequencer");
+                for (let step = 0; step < slider_volume_sequencer.length; step++) {
+                    slider_volume_sequencer[step].addEventListener("input", function () {
+                        var volume = this.value;
+                        if (drum_samples[step]) {
+                            // print out name of sample
+                            drum_samples[step].volume.value = volume;
+                            console.log("volume", volume);
+                        } else {
+                            console.log("no sample connected");
+                        }
+                    });
+                }
+
             }
+            , 1000);
 
-            // }
-        }
-        , 1000);
+        // ///////////////////////////////////////////////////
+        // /////////////////// SLIDER, KNOBS ////////////////////////
+        // ///////////////////////////////////////////////////
 
-    // ///////////////////////////////////////////////////
-    // /////////////////// LOOPER ////////////////////////
-    // ///////////////////////////////////////////////////
+        var bpm_slider = document.getElementById("bpm_slider");
+
+        bpm_slider.addEventListener("input", function () {
+            var bpm_value = bpm_slider.value;
+            document.getElementById("bpm_label").innerHTML = bpm_value;
+            console.log(bpm_value);
+            Tone.Transport.bpm.value = bpm_value;
+        });
 
 
-</script>
-{% endblock %}
+    </script>
+    {% endblock %}
