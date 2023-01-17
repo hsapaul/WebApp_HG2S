@@ -81,21 +81,12 @@ p {
 .subheadline {
     line-height: 0;
     font-size: 15px;
-    margin-bottom: 2.5em;
+    margin-bottom: 1.2em;
 }
 
 .sequencer-step {
-    /*display: inline-block;*/
-    /*width: 20px;*/
-    /*height: 30px;*/
-    /*border-radius: 50%;*/
-    /*background-color: var(--grey);*/
-    /*margin: 0 10px;*/
-    /*text-align: center;*/
-    /*line-height: 50px;*/
-    /*font-size: 20px;*/
-    /*color: var(--black);*/
-    /*cursor: pointer;*/
+    width: 15px;
+    height: 20px;
 }
 
 .second-font {
@@ -114,11 +105,20 @@ input {
 }
 
 /*---------------------------------------------*/
-/*                  SLIDER                    */
+/*                  SLIDER, COUNTER                    */
 /*---------------------------------------------*/
 
 .vertical-slider {
     transform: rotate(270deg);
+}
+
+#step-counter {
+    /*z-index: 0 !important;*/
+    position: absolute;
+    /* align on upper right of parent */
+    top: 0;
+    right: 0;
+
 }
 
 
@@ -205,6 +205,10 @@ footer p a:hover {
     position: relative;
     /*left: -0px;*/
     bottom: 0px;
+}
+
+.bg-step {
+    background-color: var(--yellow);
 }
 
 
