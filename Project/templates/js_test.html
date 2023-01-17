@@ -102,29 +102,16 @@ HG2S - Text Prompt Song Generation
                         {% set category_samples = sample_dict[category] %}
                         {% for sample in category_samples %}
                         <div class="">
-                            <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"
-                                    style="font-size:8px">
-                                {{sample}}
+                            {% set sample_name = sample | string() %}
+                            {% set sample_name = sample_name.split("'")[1] | replace(" ", "") | replace("\n", "") %}
+                            <button id="gallery_item_{{loop.index}}" class="gallery_items {{category[:-1]}}_item"
+                                    draggable="true"
+                                    style="font-size:8px">{{ sample_name }}
                             </button>
                         </div>
                         {% endfor %}
                     </section>
                     {% endfor %}
-
-
-                    <!--                    <section id="kick_section">-->
-                    <!--                        {% for kick in kick_paths %}-->
-                    <!--                        <div class="">-->
-                    <!--                            <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"-->
-                    <!--                                    style="font-size:8px">-->
-                    <!--                                {{kick_names[loop.index - 1]}}-->
-                    <!--                            </button>-->
-                    <!--                        </div>-->
-                    <!--                        {% endfor %}-->
-                    <!--                    </section>-->
-                    <!--                    <section id="snare_section" style="display: none">-->
-                    <!--                        <p>sdags</p>-->
-                    <!--                    </section>-->
                 </div>
             </div>
         </div>
@@ -524,20 +511,28 @@ HG2S - Text Prompt Song Generation
             const $rows = document.getElementsByClassName('$row')
 
             function initializeSamples() {
+                console.log("INITIALIZING SAMPLES");
                 var select_drum_samples = document.querySelectorAll(".draggables");
                 for (var i = 0; i < select_drum_samples.length; i++) {
                     // console.log(i, select_drum_samples[i].innerText);
                     // if element has button as a child
                     if (select_drum_samples[i].querySelector("button")) {
                         var element_name = select_drum_samples[i].innerText;
-                        console.log(i, element_name);
+                        // console.log(i, element_name);
                         if (element_name) {
-                            element_url = "{{static_url}}/kicks/" + element_name;
-                            // console.log(element_url);
-                            drum_samples[i] = new Tone.Player(element_url).toDestination();
-                            momentary_volume = document.getElementById("slider_volume_sequencer_" + (i + 1)).value;
-                            console.log("momentary volume", momentary_volume);
-                            drum_samples[i].volume.value = Math.round(momentary_volume);
+                            classList = select_drum_samples[i].querySelector("button").classList;
+                            category_classes = ["kick_item", "snare_item", "clap_item", "hihat_item", "percussion_item"];
+                            for (category in category_classes) {
+                                if (classList.contains(category_classes[category])) {
+                                    var element_category = category_classes[category].slice(0, -5) + "s";
+                                    var element_url = "{{static_url}}" + element_category + "/" + element_name;
+                                    console.log("Sequencer Slot:", i);
+                                    console.log("Element URL:", element_url);
+                                    drum_samples[i] = new Tone.Player(element_url).toDestination();
+                                    momentary_volume = document.getElementById("slider_volume_sequencer_" + (i + 1)).value;
+                                    drum_samples[i].volume.value = Math.round(momentary_volume);
+                                }
+                            }
                         }
                     }
                 }
