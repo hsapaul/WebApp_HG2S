@@ -15,23 +15,38 @@ HG2S - Text Prompt Song Generation
 {% block content %}
 
 <div class="col-12">
+    <h1 class="headline mb-3 px-0 rounded"
+        style="text-align: center; background-color: var(--middle-grey); color: var(--light-blue)">NO PROMPT
+        SELECTED</h1>
     <!-- TOP ROW -->
     <div class="card-deck row" style="border-radius: 10px;">
         <!-- UPPER LEFT -->
-        <div class="card p-2 col-4 bg-dark text-white d-inline-block">
-            <div class="card-title">Song Configurations</div>
-            <div class="card-body">
-                <button id="startSequencerButton" class="rounded-circle d-inline"><img
+        <div class="card col-4 bg-dark text-white d-inline-block p-0">
+            <div class="card-title rounded-top p-1 bgcolor_avenue text-black">
+                {% if text_prompt %}
+                <div>{{text_prompt}}</div>
+                {% else %}
+                <div class="">No Playground Selected</div>
+                {% endif %}
+                <button id="startSequencerButton" class="rounded-circle d-inline upper-left bgcolor_warning"><img
                         class="icon_set_imgs"
                         src="{{ url_for('static', filename='img/icons/volume.png') }}"
                         alt=""></button>
-                <div class="slidecontainer">
-                    <input id="bpm_slider" type="range" min="60" max="200" value="100" class="slider">
-                    <label id="bpm_label" for="bpm_slider">100</label>
+            </div>
+            <div class="card-body m-2 p-0">
+                <div class="row">
+                    <div class="col-3"><h5 class="d-inline slider-prefix">BPM</h5></div>
+                    <div class="col-9">
+                        <input id="bpm_slider" type="range" min="60" max="200" value="100" class="slider">
+                        <label id="bpm_label" for="bpm_slider">100</label>
+                    </div>
                 </div>
-                <div class="slidecontainer">
-                    <input id="volume_slider" type="range" min="-60" max="10" value="0" class="slider">
-                    <label id="volume_label" for="bpm_slider">0</label>
+                <div class="row">
+                    <div class="col-3"><h5 class="d-inline slider-prefix">Volume</h5></div>
+                    <div class="col-9">
+                        <input id="volume_slider" type="range" min="-60" max="10" value="0" class="slider">
+                        <label id="volume_label" for="bpm_slider">0</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -40,7 +55,7 @@ HG2S - Text Prompt Song Generation
             <div class="card-title">Song Configurations</div>
             <div class="card-body">
                 <p>KEY:</p>
-<!--                <input type="number" id="bpms" name="bpm" min="1" max="300" value="140">-->
+                <!--                <input type="number" id="bpms" name="bpm" min="1" max="300" value="140">-->
             </div>
         </div>
         <!-- UPPER RIGHT -->
@@ -69,41 +84,59 @@ HG2S - Text Prompt Song Generation
             <div class="card-title p-2 h-100">
                 <div>
                     <h4 class="">Samples</h4>
-                    <p class="subheadline">Drag&Drop that!</p>
+                    <p class="subheadline">Drag these!</p>
                 </div>
                 <div class="card-body">
                     <select id="category-select" class="category-select" name="form-select"
                             aria-label="Default select example">
-                        {% set category_list = ["Kicks", "Snares", "Claps", "HiHats"] %}
+                        {% set category_list = ["kicks", "snares", "claps", "hihats", "percussion"] %}
                         {% for category in category_list %}
                         {% if category != session['category_list'] %}
                         <option class="theme_items" value="{{theme}}">{{ category }}</option>
                         {% endif %}
                         {% endfor %}
                     </select>
-                    <section id="kick_section">
-                        {% for kick in kick_paths %}
+
+                    {% for category in category_list %}
+                    <section id="{{category[:-1]}}_section">
+                        {% set category_samples = sample_dict[category] %}
+                        {% for sample in category_samples %}
                         <div class="">
                             <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"
                                     style="font-size:8px">
-                                {{kick_names[loop.index - 1]}}
+                                {{sample}}
                             </button>
                         </div>
                         {% endfor %}
                     </section>
-                    <section id="snare_section" style="display: none">
-                        <p>sdags</p>
-                    </section>
+                    {% endfor %}
+
+
+                    <!--                    <section id="kick_section">-->
+                    <!--                        {% for kick in kick_paths %}-->
+                    <!--                        <div class="">-->
+                    <!--                            <button id="gallery_item_{{loop.index}}" class="gallery_items" draggable="true"-->
+                    <!--                                    style="font-size:8px">-->
+                    <!--                                {{kick_names[loop.index - 1]}}-->
+                    <!--                            </button>-->
+                    <!--                        </div>-->
+                    <!--                        {% endfor %}-->
+                    <!--                    </section>-->
+                    <!--                    <section id="snare_section" style="display: none">-->
+                    <!--                        <p>sdags</p>-->
+                    <!--                    </section>-->
                 </div>
             </div>
         </div>
 
         <!-- MIDDLE MIDDLE -->
         <div class="card p-2 col-7 bg-dark text-white d-inline-block" style="border-radius: 10px;">
-            <h5 id="step-counter" class="border py-1 px-2 border-danger bg-danger rounded-2 d-inline m-1">0</h5>
+            <h5 id="step-counter"
+                class="border py-1 px-2 border-danger bgcolor_warning rounded-2 d-inline m-1 upper-left">
+                0</h5>
             <div class="card-title">
                 <h4 class="d-inline">Musikantor</h4>
-                <p class="subheadline block">Drag&Drop that!</p>
+                <p class="subheadline block">Drag them into the spaces beyond!</p>
             </div>
             <div class="card-body">
                 <div class="mt-2">
@@ -550,9 +583,12 @@ HG2S - Text Prompt Song Generation
         }
         , 1000);
 
-    // ///////////////////////////////////////////////////
-    // /////////////////// SLIDER, KNOBS ////////////////////////
-    //
+    ///////////////////////////////////////////////////
+    //////////////// SLIDER, KNOBS ////////////////////
+    ///////////////////////////////////////////////////
+
+    // MASTER - Upper Left Elements
+
     var bpm_slider = document.getElementById("bpm_slider");
 
     bpm_slider.addEventListener("input", function () {
@@ -560,6 +596,14 @@ HG2S - Text Prompt Song Generation
         document.getElementById("bpm_label").innerHTML = bpm_value;
         console.log(bpm_value);
         Tone.Transport.bpm.value = bpm_value;
+    });
+
+    var master_volume_slider = document.getElementById("volume_slider");
+
+    master_volume_slider.addEventListener("input", function () {
+        var master_volume_value = master_volume_slider.value;
+        document.getElementById("volume_label").innerHTML = master_volume_value;
+        Tone.Master.volume.value = master_volume_value;
     });
 
 

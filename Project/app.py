@@ -23,7 +23,7 @@ app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 
 db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\database.db"
-sample_db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\music_gallery.db"
+sample_db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\models\music_gallery.db"
 
 # Encrypt and Decrypt Session Data
 app.secret_key = "123"
@@ -449,16 +449,16 @@ def jstest():
     # Get sample_paths from database
     conn = sqlite3.connect(sample_db_path)
     c = conn.cursor()
-    sample_paths = c.execute('SELECT sample_path FROM sample_kick_gallery').fetchall()
-    sample_names = c.execute('SELECT sample_name FROM sample_kick_gallery').fetchall()
-    print(sample_paths)
-    sample_names = [str(name[0]).replace("('", "").replace("',)", "") for name in sample_names]
-    sample_paths = [str(path[0]).replace("('", "").replace("',)", "") for path in sample_paths]
-    print(sample_paths)
+    # FETCH SAMPLE PATHS AND NAMES
+    sub_folders = ["kicks", "snares", "hihats", "claps", "percussion"]
+    sample_dict = {}
+    for sub_folder in sub_folders:
+        sample_dict[sub_folder] = c.execute(f'SELECT name FROM {sub_folder}').fetchall()
     conn.close()
     static_url = url_for('static', filename='samples/drum_samples/')
     # {{ url_for('static', filename='samples/drum_samples/kick/' + kick) }}
-    return render_template('js_test.html', kick_paths=sample_paths, kick_names=sample_names, static_url=static_url)
+    # return sample_dict
+    return render_template('js_test.html', sample_dict=sample_dict, static_url=static_url)
 
 
 @app.route('/jstest2')
