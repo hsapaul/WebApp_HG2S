@@ -110,15 +110,35 @@ input {
 }
 
 /*---------------------------------------------*/
-/*                  SLIDER, COUNTER, BUTTONS                    */
+/*   SLIDER, COUNTER, BUTTONS, RESIZABLE       */
 /*---------------------------------------------*/
 
 .vertical-slider {
     transform: rotate(270deg);
 }
 
-.slider {
+.resizable-content {
+    min-width: 150px;
+    resize: horizontal;
+    overflow: hidden;
+    max-width: 200px;
+    max-height: 400px;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    /* firefox only up to now :/ */
+    scrollbar-color: var(--yellow) var(--black);
+    scrollbar-width: thin;
+}
 
+.scrollbars::-webkit-scrollbar {
+  width: 10px; /* Mostly for vertical scrollbars */
+  height: 10px; /* Mostly for horizontal scrollbars */
+}
+.scrollbars::-webkit-scrollbar-thumb { /* Foreground */
+  background: #999;
+}
+.scrollbars::-webkit-scrollbar-track { /* Background */
+  background: #333;
 }
 
 /*.slidecontainer {*/
