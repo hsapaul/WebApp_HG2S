@@ -32,17 +32,22 @@ HG2S - Text Prompt Song Generation
 </form>
 
 </br>
+
+<!-------------------------------------------------------------->
+<!--        SHOW RESULTS AFTER TEXT PROMPT SUBMISSION         -->
+<!-------------------------------------------------------------->
+
 <!-- STEP 1 - Show Results of nlp.py -->
 {% if text_prompt %}
 <h3><em>Prompt - </em> "{{ text_prompt }}"</h3><br>
-<h2 class="mb-1"><strong>Step 1 - Text Comprehension </strong> ({{ end_time }} seconds)</h2><br>
+<h2 class="mb-1">Step 1 - Text Comprehension <p>({{ end_time }} seconds)</p></h2><br>
 <ul>
     {% if artist_objects %}
     <h3>- Artist(s):</h3>
     <div class="container">
         <div class="row">
             {% for artist in artist_objects %}
-            <div class="d-inline-block border p-1 col-6">
+            <div class="d-inline-block rounded-2 border p-1 col-6" style="border-color: var(--light-grey)">
                 <h5 class="">{{ artist_objects[loop.index - 1].name }}: </h5>
                 <p class=""><em>year:</em> {{ artist_objects[loop.index - 1].year }}</p>
                 <p class=""><em>occupations:</em> {{ artist_objects[loop.index - 1].occupation }}</p>
@@ -99,6 +104,11 @@ HG2S - Text Prompt Song Generation
     {% endif %}
 </ul>
 
+<!-------------------------------------------------------------->
+<!--     POST RESULTS TO MARKETPLACE OR ENTER PLAYGROUND      -->
+<!--     (mit Logik, ob Nutzer eingeloggt ist oder nicht)     -->
+<!-------------------------------------------------------------->
+
 <form action="#" method="post">
     <div class="form-group_2">
         {% if session['session_user'] %}
@@ -110,13 +120,18 @@ HG2S - Text Prompt Song Generation
         <p class="">Don't have an account? <a href="{{ url_for('sign_up') }}">Sign Up</a></p>
         <p class="">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
         {% endif %}
-        <button title="Play in your individual Configuration" type="submit" name="post_button" value="Generate"
+        <button title="Play in your individual Configuration" type="submit" name="playground_button" value="enter_playground"
                 class="btn mt-2 own-btn px-4 d-inline">Enter Playground
         </button>
     </div>
 </form>
 {% endif %}
 </br>
+
+<!-------------------------------------------------------------->
+<!-- EXTRAS LIKE DOCUMENTATION, EXAMPLES AND TIPPS & TRICKS   -->
+<!-------------------------------------------------------------->
+
 <div class="container">
     <div class="row">
         <div class="">

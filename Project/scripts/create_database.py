@@ -32,7 +32,7 @@ def fill_database(args):
     db = sqlite3.connect(music_gallery_db_path)
     cursor = db.cursor()
     # Get all Subfolders
-    sub_folders = ["kicks", "snares", "hihats", "claps", "percussion"]
+    sub_folders = ["kicks", "snares", "hihats", "claps", "percussions"]
     for sub_folder in sub_folders:
         cursor.execute("CREATE TABLE IF NOT EXISTS " + sub_folder + " (id INTEGER PRIMARY KEY, name TEXT, path TEXT, type TEXT)")
         current_sample_names = cursor.execute("SELECT name FROM " + sub_folder).fetchall()

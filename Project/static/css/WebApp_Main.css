@@ -78,6 +78,9 @@ p {
     font-family: Arial;
 }
 
+
+/*---------------HEADLINES---------------*/
+
 .headline {
     font-size: 50px;
     margin-bottom: 0;
@@ -87,6 +90,9 @@ p {
     line-height: 0;
     font-size: 15px;
     margin-bottom: 1.2em;
+}
+
+.headline-classic {
 }
 
 .sequencer-step {
@@ -109,6 +115,9 @@ input {
 
 }
 
+
+
+
 /*---------------------------------------------*/
 /*   SLIDER, COUNTER, BUTTONS, RESIZABLE       */
 /*---------------------------------------------*/
@@ -121,7 +130,7 @@ input {
     min-width: 150px;
     resize: horizontal;
     overflow: hidden;
-    max-width: 200px;
+    max-width: 250px;
     max-height: 400px;
     overflow-y: scroll;
     scroll-behavior: smooth;
@@ -162,13 +171,20 @@ input {
 /*}*/
 
 /*---------------------------------------------*/
-/*           OWN POSITION CLASSES              */
+/*           GENERAL POSITIONING & SIZING             */
 /*---------------------------------------------*/
 
 .upper-left {
     position: absolute;
     top: 1px;
     right: 1px;
+}
+
+.left_bottom {
+}
+
+.small-font {
+    font-size: 13px;
 }
 
 /*---------------------------------------------*/

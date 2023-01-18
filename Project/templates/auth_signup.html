@@ -12,42 +12,28 @@ HG2S - Sign Up
             <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                 <div class="card bg-dark text-white" style="border-radius: 1rem;">
                     <div class="card-body p-5 text-center">
-
-                        <div class="mb-md-5 mt-md-4 pb-5">
-
-                            <h2 class="fw-bold mb-2 text-uppercase">Sign Up</h2>
-                            <p class="text-white-50 mb-5">Please enter your login and password!</p>
-
-                            <form action="#" method="post">
-                                <div class="form-outline form-white mb-4">
-                                    <input type="text" id="username" name="username"
-                                           class="form-control form-control-lg"/>
-                                    <label class="form-label" for="username">Username</label>
-                                </div>
-                                <div class="form-outline form-white mb-4">
-                                    <input type="text" id="email" name="email"
-                                           class="form-control form-control-lg"/>
-                                    <label class="form-label" for="username">E-mail (optional)</label>
-                                </div>
-
-                                <div class="form-outline form-white mb-4">
-                                    <input type="password" name="password" id="password"
-                                           class="form-control form-control-lg"/>
-                                    <label class="form-label" for="password">Password</label>
-                                </div>
-                                <div class="form-outline form-white mb-4">
-                                    <input type="password" name="repeat_password" id="repeat_password"
-                                           class="form-control form-control-lg"/>
-                                    <label class="form-label" for="repeat_password">Repeat Password</label>
-                                </div>
-
-                                <p class="small mb-5 pb-lg-2"><a class="text-white-50" href="#!">Forgot password?</a>
-                                </p>
-
-                                <button class="btn btn-outline-light btn-lg px-5" name="submit" type="submit">Sign Up
-                                </button>
-                            </form>
+                        <div class="headline-class mb-4">
+                            <h2 class="">Sign Up</h2>
+                            <p class="subheadline">Register by filling out the following!</p>
                         </div>
+                        <form action="#" method="post">
+                            <div>
+                                <input type="text" id="username" name="username"
+                                       class="form-control form-control-lg"/>
+                                <label class="form-label" for="username">Username</label>
+                                <input type="text" id="email" name="email"
+                                       class="form-control form-control-lg"/>
+                                <label class="form-label" for="username">E-mail (optional)</label>
+                                <input type="password" name="password" id="password"
+                                       class="form-control form-control-lg"/>
+                                <label class="form-label" for="password">Password</label>
+                                <input type="password" name="repeat_password" id="repeat_password"
+                                       class="form-control form-control-lg"/>
+                                <label class="form-label" for="repeat_password">Repeat Password</label>
+                            </div>
+                            <button class="btn btn-outline-light btn-lg px-5" name="submit" type="submit">Sign Up
+                            </button>
+                        </form>
                         <h4>{{ error }}</h4>
                         <div>
                             <p class="mb-0">Don't have an account? <a href="{{ url_for('login') }}"

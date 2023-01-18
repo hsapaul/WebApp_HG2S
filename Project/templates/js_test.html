@@ -16,8 +16,9 @@ HG2S - Text Prompt Song Generation
 
 <div class="col-12">
     <h1 class="headline mb-3 px-0 rounded"
-        style="text-align: center; background-color: var(--middle-grey); color: var(--light-blue)">NO PROMPT
-        SELECTED</h1>
+        style="text-align: center; background-color: var(--middle-grey); color: var(--light-blue)">
+        {% if text_prompt%}{{text_prompt}}{% else %}}NO PROMPT SELECTED{% endif %}
+    </h1>
     <!-- TOP ROW -->
     <div class="card-deck row" style="border-radius: 10px;">
         <!-- UPPER LEFT -->
@@ -60,7 +61,7 @@ HG2S - Text Prompt Song Generation
         </div>
         <!-- UPPER RIGHT -->
         <div class="card p-2 col-4 bg-dark text-white d-inline-block">
-            <div class="card-title">Mixer</div>
+            <div id="testor" class="card-title">Mixer</div>
             <div class="card-body">
                 <div class="slidecontainer">
                     <div class="slider">
@@ -80,23 +81,25 @@ HG2S - Text Prompt Song Generation
     <!-- MIDDLE ROW -->
     <div class="card-deck row" style="border-radius: 10px;">
         <!-- MIDDLE LEFT -->
-        <div class="card p-2 col-2 bg-dark text-white d-inline-block resizable-content scrollbars">
+        <div id="component_gallery"
+             class="card p-2 col-2 bg-dark text-white d-inline-block resizable-content scrollbars">
             <div class="card-title p-2 h-100">
                 <div>
                     <h4 class="">Samples</h4>
                     <p class="subheadline">Drag these!</p>
                 </div>
-                <div class="">
-                    <select id="category-select" class="category-select" name="form-select"
-                            aria-label="Default select example">
-                        {% set category_list = ["kicks", "snares", "claps", "hihats", "percussion"] %}
-                        {% for category in category_list %}
-                        {% if category != session['category_list'] %}
-                        <option class="theme_items" value="{{theme}}">{{ category }}</option>
-                        {% endif %}
-                        {% endfor %}
-                    </select>
-
+                <div>
+                    <div id="scrollable_category">
+                        <select id="category-select" class="category-select" name="form-select"
+                                aria-label="Default select example">
+                            {% set category_list = ["kicks", "snares", "claps", "hihats", "percussions"] %}
+                            {% for category in category_list %}
+                            {% if category != session['category_list'] %}
+                            <option class="theme_items" value="{{theme}}">{{ category }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
                     {% for category in category_list %}
                     <section id="{{category[:-1]}}_section">
                         {% set category_samples = sample_dict[category] %}
@@ -154,31 +157,7 @@ HG2S - Text Prompt Song Generation
                 </div>
             </div>
         </div>
-        <!-- MIDDLE MIDDLE 2 -->
-        <!--        <div class="">-->
-        <!--                    <h6>Synth Sequencer</h6>-->
-        <!--                    <button class="melody-play-button col-2">Play</button>-->
-        <!--                    {% for i in range(4) %}-->
-        <!--                    {% set list = ['sine', 'sawtooth', 'square', 'triangle'] %}-->
-        <!--                    <div class="row">-->
-        <!--                        <div class="col-3">-->
-        <!--                            <button onClick="playSynth('{{list[loop.index-1]}}')" class="px-4 m-2">-->
-        <!--                                {{list[loop.index-1]}} Synth-->
-        <!--                            </button>-->
-        <!--                        </div>-->
-        <!--                        <div class="col-7">-->
-        <!--                            {% for i in range(16) %}-->
-        <!--                            &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
-        <!--                            {% if i % 4 == 3 %}-->
-        <!--                            <input class="d-inline me-1 bg-danger border-danger melody-sequencer-step" type="checkbox">-->
-        <!--                            {% else %}-->
-        <!--                            <input class="d-inline melody-sequencer-step" type="checkbox">-->
-        <!--                            {% endif %}-->
-        <!--                            {% endfor %}-->
-        <!--                        </div>-->
-        <!--                    </div>-->
-        <!--                    {% endfor %}-->
-        <!--        </div>-->
+
         <!-- MIDDLE RIGHT -->
         <div class="card p-2 col-3 bg-dark text-white d-inline-block">
             <div class="card-title">
@@ -186,22 +165,7 @@ HG2S - Text Prompt Song Generation
                 <p class="subheadline block">Drag&Drop that!</p>
             </div>
             <div class="card-body">
-                <!--                    <div>-->
-                <!--                        <h4 class="">Synths</h4>-->
-                <!--                        <p class="subheadline">Drag&Drop that!</p>-->
-                <!--                    </div>-->
-                <!--                    <div class="card-body">-->
-                <!--                        <section id="synth_section">-->
-                <!--                            {% for synth in synth_paths %}-->
-                <!--                            <div class="">-->
-                <!--                                <button id="synth_item_{{loop.index}}" class="synth_items" draggable="true"-->
-                <!--                                        style="font-size:8px">-->
-                <!--                                    {{synth_names[loop.index - 1]}}-->
-                <!--                                </button>-->
-                <!--                            </div>-->
-                <!--                            {% endfor %}-->
-                <!--                        </section>-->
-                <!--                    </div>-->
+
             </div>
         </div>
     </div>
@@ -219,138 +183,6 @@ HG2S - Text Prompt Song Generation
     </div>
 </div>
 
-
-<!--{% if id %}-->
-<!--<h1 class="m-0">Playground</h1>-->
-<!--<p class="mb-4">You just entered the individual Playground Dimension of text prompt {{id}}</p>-->
-<!--<div class="post border rounded p-2">-->
-<!--    {% if text_prompt %}-->
-<!--    <h4>"{{ text_prompt }}"</h4>-->
-<!--    {% endif %}-->
-<!--    <a href="/upvote_post/{{id}}">-->
-<!--        <button>Upvote ({{popularity}})</button>-->
-<!--    </a>-->
-<!--</div>-->
-<!--{% endif %}-->
-
-<!--<div class="container">-->
-<!--    <h1>Step Sequencer</h1>-->
-<!--    &lt;!&ndash;    <button id="button_start">Start</button>&ndash;&gt;-->
-<!--    &lt;!&ndash; Show Start Button when tone_module is loaded &ndash;&gt;-->
-<!--    <button id="button_start" style="display: none;">Start</button>-->
-<!--    <div class="row border p-1">-->
-<!--        {% for i in range(4) %}-->
-<!--        {% set list = ['kick', 'snare', 'hihat', 'perc'] %}-->
-<!--        <div class="sequencer-row row">-->
-<!--            <div class="col-5">-->
-<!--                <h6 class="d-inline mx-2">{{list[loop.index-1]}}:</h6>-->
-<!--                <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
-<!--            </div>-->
-<!--            <div class="col-7">-->
-<!--                {% for i in range(16) %}-->
-<!--                &lt;!&ndash; Make a mx-2 at every fourth element &ndash;&gt;-->
-<!--                {% if i % 4 == 3 %}-->
-<!--                <input class="d-inline me-1 bg-danger border-danger sequencer-step" type="checkbox">-->
-<!--                {% else %}-->
-<!--                <input class="d-inline sequencer-step" type="checkbox">-->
-<!--                {% endif %}-->
-<!--                {% endfor %}-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        {% endfor %}-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<div class="container">-->
-<!--    <h1>Drum Rack</h1>-->
-<!--    <div class="row">-->
-<!--        &lt;!&ndash; SAMPLE GALLERY &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-2">-->
-<!--            <h3>SAMPLE GALLERY</h3>-->
-<!--            {% for kick in kick_paths %}-->
-<!--            <div class="">-->
-<!--                <button id="gallery_item_{{loop.index}}" class="gallery_items"-->
-<!--                        onclick="">-->
-<!--                    {{kick_names[loop.index - 1]}}-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--        &lt;!&ndash; PATTERN RACK &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-6">-->
-<!--            <h3>PATTERN RACK</h3>-->
-<!--            <div class="">-->
-<!--                <button class=""></button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; MIDI COLLECTION &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-2">-->
-<!--            <h3>MIDI COLLECTION</h3>-->
-<!--            {% for midi in midi_paths %}-->
-<!--            {{midi}}-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--        &lt;!&ndash; SOUNFONT COLLECTION &ndash;&gt;-->
-<!--        <div class="d-inline-block border p-1 col-2">-->
-<!--            <h3>SOUND FONT COLLECTION</h3>-->
-<!--            {% for soundfont in soundfont_paths %}-->
-<!--            {{soundfont}}-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--        <div class="col-8">-->
-<!--            <ul id="piano">-->
-<!--                <li data-note="C4" class="key">-->
-<!--                    <div data-note="C#4" class="black-key">R</div>-->
-<!--                    D-->
-<!--                </li>-->
-<!--                <li data-note="D4" class="key">-->
-<!--                    <div data-note="D#4" class="black-key">T</div>-->
-<!--                    F-->
-<!--                </li>-->
-<!--                <li data-note="E4" class="key">-->
-<!--                    G-->
-<!--                </li>-->
-<!--                <li data-note="F4" class="key">-->
-<!--                    <div data-note="F#4" class="black-key">U</div>-->
-<!--                    H-->
-<!--                </li>-->
-<!--                <li data-note="G4" class="key">-->
-<!--                    <div data-note="G#4" class="black-key">I</div>-->
-<!--                    J-->
-<!--                </li>-->
-<!--                <li data-note="A4" class="key">-->
-<!--                    <div data-note="A#4" class="black-key">O</div>-->
-<!--                    K-->
-<!--                </li>-->
-<!--                <li data-note="B4" class="key">-->
-<!--                    L-->
-<!--                </li>-->
-<!--            </ul>-->
-
-
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-<!--<div class="container">-->
-<!--    <button onclick="random_key()">Random Key</button>-->
-<!--    <h1>Key: C Major</h1>-->
-<!--    <button onclick=play(note_1)>C</button>-->
-<!--    <button onclick=play(note_2)>D</button>-->
-<!--    <button onclick=play(note_3)>E</button>-->
-<!--    <button onclick=play(note_4)>F</button>-->
-<!--    <button onclick=play(note_5)>G</button>-->
-<!--    <button onclick=play(note_6)>A</button>-->
-<!--    <button onclick=play(note_7)>B</button>-->
-<!--    <h3>Try different Sounds</h3>-->
-<!--    <button onclick="change_sound()">Change Sound</button>-->
-<!--    <button onclick="play_soundfont()">Play Soundfont</button>-->
-<!--    <button onclick="change_soundfont_instrument()">Random Soundfont</button>-->
-<!--    <h4>acoustic_grand_piano</h4>-->
-<!--</div>-->
-
-
 <script type="text/javascript">
 
     //////////////////////////////////////////
@@ -360,13 +192,17 @@ HG2S - Text Prompt Song Generation
     var category_select = document.getElementById("category-select");
     var section_list = document.querySelectorAll("#kick_section, #snare_section, #clap_section, #hihat_section, #percussion_section");
 
-    // show only kick section in beginning
+    //show only kick section in beginning
     for (var i = 0; i < section_list.length; i++) {
         section_list[i].style.display = "none";
     }
-    // document.getElementById("kick_section").style.display = "block";
+    document.getElementById("kick_section").style.display = "block";
 
     category_select.addEventListener("change", function () {
+        show_needed_samples()
+    });
+
+    function show_needed_samples() {
         // Get the selected option of #category-select
         var selected_option = document.querySelector("#category-select option:checked").innerText;
         // console.log(selected_option);
@@ -378,12 +214,31 @@ HG2S - Text Prompt Song Generation
                 section_list[i].style.display = "block";
             }
         }
-        // // get selected option
-        // var selected_option = category_select.options[category_select.selectedIndex].value;
-        // var new_selection = document.getElementById("category-select");
-        //
-        // console.log(new_selection);
-        // // document.getElementById(category_select.value).style.display = "block";
+    }
+
+    gallery_scroller = document.getElementById("scrollable_category");
+
+    // Change Select Option on Scroll
+    gallery_scroller.addEventListener("mousewheel", function (e) {
+        console.log(e.deltaY);
+        e.preventDefault();
+        // Change Select Option on Scroll
+        if (e.deltaY > 0) {
+            // Scroll Down
+            if (category_select.selectedIndex < category_select.length - 1) {
+                category_select.selectedIndex++;
+            } else {
+                category_select.selectedIndex = 0;
+            }
+        } else {
+            // Scroll Up
+            if (category_select.selectedIndex > 0) {
+                category_select.selectedIndex--;
+            } else {
+                category_select.selectedIndex = category_select.length - 1;
+            }
+        }
+        show_needed_samples();
     });
 
 
@@ -460,6 +315,18 @@ HG2S - Text Prompt Song Generation
         this.style.backgroundColor = "var(--black)";
     }
 
+
+    //////////////////////////////////////////
+    //////// Resizable Components ////////////
+    //////////////////////////////////////////
+
+    component_gallery = document.getElementById("component_gallery");
+    // Print out width if resized
+    component_gallery.addEventListener("resize", function () {
+        console.log("resized");
+    });
+
+
     //////////////////////////////////////////
     /////////// PLAYING MUSIC ////////////////
     //////////////////////////////////////////
@@ -512,15 +379,9 @@ HG2S - Text Prompt Song Generation
 
             start_button.addEventListener("click", startSequencer);
 
-
             // Initialize drum samples
 
             const drum_samples = ["", "", "", ""];
-
-            // synths[0].oscillator.type = 'triangle';
-            // synths[1].oscillator.type = 'sine';
-            // synths[2].oscillator.type = 'sawtooth';
-
 
             const $rows = document.getElementsByClassName('$row')
 

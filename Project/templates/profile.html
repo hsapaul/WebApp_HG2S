@@ -86,20 +86,22 @@ HG2S - Profile
             <div class="card bg-dark text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>Prompt History</h4>
-                    <p style="margin-top: -10px; line-height: 90%">They are only saved for two weeks so make sure to
-                        post to Marketplace</p>
                     {% if your_last_prompts|length > 0%}
                     {% for prompt in your_last_prompts %}
                     <div class="rounded border border-white bg-dark text-light py-1 m-1">
-                        <h6>"{{ prompt.text_prompt }}"</h6>
-                        <p class="" style="font-size: 13px;">{{ prompt.creation_date }}</p>
+                        <h6 class="">"{{ prompt.text_prompt }}"</h6>
+                        <p class="d-inline m-1 small-font">{{ prompt.creation_date }}</p>
+                        <p class="d-inline float-end left_bottom m-1 small-font"><a href="{{ url_for('jstest', text_prompt = prompt.text_prompt) }}">Playground</a></p>
                     </div>
                     {% endfor %}
+                    <p style="line-height: 90%">Post your Prompt Creations to the Marketplace</p>
                     <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
                     {% else %}
-                    <p class="">You didn't prompted yet!
-                        Consider <a class="d-inline" href="{{ url_for('index')}}">Prompting Right now!</a></p>
+                    <p class="">You didn't prompt yet!</p>
+                    <div><p>Start <a class="d-inline" href="{{ url_for('index')}}">your first Prompt Creation</a> Right
+                        now!</p></div>
                     {% endif %}
+
                 </div>
             </div>
         </div>

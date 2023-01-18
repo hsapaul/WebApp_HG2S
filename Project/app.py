@@ -59,7 +59,7 @@ def index():
     song_info = {}
     end_time = 0
     if request.method == 'POST':
-        # Check which button was pressed
+        # Responsible Button: "Submit" (Text Prompt)
         if 'submit_button' in request.form:
             start_time = time.time()
             text_prompt = request.form['text_prompt']
@@ -93,6 +93,7 @@ def index():
             return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
                                    instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
                                    end_time=execution_time)
+        # Responsible Button: "Post to Marketplace"
         elif 'post_button' in request.form:
             text_prompt, artists, instruments, genres, key_and_bpm = session['text_prompt'], \
                                                                      session['artists'], session['instruments'], \
@@ -124,7 +125,10 @@ def index():
             db.commit()
             flash("Your post was successfully submitted!")
             return redirect(url_for('marketplace'))
-
+        # Responsible Button: "Enter Playground"
+        elif 'playground_button' in request.form:
+            text_prompt = session['text_prompt']
+            return redirect(url_for('jstest', text_prompt=text_prompt))
     if 'session_user' in session:
         return render_template('index.html', session_user=session['session_user'])
     else:
@@ -145,14 +149,16 @@ def marketplace():
     posts = cur.fetchall()
     artists = cur2.fetchall()
     if request.method == 'GET':
-        return render_template('marketplace.html', posts=posts, artists_db=artists, today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
+        return render_template('marketplace.html', posts=posts, artists_db=artists,
+                               today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
     elif request.method == 'POST':
         sort_alg = request.form.get('form-select')
         if sort_alg == 'Recently Posted':
             posts = sorted(posts, key=lambda x: x[3], reverse=True)
         elif sort_alg == 'Most Popular':
             posts = sorted(posts, key=lambda x: x[8], reverse=True)
-        return render_template('marketplace.html', posts=posts, artists_db=artists, today=str(datetime.datetime.now())[:10], sort_alg=sort_alg)
+        return render_template('marketplace.html', posts=posts, artists_db=artists,
+                               today=str(datetime.datetime.now())[:10], sort_alg=sort_alg)
 
 
 """
@@ -287,9 +293,11 @@ def sign_up():
                     return render_template('auth_signup.html', error='Email already taken!')
             db.execute(
                 'INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [request.form['username'], request.form['email'], request.form['password'], role, None, None, "default", 0])
+                [request.form['username'], request.form['email'], request.form['password'], role, None, None, "default",
+                 0])
             db.commit()
-            session['session_id'] = db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
+            session['session_id'] = \
+            db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
             session['session_role'] = role
@@ -310,7 +318,8 @@ def login():
         db_nutzer = db.execute('SELECT id, email, username, password FROM nutzer').fetchall()
         username_or_email = request.form['username_or_email']
         for nutzer in db_nutzer:
-            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form['password']:
+            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form[
+                'password']:
                 user, password, email, role, theme, appearance_mode = db.execute(
                     f'select username, password, email, role, theme, appearance_mode from nutzer where id = {nutzer["id"]}').fetchone()
                 session['session_id'] = nutzer['id']
@@ -342,7 +351,8 @@ def logout():
 def profile(username):
     # Get Temp Prompt History
     db = get_db(db_path)
-    prompts_for_user_id = db.execute(f'select temp_post_id, text_prompt, creation_date, saved_to_marketplace from temp_prompt_history where user_id = {session["session_id"]}').fetchall()
+    prompts_for_user_id = db.execute(
+        f'select temp_post_id, text_prompt, creation_date, saved_to_marketplace from temp_prompt_history where user_id = {session["session_id"]}').fetchall()
     # Chech if post and if submit name is submit_theme
     if request.method == 'POST':
         # Requests
@@ -360,13 +370,14 @@ def profile(username):
         session['session_theme'] = theme
         session['appearance_mode'] = light_mode
         flash("Appearance Changed Successfully")
-        return render_template('profile.html', session_user=session['session_user'], light_mode=light_mode, your_last_prompts=prompts_for_user_id)
+        return render_template('profile.html', session_user=session['session_user'], light_mode=light_mode,
+                               your_last_prompts=prompts_for_user_id)
     if request.method == 'GET':
         if 'session_user' in session:
-            return render_template('profile.html', session_user=session['session_user'], your_last_prompts=prompts_for_user_id)
+            return render_template('profile.html', session_user=session['session_user'],
+                                   your_last_prompts=prompts_for_user_id)
         else:
             return redirect(url_for('login'))
-
 
 
 @app.route('/admin')
@@ -423,8 +434,9 @@ def service_download():
         return render_template("services.html", song_json=song_json)
 
 
-@app.route('/playground/<int:id>')
-def playground(id):
+@app.route('/playground/<string:text_prompt>')
+def playground(text_prompt):
+    return text_prompt
     db = get_db(db_path)
     text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
     popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]
@@ -444,13 +456,13 @@ def vstplugins():
     return render_template('vstplugins.html')
 
 
-@app.route('/jstest')
-def jstest():
+@app.route('/jstest/<string:text_prompt>')
+def jstest(text_prompt):
     # Get sample_paths from database
     conn = sqlite3.connect(sample_db_path)
     c = conn.cursor()
     # FETCH SAMPLE PATHS AND NAMES
-    sub_folders = ["kicks", "snares", "hihats", "claps", "percussion"]
+    sub_folders = ["kicks", "snares", "hihats", "claps", "percussions"]
     sample_dict = {}
     for sub_folder in sub_folders:
         sample_dict[sub_folder] = c.execute(f'SELECT name FROM {sub_folder}').fetchall()
@@ -458,12 +470,15 @@ def jstest():
     static_url = url_for('static', filename='samples/drum_samples/')
     # {{ url_for('static', filename='samples/drum_samples/kick/' + kick) }}
     # return sample_dict
-    return render_template('js_test.html', sample_dict=sample_dict, static_url=static_url)
+    # if 'session_user' in session:
+    #     text_prompt = session['text_prompt']
+    return render_template('js_test.html', sample_dict=sample_dict, static_url=static_url, text_prompt=text_prompt)
 
 
 @app.route('/jstest2')
 def jstest2():
     return render_template('js_test_2.html')
+
 
 @app.route('/jstest3')
 def jstest3():
