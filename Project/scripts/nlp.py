@@ -1,39 +1,42 @@
+# import modules
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 from transformers import pipeline
 import time
 import pandas as pd
 
+# global variables and lists
 tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb', ' a ',
          ' a# ', ' ab', ' b ', ' bb']
 mode = ['major', 'minor', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian']
 decades_year_era = ['1920s', '1930s', '1940s', '1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s',
                     '20s', '30s', '40s', '50s', '60s', '70s', '80s', '90s',
                     "30's", "40's", "50's", "60's", "70's", "80's", "90's", "00's", "10's", "20's",
-                    '18th century', '19th century', '20th century', '21st century',
-                    'Anno Dominini', 'Before Christ', 'BC', 'AD', 'CE', 'BCE']
+                    '18th century', '19th century', '20th century', '21st century']
 
 
-def check_for_artists(text_input):
-    text_prompt = text_input
+def check_for_artists(text_prompt, static_url_path):
     # Check for artists
     found_artists = []
     for index in range(1, 5):
-        list_path = fr"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\1. Natural Language Processing\artists\10000-MTV-Music-Artists-page-{index}.csv"
+        if static_url_path is None:
+            static_url_path = "../static"
+        list_path = fr"{static_url_path}/lists/artists/10000-MTV-Music-Artists-page-{index}.csv"
         df = pd.read_csv(list_path)
         namen = df["name"].tolist()
         for name in namen:
-            if str(name).strip().lower() in text_prompt.lower():
+            if f" {str(name).strip().lower()} " in f" {text_prompt.lower()} ":
                 found_artists.append(str(name).strip())
     found_artists = list(set([x.lower() for x in found_artists]))
     found_artists = [str(artist).capitalize() for artist in found_artists]
     return found_artists
 
 
-def check_for_instruments(text_input):
+def check_for_instruments(text_input, static_url_path):
     text_prompt = text_input
-    # Check for instruments
     found_instruments = []
-    list_path = fr"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\1. Natural Language Processing\instruments\top100instruments.csv"
+    if static_url_path is None:
+        static_url_path = "../static"
+    list_path = fr"{static_url_path}/lists/instruments/top100instruments.csv"
     # Read the csv file without pandas
     with open(list_path, 'r', encoding='utf-8') as f:
         for line in f:
@@ -43,10 +46,13 @@ def check_for_instruments(text_input):
     return text_prompt, found_instruments
 
 
-def check_for_genres(text_input):
-    text_prompt = text_input
+def check_for_genres(text_prompt, static_url_path):
+    # get static url of the csv file
     found_genres = []
-    list_path = fr"C:\Users\franz\Desktop\WebApp (Werkstück)\Music Gallery (Database)\1. Natural Language Processing\genres\top75genres.csv"
+    if static_url_path is None:
+        static_url_path = "../static"
+    list_path = fr"{static_url_path}/lists/genres/top75genres.csv"
+    print("top75genres.csv: ", list_path)
     # Read the csv file without pandas
     with open(list_path, 'r', encoding='utf-8') as f:
         for line in f:
@@ -128,38 +134,37 @@ def word_categories(keywords):
     return classified_word_dict
 
 
-def main(text_prompt):
-    start_time = time.time()
-    filtered_text, found_genres = check_for_genres(text_prompt)
-    filtered_text, found_instruments = check_for_instruments(filtered_text)
-    found_time = check_for_time_information(filtered_text)
-    # filtered_text = get_key_words(filtered_text)
-    found_artists = check_for_artists(filtered_text)
-    # print("Found Instruments: ", found_instruments)
-    # print("Found Artists: ", found_artists)
-    # print("Found Genres: ", found_genres)
-    # print("Found Time: ", found_time)
-    filtered_text_prompt, key_and_bpm = check_for_key_and_bpm(text_prompt)
-    # print("Found Key and BPM: ", key_and_bpm)
-    end_time = round(time.time() - start_time, 2)
-    # print(found_artists, found_instruments, found_genres, found_time, key_and_bpm)
-    return found_artists, found_instruments, found_genres, found_time, key_and_bpm
-    # print(list)
-    # print("--- %s seconds ---" % round(time.time() - start_time, 2))
-    # # Timer Start
-    # start_time = time.time()
-    # filtered_text_prompt, song_info = check_for_key_and_bpm(text_prompt)
-    # print(time.time() - start_time)
-    # print(song_info)
-    # key_words = get_key_words(filtered_text_prompt)
-    # print(time.time() - start_time)
-    # classified_word_dict = word_categories(key_words)
-    # print(time.time() - start_time)
-    # print(classified_word_dict)
-    # end_time = time.time() - start_time
-    # return classified_word_dict, song_info, int(end_time)
-    # return {"test":"asdf"}, {"test":"asdf"}, 1
+def main(text_prompt, static_url_path=None):
+    # Test
+    method = True
+
+    # EXECUTION SCRIPT
+    start_time = time.time()  # start timer
+    if method:
+        # METHOD 1: Main Script with lists
+        filtered_text, found_genres = check_for_genres(text_prompt, static_url_path)
+        filtered_text, found_instruments = check_for_instruments(filtered_text, static_url_path)
+        found_time = check_for_time_information(filtered_text)
+        found_artists = check_for_artists(filtered_text, static_url_path)
+        filtered_text_prompt, key_and_bpm = check_for_key_and_bpm(text_prompt)
+        # PRINT TO CONSOLE
+        print("Found Instruments: ", found_instruments)
+        print("Found Artists: ", found_artists)
+        print("Found Genres: ", found_genres)
+        print("Found Time: ", found_time)
+        print("Found Key and BPM: ", key_and_bpm)
+        print("EXECUTION TIME: ", round(time.time() - start_time, 2))
+        return found_artists, found_instruments, found_genres, found_time, key_and_bpm
+    else:
+        # METHOD 2: with NLP
+        filtered_prompt = get_key_words(text_prompt)
+        print("'get_key_words()' done after %s seconds - %s" % (round(time.time() - start_time, 2), filtered_prompt))
+        classified_word_dict = word_categories(filtered_prompt)
+        print("'word_categories()' done after %s seconds" % round(time.time() - start_time, 2))
+        # PRINT TO CONSOLE
+        print(classified_word_dict)
 
 
 if __name__ == "__main__":
-    main("Sia")
+    text_input = input("Test the script in isolation with a text prompt: ")
+    main(text_input)

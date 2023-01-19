@@ -3,24 +3,17 @@ from flask import Flask, g, render_template, request, redirect, url_for, session
 import datetime  # Saving time on clock to db with every Post
 import sqlite3  # Connect to database
 import time  # Measuring of Execution Times
-from flask_sqlalchemy import SQLAlchemy
-
 # Import Service Scripts
 from scripts.step_metadata import get_song_key_and_bpm as metadata
 from scripts.step_textdata import main as textdata
-from scripts.step_chords.get_chords_url import main as chords_url
-from scripts.step_chords.parse_chords import main as chords_2
 from scripts.nlp import main as nlp_task
-import scripts.artist_information.artistSearch_ChordProgressions as artist_chords
 import scripts.artist_information.artistSearch_WikipediaInformation as artist_wiki
-
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 
 db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\database.db"
 sample_db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\models\music_gallery.db"
@@ -53,18 +46,19 @@ def close_db(error):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # Increase Scope for Variables
-    text_prompt = "local"
-    word_classification_dict = {}
-    song_info = {}
-    end_time = 0
+    # Loading Site regularly
+    if request.method == 'GET':
+        return render_template('index.html')
+    # One of the Buttons was pressed
     if request.method == 'POST':
         # Responsible Button: "Submit" (Text Prompt)
         if 'submit_button' in request.form:
             start_time = time.time()
             text_prompt = request.form['text_prompt']
+            # get static url
+            static_url = request.url_root + "static/"
             # Call NLP Task
-            found_artists, found_instruments, found_genres, found_time, key_and_bpm = nlp_task(text_prompt)
+            found_artists, found_instruments, found_genres, found_time, key_and_bpm = nlp_task(text_prompt, static_url)
             artist_objects = []
             instrument_objects = []
             if len(found_artists) >= 1:
@@ -79,16 +73,17 @@ def index():
             session['instruments'] = found_instruments
             session['genres'] = found_genres
             session['key_and_bpm'] = key_and_bpm
-            user_id = session['session_id']
             creation_date = str(datetime.datetime.now())[:-10]
             execution_time = round(time.time() - start_time, 2)
-            # Save to Temporary Database "temp_prompt_history"
-            db = get_db(db_path)
-            db.execute(
-                'CREATE TABLE IF NOT EXISTS temp_prompt_history (temp_post_id INTEGER PRIMARY KEY, user_id INTEGER, text_prompt TEXT, creation_date TEXT, saved_to_marketplace INTEGER)')
-            db.execute(
-                f'insert into temp_prompt_history (user_id, text_prompt, creation_date, saved_to_marketplace) values ("{user_id}", "{text_prompt}", "{creation_date}", 0)')
-            db.commit()
+            # Save to Temporary Database "temp_prompt_history" if logged in
+            if 'session_id' in session:
+                user_id = session['session_id']
+                db = get_db(db_path)
+                db.execute(
+                    'CREATE TABLE IF NOT EXISTS temp_prompt_history (temp_post_id INTEGER PRIMARY KEY, user_id INTEGER, text_prompt TEXT, creation_date TEXT, saved_to_marketplace INTEGER)')
+                db.execute(
+                    f'insert into temp_prompt_history (user_id, text_prompt, creation_date, saved_to_marketplace) values ("{user_id}", "{text_prompt}", "{creation_date}", 0)')
+                db.commit()
 
             return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
                                    instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
@@ -129,10 +124,7 @@ def index():
         elif 'playground_button' in request.form:
             text_prompt = session['text_prompt']
             return redirect(url_for('jstest', text_prompt=text_prompt))
-    if 'session_user' in session:
-        return render_template('index.html', session_user=session['session_user'])
-    else:
-        return render_template('index.html')
+
 
 
 @app.route('/documentation')
@@ -297,13 +289,15 @@ def sign_up():
                  0])
             db.commit()
             session['session_id'] = \
-            db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
+                db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
             session['session_role'] = role
             session['session_email'] = request.form['email']
             session['session_theme'] = "default"
             flash("Signed up successfully!")
+            flash("You get to the Main Page by pressing the Logo in the upper left")
+            flash("On the current page, you can change your user data and the theme of the website")
             return redirect(url_for('profile', username=session['session_user']))
         else:
             flash("Passwords don't match")
@@ -329,7 +323,8 @@ def login():
                 session['session_role'] = role
                 session['session_theme'] = theme
                 session['appearance_mode'] = appearance_mode
-                flash(f"You were successfully logged in {session['session_email']}")
+                flash(f"Welcome {session['session_user']}! You were successfully logged in. ")
+                flash("By pressing on the logo icon on the upper left you get to the Prompt Area")
                 return redirect(url_for('profile', username=session['session_user']))
         flash("Wrong Username or Password")
         return render_template('auth_login.html')

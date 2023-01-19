@@ -8,7 +8,11 @@ HG2S - Text Prompt Song Generation
 <!--&lt;!&ndash; include css files &ndash;&gt;-->
 <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/extra_playground.css') }}">-->
 <!--&lt;!&ndash; include js files &ndash;&gt;-->
-<!--<script src="{{ url_for('static', filename='js/extra_playground.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/playground_pianoRoll.js') }}"></script>
+<script src="{{ url_for('static', filename='js/playground_stepSequencer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/webaudio-pianoroll.js') }}"></script>
+<script id="module_sf_player" type="module"
+        src="{{ url_for('static', filename = 'node_modules/soundfont-player/dist/soundfont-player.min.js')}}"></script>
 <!--<script type="text/javascript" src="{{ url_for('static', filename='js/step_sequencer.js') }}"></script>-->
 {% endblock %}
 
@@ -29,17 +33,19 @@ HG2S - Text Prompt Song Generation
                 {% else %}
                 <div class="">No Playground Selected</div>
                 {% endif %}
-                <button id="startSequencerButton" class="rounded-circle d-inline upper-left bgcolor_warning"><img
-                        class="icon_set_imgs"
-                        src="{{ url_for('static', filename='img/icons/volume.png') }}"
-                        alt=""></button>
+                <div id="invisible" style="display: none">
+                    <button id="startSequencerButton" class="rounded-circle upper-left bgcolor_warning"><img
+                            class="icon_set_imgs"
+                            src="{{ url_for('static', filename='img/icons/volume.png') }}"
+                            alt=""></button>
+                </div>
             </div>
             <div class="card-body m-2 p-0">
                 <div class="row">
                     <div class="col-3"><h5 class="d-inline slider-prefix">BPM</h5></div>
                     <div class="col-9">
-                        <input id="bpm_slider" type="range" min="60" max="200" value="100" class="slider">
-                        <label id="bpm_label" for="bpm_slider">100</label>
+                        <input id="bpm_slider" type="range" min="60" max="200" value="120" class="slider">
+                        <label id="bpm_label" for="bpm_slider">120</label>
                     </div>
                 </div>
                 <div class="row">
@@ -154,6 +160,40 @@ HG2S - Text Prompt Song Generation
                         </div>
                     </div>
                     {% endfor %}
+
+                    <div id="base">
+                        <webaudio-pianoroll id="pianoroll"
+                                            width="550" height="450"
+                                            timebase="8" loop="1"
+                                            xrange="32"
+                                            yrange="24"
+                                            markend="32"
+                                            grid="1"
+                                            wheelzoom="1"
+                                            tempo="120"
+                                            editmode="dragpoly"
+                        ></webaudio-pianoroll>
+
+                        <webaudio-slider onchange="Layout(this)" id="xrange" direction="horizontal" min="1" max="10"
+                                         value="2"></webaudio-slider>
+                        <webaudio-slider onchange="Layout(this)" id="xoffset" direction="horizontal" width="200" min="0"
+                                         max="20"
+                                         step="0.01" value="0"></webaudio-slider>
+                        <webaudio-slider onchange="Layout(this)" id="yrange" min="3" max="32"
+                                         value="16"></webaudio-slider>
+                        <webaudio-slider onchange="Layout(this)" id="yoffset" min="30" max="120" height="200"
+                                         value="60"></webaudio-slider>
+                    </div>
+                    <button id="play_melody_button" style="display: none">Play</button>
+                    <button onclick="document.getElementById('proll').stop()">Stop</button>
+                    <select name="osc_type" id="osc_type">
+                        <option value="sine" selected>sine</option>
+                        <option value="square">square</option>
+                        <option value="sawtooth">sawtooth</option>
+                        <option value="triangle">triangle</option>
+                    </select>
+                    <select name="soundfont_select" id="soundfont_select"></select>
+
                 </div>
             </div>
         </div>
@@ -184,6 +224,24 @@ HG2S - Text Prompt Song Generation
 </div>
 
 <script type="text/javascript">
+
+    actx = new AudioContext();
+
+    ///////////////////////////////////////////////////
+    /////////////// STEP SEQUENCER ////////////////////
+    ///////////////////////////////////////////////////
+
+    static_url = "{{static_url}}";
+    stepSequencer(static_url);
+
+    ///////////////////////////////////////////////////
+    ///////////////// PIANO ROLL //////////////////////
+    ///////////////////////////////////////////////////
+
+    var startSequencer = document.getElementById('invisible');
+    var html_pianoroll = document.getElementById('pianoroll');
+    startSequencer.style.display = 'none !important';
+    pianoRoll();
 
     //////////////////////////////////////////
     //////// SAMPLE GALLERY SHOW /////////////
@@ -347,111 +405,6 @@ HG2S - Text Prompt Song Generation
         audio.play();
     }
 
-    ///////////////////////////////////////////////////
-    /////////////// DRUM SEQUENCER ////////////////////
-    ///////////////////////////////////////////////////
-
-    document.documentElement.addEventListener('mousedown', () => {
-        if (Tone.context.state !== 'running') Tone.context.resume();
-    });
-
-    // Wait till tone.js is loaded
-    setTimeout(function () {
-
-            console.log("tone.js hopefully loaded");
-
-            // When New Item is detected in Sequencer --> initialize new Tone.js Player
-            var sequencer_rows = document.getElementsByClassName("draggables");
-            for (var i of sequencer_rows) {
-                i.addEventListener("drop", initializeSamples);
-            }
-
-            // var buffer = new Tone.Buffer("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Deep_F.wav");
-
-            var start_button = document.getElementById("startSequencerButton");
-
-            function startSequencer() {
-                console.log("start sequencer");
-                initializeSamples();
-                Tone.Transport.scheduleRepeat(repeat, '16n');
-                Tone.Transport.start();
-            }
-
-            start_button.addEventListener("click", startSequencer);
-
-            // Initialize drum samples
-
-            const drum_samples = ["", "", "", ""];
-
-            const $rows = document.getElementsByClassName('$row')
-
-            function initializeSamples() {
-                console.log("INITIALIZING SAMPLES");
-                var select_drum_samples = document.querySelectorAll(".draggables");
-                for (var i = 0; i < select_drum_samples.length; i++) {
-                    // console.log(i, select_drum_samples[i].innerText);
-                    // if element has button as a child
-                    if (select_drum_samples[i].querySelector("button")) {
-                        var element_name = select_drum_samples[i].innerText;
-                        // console.log(i, element_name);
-                        if (element_name) {
-                            classList = select_drum_samples[i].querySelector("button").classList;
-                            category_classes = ["kick_item", "snare_item", "clap_item", "hihat_item", "percussion_item"];
-                            for (category in category_classes) {
-                                if (classList.contains(category_classes[category])) {
-                                    var element_category = category_classes[category].slice(0, -5) + "s";
-                                    var element_url = "{{static_url}}" + element_category + "/" + element_name;
-                                    console.log("Sequencer Slot:", i);
-                                    console.log("Element URL:", element_url);
-                                    drum_samples[i] = new Tone.Player(element_url).toDestination();
-                                    momentary_volume = document.getElementById("slider_volume_sequencer_" + (i + 1)).value;
-                                    drum_samples[i].volume.value = Math.round(momentary_volume);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            let index = 0;
-            var step_counter = document.getElementById("step-counter");
-
-            function repeat(time) {
-                let step = index % 16;
-                step_counter.innerText = step;
-                for (let i = 0; i < $rows.length; i++) {
-                    let sample = drum_samples[i],
-                        $row = $rows[i],
-                        $input = $row.querySelector(`span:nth-child(${step + 1}) > input`);
-                    $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_avenue'));
-                    $row.querySelector(`span:nth-child(${step + 1})`).classList.add('bgcolor_avenue');
-                    // $input.style.backgroundColor = "var(--yellow)";
-                    if ($input.checked) {
-                        console.log(drum_samples[i].volume.value);
-                        drum_samples[i].start(time);
-                    }
-                }
-                index++;
-            }
-
-            // Mixer Sliders
-            slider_volume_sequencer = document.getElementsByClassName("slider_volume_sequencer");
-            for (let step = 0; step < slider_volume_sequencer.length; step++) {
-                slider_volume_sequencer[step].addEventListener("input", function () {
-                    var volume = this.value;
-                    if (drum_samples[step]) {
-                        // print out name of sample
-                        drum_samples[step].volume.value = volume;
-                        // console.log(drum_samples[0].volume, drum_samples[1].volume, drum_samples[2].volume, drum_samples[3].volume);
-                        // console.log("controlling with sample - ", step, drum_samples[step].volume.value);
-                    } else {
-                        console.log("no sample connected on ", step);
-                    }
-                });
-            }
-
-        }
-        , 1000);
 
     ///////////////////////////////////////////////////
     //////////////// SLIDER, KNOBS ////////////////////
@@ -464,8 +417,8 @@ HG2S - Text Prompt Song Generation
     bpm_slider.addEventListener("input", function () {
         var bpm_value = bpm_slider.value;
         document.getElementById("bpm_label").innerHTML = bpm_value;
-        console.log(bpm_value);
         Tone.Transport.bpm.value = bpm_value;
+        html_pianoroll.tempo = bpm_value;
     });
 
     var master_volume_slider = document.getElementById("volume_slider");
@@ -475,7 +428,6 @@ HG2S - Text Prompt Song Generation
         document.getElementById("volume_label").innerHTML = master_volume_value;
         Tone.Master.volume.value = master_volume_value;
     });
-
 
 </script>
 {% endblock %}
