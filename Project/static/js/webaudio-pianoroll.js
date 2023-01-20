@@ -185,18 +185,20 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
         };
         this.play = function (actx, playcallback, tick) {
             function Interval() {
+                // console.log(this.actx.currentTime);
                 this.updateTimer();
                 const current = this.actx.currentTime;
                 while (this.timestack.length > 1 && current >= this.timestack[1][0]) {
                     this.timestack.shift();
                 }
                 this.cursor = this.timestack[0][1] + (current - this.timestack[0][0]) / this.timestack[0][2];
-
+                // console.log(this.cursor);
                 this.redrawMarker();
                 while (current + this.preload >= this.time1) {
                     this.time0 = this.time1;
                     this.tick0 = this.tick1;
                     let e = this.sequence[this.index1];
+                    // console.log("e", e, "time0", this.time0, "tick0", this.tick0, "this.time1", this.time1, "this.tick1", this.tick1);
                     if (!e || e.t >= this.markend) {
                         console.log("start");
                         this.timestack.push([this.time1, this.markstart, this.tick2time]);
@@ -249,6 +251,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
         this.stop = function () {
             if (this.timer)
                 clearInterval(this.timer);
+            this.cursor = this.markstart;
             this.timer = null;
         };
         this.setMMLString = function (s) {

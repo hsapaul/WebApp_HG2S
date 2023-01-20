@@ -5,34 +5,25 @@ HG2S - Text Prompt Song Generation
 {% endblock %}
 
 {% block extra_head_configs %}
-<!--&lt;!&ndash; include css files &ndash;&gt;-->
-<!--<link rel="stylesheet" href="{{ url_for('static', filename='css/extra_playground.css') }}">-->
-<!--&lt;!&ndash; include js files &ndash;&gt;-->
 <script src="{{ url_for('static', filename='js/playground_pianoRoll.js') }}"></script>
 <script src="{{ url_for('static', filename='js/playground_stepSequencer.js') }}"></script>
 <script src="{{ url_for('static', filename='js/webaudio-pianoroll.js') }}"></script>
 <script id="module_sf_player" type="module"
         src="{{ url_for('static', filename = 'node_modules/soundfont-player/dist/soundfont-player.min.js')}}"></script>
-<!--<script type="text/javascript" src="{{ url_for('static', filename='js/step_sequencer.js') }}"></script>-->
 {% endblock %}
 
 {% block content %}
-
 <div class="col-12">
-    <h1 class="headline mb-3 px-0 rounded"
-        style="text-align: center; background-color: var(--middle-grey); color: var(--light-blue)">
-        {% if text_prompt%}{{text_prompt}}{% else %}}NO PROMPT SELECTED{% endif %}
-    </h1>
+<!--    <h1 class="headline mb-3 px-0 rounded"-->
+<!--        style="text-align: center; background-color: var(&#45;&#45;middle-grey); color: var(&#45;&#45;light-blue)">-->
+<!--        {% if text_prompt%}{{text_prompt}}{% else %}}NO PROMPT SELECTED{% endif %}-->
+<!--    </h1>-->
     <!-- TOP ROW -->
     <div class="card-deck row" style="border-radius: 10px;">
         <!-- UPPER LEFT -->
         <div class="card col-4 bg-dark text-white d-inline-block p-0">
             <div class="card-title rounded-top p-1 bgcolor_avenue text-black">
-                {% if text_prompt %}
-                <div>{{text_prompt}}</div>
-                {% else %}
-                <div class="">No Playground Selected</div>
-                {% endif %}
+                <div>{% if text_prompt%}"{{text_prompt}}"{% else %}}No Playground Selected{% endif %}</div>
                 <div id="invisible" style="display: none">
                     <button id="startSequencerButton" class="rounded-circle upper-left bgcolor_warning"><img
                             class="icon_set_imgs"
@@ -62,7 +53,6 @@ HG2S - Text Prompt Song Generation
             <div class="card-title">Song Configurations</div>
             <div class="card-body">
                 <p>KEY:</p>
-                <!--                <input type="number" id="bpms" name="bpm" min="1" max="300" value="140">-->
             </div>
         </div>
         <!-- UPPER RIGHT -->
@@ -105,6 +95,7 @@ HG2S - Text Prompt Song Generation
                             {% endif %}
                             {% endfor %}
                         </select>
+                        <p id="experience_aid" class="display-none small-lineheight">Use your Mousewheel!</p>
                     </div>
                     {% for category in category_list %}
                     <section id="{{category[:-1]}}_section">
@@ -124,7 +115,6 @@ HG2S - Text Prompt Song Generation
                 </div>
             </div>
         </div>
-
         <!-- MIDDLE MIDDLE -->
         <div class="card p-2 col-7 bg-dark text-white d-inline-block" style="border-radius: 10px;">
             <h5 id="step-counter"
@@ -185,7 +175,6 @@ HG2S - Text Prompt Song Generation
                                          value="60"></webaudio-slider>
                     </div>
                     <button id="play_melody_button" style="display: none">Play</button>
-                    <button onclick="document.getElementById('proll').stop()">Stop</button>
                     <select name="osc_type" id="osc_type">
                         <option value="sine" selected>sine</option>
                         <option value="square">square</option>
@@ -197,7 +186,6 @@ HG2S - Text Prompt Song Generation
                 </div>
             </div>
         </div>
-
         <!-- MIDDLE RIGHT -->
         <div class="card p-2 col-3 bg-dark text-white d-inline-block">
             <div class="card-title">
@@ -225,6 +213,10 @@ HG2S - Text Prompt Song Generation
 
 <script type="text/javascript">
 
+    // var page_content = document.getElementsByClassName("page-content")[0];
+    // page_content.classList.add("p-3");
+    // page_content.classList.add("m-2");
+
     actx = new AudioContext();
 
     ///////////////////////////////////////////////////
@@ -232,7 +224,7 @@ HG2S - Text Prompt Song Generation
     ///////////////////////////////////////////////////
 
     static_url = "{{static_url}}";
-    stepSequencer(static_url);
+    stepSequencer(static_url); // function in step_sequencer.js
 
     ///////////////////////////////////////////////////
     ///////////////// PIANO ROLL //////////////////////
@@ -241,7 +233,7 @@ HG2S - Text Prompt Song Generation
     var startSequencer = document.getElementById('invisible');
     var html_pianoroll = document.getElementById('pianoroll');
     startSequencer.style.display = 'none !important';
-    pianoRoll();
+    pianoRoll(); // function in pianoroll.js
 
     //////////////////////////////////////////
     //////// SAMPLE GALLERY SHOW /////////////
@@ -276,8 +268,20 @@ HG2S - Text Prompt Song Generation
 
     gallery_scroller = document.getElementById("scrollable_category");
 
+    var show_only_once = 0;
+    gallery_scroller.addEventListener("mouseover", function () {
+        if (show_only_once === 0) {
+            document.getElementById("experience_aid").style.display = "block";
+            show_only_once = 1;
+        }
+    });
+    gallery_scroller.addEventListener("mouseleave", function () {
+        document.getElementById("experience_aid").style.display = "none";
+    });
+
     // Change Select Option on Scroll
     gallery_scroller.addEventListener("mousewheel", function (e) {
+        document.getElementById("experience_aid").style.display = "none";
         console.log(e.deltaY);
         e.preventDefault();
         // Change Select Option on Scroll

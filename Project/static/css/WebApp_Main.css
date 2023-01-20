@@ -115,8 +115,13 @@ input {
 
 }
 
-.random_message {
+.display-none {
     display: none;
+}
+
+.small-lineheight {
+    font-size: 13px;
+    line-height: 15px;
 }
 
 

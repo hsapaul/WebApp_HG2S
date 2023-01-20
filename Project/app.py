@@ -9,18 +9,18 @@ from scripts.step_textdata import main as textdata
 from scripts.nlp import main as nlp_task
 import scripts.artist_information.artistSearch_WikipediaInformation as artist_wiki
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
 
-db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\database.db"
-sample_db_path = r"C:\Users\franz\Desktop\WebApp (Werkstück)\Project\models\music_gallery.db"
+db_path = r"./models/database.db"
+sample_db_path = r"./models/music_gallery.db"
 
 # Encrypt and Decrypt Session Data
 app.secret_key = "123"
-
 
 # Connect to database
 def connect_db(db_path_new):
@@ -66,6 +66,7 @@ def index():
                     print(artist)
                     artist_objects.append(artist_wiki.wikipedia_search(artist))
                 # Clear out empty artist objects
+            print(artist_objects)
             artist_objects = [x for x in artist_objects if x != None]
             # Save Session Data so it can be accessed when posting to marketplace/databse
             session['text_prompt'] = text_prompt
@@ -84,7 +85,6 @@ def index():
                 db.execute(
                     f'insert into temp_prompt_history (user_id, text_prompt, creation_date, saved_to_marketplace) values ("{user_id}", "{text_prompt}", "{creation_date}", 0)')
                 db.commit()
-
             return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
                                    instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
                                    end_time=execution_time)
@@ -431,7 +431,7 @@ def service_download():
 
 @app.route('/playground/<string:text_prompt>')
 def playground(text_prompt):
-    return text_prompt
+    # return text_prompt
     db = get_db(db_path)
     text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
     popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]

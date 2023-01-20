@@ -27,16 +27,30 @@ function stepSequencer(static_url) {
 
         // var buffer = new Tone.Buffer("{{static_url}}/kicks/BOS_DHT_Kick_One_Shot_Deep_F.wav");
 
+        // Clickable Play/Pause Button
         var start_button = document.getElementById("startSequencerButton");
+        start_button.addEventListener("click", startSequencer);
 
         function startSequencer() {
-            console.log("play function (playground_stepSequencer.js)");
-            initializeSamples();
-            Tone.Transport.scheduleRepeat(repeat, '16n');
-            Tone.Transport.start();
-        }
+            if (Tone.Transport.state === "started") {
+                // clear the schedule repeat event and set index to 0
+                Tone.Transport.clear(Tone.Transport.scheduleRepeat);
+                Tone.Transport.position = 0;
+                Tone.Transport.stop(0);
+                Tone.Transport.cancel();
+                set_index_to_zero = true;
+                step_counter.innerText = "0";
+                for (const $row of $rows) {
+                    $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_avenue'));
+                }
+            } else {
+                initializeSamples();
+                // start scheduleRepeat at index 0
+                Tone.Transport.start(0);
+                Tone.Transport.scheduleRepeat(repeat, "16n", startTime = 0);
 
-        start_button.addEventListener("click", startSequencer);
+            }
+        }
 
         // Initialize drum samples
 
@@ -76,8 +90,14 @@ function stepSequencer(static_url) {
         let index = 0;
         var step_counter = document.getElementById("step-counter");
 
+        let set_index_to_zero = false;
+
         function repeat(time) {
+            // Setzen des Index auf 0 bei Neustart
+            if (set_index_to_zero) {index = 0; set_index_to_zero = false;}
+            // Modulo 16 damit der Index immer zwischen 0 und 15 bleibt
             let step = index % 16;
+            // Anzeige des Steps
             step_counter.innerText = step;
             for (let i = 0; i < $rows.length; i++) {
                 let sample = drum_samples[i],
@@ -89,11 +109,11 @@ function stepSequencer(static_url) {
                     try {
                         drum_samples[i].start(time);
                     } catch (e) {
+                        drum_samples[i].stop(time);
                         console.log(e);
                         continue;
                     }
                 }
-
             }
             index++;
         }

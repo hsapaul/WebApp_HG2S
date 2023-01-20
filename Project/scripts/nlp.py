@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification, pipelin
 from transformers import pipeline
 import time
 import pandas as pd
+import requests
 
 # global variables and lists
 tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb', ' a ',
@@ -21,9 +22,9 @@ def check_for_artists(text_prompt, static_url_path):
         if static_url_path is None:
             static_url_path = "../static"
         list_path = fr"{static_url_path}/lists/artists/10000-MTV-Music-Artists-page-{index}.csv"
-        df = pd.read_csv(list_path)
-        namen = df["name"].tolist()
-        for name in namen:
+        artist_list = requests.get(list_path).text.split("\n")
+        for line in artist_list:
+            name = line.split(",")[0]
             if f" {str(name).strip().lower()} " in f" {text_prompt.lower()} ":
                 found_artists.append(str(name).strip())
     found_artists = list(set([x.lower() for x in found_artists]))
@@ -37,12 +38,11 @@ def check_for_instruments(text_input, static_url_path):
     if static_url_path is None:
         static_url_path = "../static"
     list_path = fr"{static_url_path}/lists/instruments/top100instruments.csv"
-    # Read the csv file without pandas
-    with open(list_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.strip().lower() in text_prompt.lower():
-                found_instruments.append(line.strip())
-                text_prompt = text_prompt.replace(line.strip().lower(), "")
+    instrument_list = requests.get(list_path).text.split("\n")
+    for line in instrument_list:
+        if line.strip().lower() in text_prompt.lower():
+            found_instruments.append(line.strip())
+            text_prompt = text_prompt.replace(line.strip().lower(), "")
     return text_prompt, found_instruments
 
 
@@ -53,12 +53,11 @@ def check_for_genres(text_prompt, static_url_path):
         static_url_path = "../static"
     list_path = fr"{static_url_path}/lists/genres/top75genres.csv"
     print("top75genres.csv: ", list_path)
-    # Read the csv file without pandas
-    with open(list_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.strip().lower() in text_prompt.lower():
-                found_genres.append(line.strip())
-                text_prompt = text_prompt.replace(line.strip().lower(), "")
+    genre_list = requests.get(list_path).text.split("\n")
+    for line in genre_list:
+        if line.strip().lower() in text_prompt.lower():
+            found_genres.append(line.strip())
+            text_prompt = text_prompt.replace(line.strip().lower(), "")
     return text_prompt, found_genres
 
 

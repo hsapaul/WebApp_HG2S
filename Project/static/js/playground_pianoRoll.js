@@ -30,11 +30,21 @@ function pianoRoll() {
         initializeSoundfont("accordion");
 
         var play_button = document.getElementById("startSequencerButton");
+        var bool_playing = 0;
         play_button.addEventListener("click", function () {
-            console.log("play function (playground_pianoRoll.js)");
-            // actx.resume();
-            document.getElementById("pianoroll").play(actx, Callback_sf);
+            // check if bool_playing is true or false
+            if (bool_playing == 0) {
+                document.getElementById("pianoroll").play(actx, Callback_sf);
+                console.log("play");
+                bool_playing = 1;
+            } else {
+
+                document.getElementById("pianoroll").stop(actx, Callback_sf);
+                console.log("stop");
+                bool_playing = 0;
+            }
         });
+
 
         var soundfont_select = document.getElementById("soundfont_select");
         soundfont_select.addEventListener("change", function () {
@@ -54,7 +64,6 @@ function pianoRoll() {
                 document.getElementById('invisible').style.display = "block";
             });
         }
-
 
         function Callback_sf(ev) {
             console.log("play: " + ev.n);

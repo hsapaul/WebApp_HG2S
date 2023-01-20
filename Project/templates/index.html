@@ -12,16 +12,20 @@ HG2S - Text Prompt Song Generation
 
     {% if session['session_user'] %}
     <h1 class="headline">Welcome {{ session['session_user'] }}</h1>
-    <!-- some welcome messages, js will make one randomly appear -->
-    <p class="subheadline random_message">Great to see you back for another Session!</p>
-    <p class="subheadline random_message">Another Day Another Prompt!</p>
-    <p class="subheadline random_message">Experts confirm: "One Prompt a Day, keeps the doctor away"</p>
+    <!-- WELCOME MESSAGES for logged-in Users: js will randomly show one -->
+    <p class="subheadline random-message display-none">Great to see you back for another Session!</p>
+    <p class="subheadline random-message display-none">Another Day Another Prompt!</p>
+    <p class="subheadline random-message display-none">Experts agree: "One Prompt a Day, keeps the doctor away"</p>
     {% else %}
     <h1 class="headline">Welcome New Citizen</h1>
-    <p class="subheadline">You should consider to <a href="{{ url_for('login') }}">Login</a> or
+    <p class="subheadline">You should consider to <a href="{{ url_for('login') }}">Log-in</a> or
         <a href="{{ url_for('sign_up') }}">Signup</a> for a better Experience </p>
     {% endif %}
 </div>
+
+<!-------------------------------------------------------------->
+<!--            Form I - Write Text Prompt and Submit         -->
+<!-------------------------------------------------------------->
 
 <div class="my-2 py-5">
     <h4 class="mb-4">Text-to-Music Tool</h4>
@@ -45,6 +49,7 @@ HG2S - Text Prompt Song Generation
 <h3><em>Prompt - </em> "{{ text_prompt }}"</h3><br>
 <h2 class="mb-1">Step 1 - Text Comprehension <p>({{ end_time }} seconds)</p></h2><br>
 <ul>
+    <!-- If an ARTIST was found in the Prompt -->
     {% if artist_objects %}
     <h3>- Artist(s):</h3>
     <div class="container">
@@ -61,6 +66,7 @@ HG2S - Text Prompt Song Generation
         </div>
     </div>
     {% endif %}
+    <!-- If an INSTRUMENT was found in the Prompt -->
     {% if instruments %}
     <h3>- Instrument(s):</h3>
     <div class="container">
@@ -73,6 +79,7 @@ HG2S - Text Prompt Song Generation
         </div>
     </div>
     {% endif %}
+    <!-- If a GENRE was found in the Prompt -->
     {% if genres %}
     <h3>- Genre(s):</h3>
     <div class="container">
@@ -85,6 +92,7 @@ HG2S - Text Prompt Song Generation
         </div>
     </div>
     {% endif %}
+    <!-- If EXTRA INFORMATION was found in the Prompt -->
     {% if key_and_bpm %}
     <h3>- Key and BPM:</h3>
     <div class="container">
@@ -108,6 +116,7 @@ HG2S - Text Prompt Song Generation
 </ul>
 
 <!-------------------------------------------------------------->
+<!--                        Form II                           -->
 <!--     POST RESULTS TO MARKETPLACE OR ENTER PLAYGROUND      -->
 <!--     (mit Logik, ob Nutzer eingeloggt ist oder nicht)     -->
 <!-------------------------------------------------------------->
@@ -131,10 +140,10 @@ HG2S - Text Prompt Song Generation
     </div>
 </form>
 {% endif %}
-</br>
 
 <!-------------------------------------------------------------->
 <!-- EXTRAS LIKE DOCUMENTATION, EXAMPLES AND TIPPS & TRICKS   -->
+<!--                    (Shown anytime)                       -->
 <!-------------------------------------------------------------->
 
 <div class="container">
@@ -181,10 +190,11 @@ HG2S - Text Prompt Song Generation
 
 {% block extra_javascript %}
 <script type="text/javascript">
-    const random_messages = document.querySelectorAll('.random_message');
+    <!-- Randomly select a Welcome Message for logged-in Users -->
+    const random_messages = document.querySelectorAll('.random-message');
     const random_message = random_messages[Math.floor(Math.random() * random_messages.length)];
-    random_message.classList.remove("random_message");
-</script>
-
+    random_message.classList.remove("display-none");
 </script>
 {% endblock %}
+
+
