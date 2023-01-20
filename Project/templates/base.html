@@ -31,12 +31,8 @@
                         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
                     </a>
                     <ul class="nav">
-                        <!-- Menu Items - Base -->
-                        <li><a href="{{ url_for('services')}}">Services</a></li>
-                        <li><a href="{{ url_for('marketplace')}}">Marketplace</a></li>
-                        <li><a href="{{ url_for('research')}}">Research</a></li>
+                        <li><a href="{{ url_for('marktplatz')}}">Marktplatz</a></li>
                         <li><a href="{{ url_for('documentation')}}">Documentation</a></li>
-                        <!-- Menu Items - Logic -->
                         {% if session['session_user'] %}
                         <li><a href="{{ url_for('profile', username=session['session_user'])}}">Profile</a></li>
                         {% if session['session_id'] == 1 %}

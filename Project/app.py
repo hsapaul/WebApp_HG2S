@@ -1,28 +1,28 @@
-# Imports
+"""
+Rahmen: Werkstück einer Bachelorarbeit (B.Sc.)
+Studium: Interaktive Medien, Hochschule Augsburg
+Titel: 'INTERAKTIVE WEBAPPLIKATION ZUR TEXTBASIERTEN MUSIKKOMPOSITION'
+Autor: Paul Hitzler
+"""
+
+# EXTERNAL IMPORTS
 from flask import Flask, g, render_template, request, redirect, url_for, session, flash
 import datetime  # Saving time on clock to db with every Post
 import sqlite3  # Connect to database
 import time  # Measuring of Execution Times
-# Import Service Scripts
-from scripts.step_metadata import get_song_key_and_bpm as metadata
-from scripts.step_textdata import main as textdata
 from scripts.nlp import main as nlp_task
 import scripts.artist_information.artistSearch_WikipediaInformation as artist_wiki
 from dotenv import load_dotenv
-import requests
 
+# GLOBAL CONFIGURATIONS
 load_dotenv()
-
-# Create Flask App
-app = Flask(__name__)
-
+app = Flask(__name__)  # Create Flask App
 db_path = r"./models/database.db"
 sample_db_path = r"./models/music_gallery.db"
-
-# Encrypt and Decrypt Session Data
 app.secret_key = "123"
 
-# Connect to database
+
+# DATABASE CONNECTION
 def connect_db(db_path_new):
     # Connect to database with .env variable
     sql = sqlite3.connect(db_path_new)
@@ -30,18 +30,21 @@ def connect_db(db_path_new):
     return sql
 
 
-# Check if variable g has attribute db
 def get_db(db_path):
     if not hasattr(g, 'sqlite_db'):
         g.sqlite_db = connect_db(db_path)
     return g.sqlite_db
 
 
-# Close connection to database
 @app.teardown_appcontext
 def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
+
+
+"""
+HOME ROUTE LANDING PAGE
+"""
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -77,22 +80,23 @@ def index():
             creation_date = str(datetime.datetime.now())[:-10]
             execution_time = round(time.time() - start_time, 2)
             # Save to Temporary Database "temp_prompt_history" if logged in
+            p1_found_entities = [artist_objects, found_instruments, found_genres, found_time, key_and_bpm]
+            p2_music_configurations = []
             if 'session_id' in session:
                 user_id = session['session_id']
                 db = get_db(db_path)
                 db.execute(
-                    'CREATE TABLE IF NOT EXISTS temp_prompt_history (temp_post_id INTEGER PRIMARY KEY, user_id INTEGER, text_prompt TEXT, creation_date TEXT, saved_to_marketplace INTEGER)')
-                db.execute(
-                    f'insert into temp_prompt_history (user_id, text_prompt, creation_date, saved_to_marketplace) values ("{user_id}", "{text_prompt}", "{creation_date}", 0)')
+                    'INSERT INTO temp_prompt_history (id, user_id, text_prompt, p1_found_entities, p2_music_configurations,'
+                    f'creation_date, saved_to_marketplace) VALUES ("{user_id}", "{text_prompt}", '
+                    f'"{p1_found_entities}", "{p2_music_configurations}", "{creation_date}", 0)')
                 db.commit()
             return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
                                    instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
                                    end_time=execution_time)
         # Responsible Button: "Post to Marketplace"
         elif 'post_button' in request.form:
-            text_prompt, artists, instruments, genres, key_and_bpm = session['text_prompt'], \
-                                                                     session['artists'], session['instruments'], \
-                                                                     session['genres'], session['key_and_bpm']
+            text_prompt, artists, instruments = session['text_prompt'], session['artists'], session['instruments']
+            genres, key_and_bpm = session['genres'], session['key_and_bpm']
             # Get names out of the dictionary
             artist_names = [artist["name"] for artist in artists]
             # Get date and time
@@ -105,18 +109,17 @@ def index():
             else:
                 user_name = "Guest"
             db.execute(
-                'CREATE TABLE IF NOT EXISTS marketplace_posts (id INTEGER PRIMARY KEY, text_prompt TEXT, user_name TEXT, datum TEXT, instruments TEXT, genres TEXT, key_and_bpm TEXT, popularity INTEGER)')
-            db.execute(
-                f'insert into marketplace_posts (text_prompt, user_name, datum, artists, instruments, genres, key_and_bpm, popularity) values ("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", "{instruments}", "{genres}", "{key_and_bpm}", 0)')
-            # Create table for each artist
-            # db.execute('CREATE TABLE IF NOT EXISTS artists (id INTEGER PRIMARY KEY, name TEXT, genres TEXT, instruments TEXT, occupation TEXT, year TEXT)')
+                'INSERT INTO marketplace_posts (text_prompt, user_name, datum, '
+                'artists, instruments, genres, key_and_bpm, popularity) VALUES '
+                f'("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", '
+                f'"{instruments}", "{genres}", "{key_and_bpm}", 0)')
             for artist in artists:
                 print(artist)
                 name, genres, instruments, occupation, year = artist["name"], artist["genres"], artist["instruments"], \
                                                               artist["occupation"], artist["year"]
                 db.execute(
-                    f'insert into artists (name, genres, instruments, occupations, year) values ("{name}", "{genres}", "{instruments}", "{occupation}", "{year}")')
-            # db.execute('insert into artists (name) values ("test")')
+                    f'INSERT INTO artists (name, genres, instruments, occupations, year) VALUES '
+                    f'("{name}", "{genres}", "{instruments}", "{occupation}", "{year}")')
             db.commit()
             flash("Your post was successfully submitted!")
             return redirect(url_for('marketplace'))
@@ -126,17 +129,16 @@ def index():
             return redirect(url_for('playground', text_prompt=text_prompt))
 
 
-
 @app.route('/documentation')
 def documentation():
     return render_template('documentation.html')
 
 
-@app.route('/marketplace', methods=['GET', 'POST'])
-def marketplace():
+@app.route('/marktplatz', methods=['GET', 'POST'])
+def marktplatz():
     # Get data from database
     db = get_db(db_path)
-    cur = db.execute('select * from marketplace_posts')
+    cur = db.execute('select * from marktplatz_posts')
     cur2 = db.execute('select * from artists')
     posts = cur.fetchall()
     artists = cur2.fetchall()
@@ -154,7 +156,7 @@ def marketplace():
 
 
 """
-CRUD Operations
+CRUD Operations & Changes by User & Upvotes
 """
 
 
@@ -188,21 +190,24 @@ def upvote(id):
                 f'update nutzer set liked_post_ids = "{str(cur) + str(id) + ","}" where id = "{session["session_id"]}"')
             db.commit()
         return redirect(url_for('marketplace'))
-    # except:
-    #     return "There was a problem upvoting that post"
 
 
-@app.route('/change_theme/<int:theme_id>')
-def change_theme(theme_id):
-    theme = theme_id
-    return redirect(url_for('profile', theme=theme, username=session['session_user']))
-    # session['theme'] = request.args.get('theme')
-    # db = get_db(db_path)
-    # db.execute(f'update nutzer set theme = "{session["theme"]}" where id = "{session["session_id"]}"')
-    # db.commit()
-    #
-    # return redirect(url_for('index'
-    # session['theme'] = ))
+@app.route('/change_theme')
+def change_theme():
+    theme = request.form.get('form-select')
+    light_mode = request.form.get('dark_mode_checkbox')
+    # DB Executions
+    db = get_db(db_path)
+    if light_mode is None:
+        db.execute(f'update nutzer set appearance_mode = 1 where username = "{session["session_user"]}"')
+    elif light_mode == "on":
+        db.execute(f'update nutzer set appearance_mode = 0 where username = "{session["session_user"]}"')
+    db.execute(f'update nutzer set theme = "{theme}" where username = "{session["session_user"]}"')
+    db.commit()
+    session['session_theme'] = theme
+    session['appearance_mode'] = light_mode
+    flash("Appearance Changed Successfully")
+    return render_template('profile.html')
 
 
 @app.route('/change_user_name', methods=['GET', 'POST'])
@@ -212,7 +217,8 @@ def change_user_name():
             try:
                 db = get_db(db_path)
                 db.execute(
-                    f'update nutzer set username = "{request.form["new_user_name"]}" where username = "{session["session_user"]}"')
+                    f'UPDATE nutzer SET username = "{request.form["new_user_name"]}" '
+                    f'WHERE username = "{session["session_user"]}"')
                 session['session_user'] = request.form['new_user_name']
                 db.commit()
                 flash("Username changed successfully")
@@ -259,6 +265,7 @@ def change_password():
 Authentication Logic & Routing
 """
 
+
 @app.route('/sign_up', methods=['POST', 'GET'])
 def sign_up():
     if request.method == 'POST':
@@ -275,16 +282,15 @@ def sign_up():
                     flash("Email already taken")
                     return render_template('auth_signup.html', error='Email already taken!')
             db.execute(
-                'INSERT INTO nutzer (username, email, password, posted_prompt_ids, liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO nutzer (username, email, password, posted_prompt_ids, '
+                'liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 [request.form['username'], request.form['email'], request.form['password'], None, None, "default",
                  0])
             db.commit()
-            session['session_id'] = \
-                db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
-            session['session_user'] = request.form['username']
-            session['session_password'] = request.form['password']
-            session['session_email'] = request.form['email']
-            session['session_theme'] = "default"
+            session['session_id'] = db.execute('SELECT id FROM nutzer WHERE username = ?',
+                                               [request.form['username']]).fetchone()[0]
+            session['session_user'], session['session_password'] = request.form['username'], request.form['password']
+            session['session_email'], session['session_theme'] = request.form['email'], "default"
             flash("Signed up successfully!")
             flash("You get to the Main Page by pressing the Logo in the upper left")
             return redirect(url_for('profile', username=session['session_user']))
@@ -301,16 +307,14 @@ def login():
         db_nutzer = db.execute('SELECT id, email, username, password FROM nutzer').fetchall()
         username_or_email = request.form['username_or_email']
         for nutzer in db_nutzer:
-            if username_or_email in (nutzer['username'], nutzer['email']) and nutzer['password'] == request.form[
-                'password']:
+            if username_or_email in (nutzer['username'], nutzer['email']) \
+                    and nutzer['password'] == request.form['password']:
                 user, password, email, role, theme, appearance_mode = db.execute(
-                    f'select username, password, email, role, theme, appearance_mode from nutzer where id = {nutzer["id"]}').fetchone()
-                session['session_id'] = nutzer['id']
-                session['session_user'] = user
-                session['session_password'] = password
-                session['session_email'] = email
-                session['session_role'] = role
-                session['session_theme'] = theme
+                    f'select username, password, email, role, theme, appearance_mode '
+                    f'from nutzer where id = {nutzer["id"]}').fetchone()
+                session['session_id'], session['session_user'] = nutzer['id'], user
+                session['session_password'], session['session_email'] = password, email
+                session['session_role'], session['session_theme'] = role, theme
                 session['appearance_mode'] = appearance_mode
                 flash(f"Welcome {session['session_user']}! You were successfully logged in. ")
                 flash("By pressing on the logo icon on the upper left you get to the Prompt Area")
@@ -331,31 +335,18 @@ def logout():
     return redirect(url_for('login'))
 
 
+"""
+ USER PROFILE - individual per User
+"""
+
+
 @app.route('/users/<username>', methods=['GET', 'POST'])
 def profile(username):
     # Get Temp Prompt History
     db = get_db(db_path)
-    prompts_for_user_id = db.execute(
-        f'select temp_post_id, text_prompt, creation_date, saved_to_marketplace from temp_prompt_history where user_id = {session["session_id"]}').fetchall()
+    prompts_for_user_id = db.execute('SELECT temp_post_id, text_prompt, creation_date, saved_to_marketplace '
+        f'FROM temp_prompt_history WHERE user_id = {session["session_id"]}').fetchall()
     # Chech if post and if submit name is submit_theme
-    if request.method == 'POST':
-        # Requests
-        theme = request.form.get('form-select')
-        light_mode = request.form.get('dark_mode_checkbox')
-        print(light_mode)
-        # DB Executions
-        db = get_db(db_path)
-        if light_mode is None:
-            db.execute(f'update nutzer set appearance_mode = 1 where username = "{session["session_user"]}"')
-        elif light_mode == "on":
-            db.execute(f'update nutzer set appearance_mode = 0 where username = "{session["session_user"]}"')
-        db.execute(f'update nutzer set theme = "{theme}" where username = "{session["session_user"]}"')
-        db.commit()
-        session['session_theme'] = theme
-        session['appearance_mode'] = light_mode
-        flash("Appearance Changed Successfully")
-        return render_template('profile.html', session_user=session['session_user'], light_mode=light_mode,
-                               your_last_prompts=prompts_for_user_id)
     if request.method == 'GET':
         if 'session_user' in session:
             return render_template('profile.html', session_user=session['session_user'],
@@ -364,72 +355,9 @@ def profile(username):
             return redirect(url_for('login'))
 
 
-@app.route('/admin')
-def admin():
-    if 'session_user' in session:
-        if session['session_id'] == 1:
-            return render_template('admin.html')
-        else:
-            flash('You are not allowed to access this page!')
-            return redirect(url_for('profile'))
-    else:
-        flash('You are not logged in')
-        return redirect(url_for('login'))
-
-
 """
-EXTRA ROUTES
+ PROMPT PLAYGROUND - Templates individual per Prompt
 """
-
-
-@app.route('/services')
-def services():
-    # Check if user logged in
-    if 'session_user' in session:
-        return render_template('services.html', logged_in=True)
-    else:
-        return render_template('services.html', logged_in=False)
-
-
-@app.route('/services', methods=['POST'])
-def service_download():
-    # Check which Service was demanded
-    if request.form['btn'] == 'Download':
-        from scripts.yt_downloader import download_video
-        download_url = request.form['url'].replace('"', '')
-        download_path = request.form['path'].replace('"', '')
-        download_video(download_url, download_path)
-        downloaded = True
-        return redirect(url_for('services'))
-    if request.form['btn'] == 'Scrape':
-        song_name = request.form['song']
-        artist_name = request.form['artist']
-        base_path = request.form['path'].replace('"', '')
-        bpm_and_key = metadata(song_name, artist_name, base_path)
-        song_json = {"song": song_name,
-                     "artist": artist_name,
-                     "bpm": bpm_and_key[0],
-                     "key": bpm_and_key[1]}
-        textdata_json = textdata(song_name, artist_name, base_path)
-        # url = chords_url(song_name, artist_name, base_path)
-        # chords = chords_2(url, song_name, artist_name, base_path)
-        song_json = song_json | textdata_json
-        # return render_template("songprofiler.html", song_json=song_json, chord_progression=chords)
-        return render_template("services.html", song_json=song_json)
-
-
-
-@app.route('/research')
-def research():
-    return render_template('research.html')
-
-
-@app.route('/vstplugins', methods=['POST', 'GET'])
-def vstplugins():
-    if request.method == 'POST':
-        # open_vst()
-        return render_template('vstplugins.html', bool_open_vst=True)
-    return render_template('vstplugins.html')
 
 
 @app.route('/playground/<string:text_prompt>')
@@ -446,14 +374,37 @@ def playground(text_prompt):
     static_url = url_for('static', filename='samples/drum_samples/')
     return render_template('playground.html', sample_dict=sample_dict, static_url=static_url, text_prompt=text_prompt)
 
-# @app.route('/playground/<string:text_prompt>')
-# def playground(text_prompt):
-#     # return text_prompt
-#     db = get_db(db_path)
-#     text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
-#     popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]
-#     return render_template('playground.html', id=id, text_prompt=text_prompt, popularity=popularity)
+
+"""
+ TABLE CHECK - Initial Verification of table existence
+"""
 
 
+def create_tables_if_not_exist():
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    # Table for Users - General Settings, Interaction&Activity and Appearance Settings
+    c.execute('CREATE TABLE IF NOT EXISTS nutzer (id INTEGER PRIMARY KEY, '
+              'username TEXT, email TEXT, password TEXT, '
+              'marketplace_post_ids TEXT, temp_post_ids TEXT, liked_post_ids TEXT, '
+              'appearance_theme TEXT, appearance_light_mode INTEGER)')
+    # Table for Posts - Prompt Results, Time Data and Popularity (w/ References to User)
+    c.execute('CREATE TABLE IF NOT EXISTS marktplatz_posts (id INTEGER PRIMARY KEY, '
+              'user_id INTEGER, text_prompt TEXT, p1_found_entities TEXT, '
+              'p2_music_configurations TEXT, post_datum TEXT, creation_date TEXT, '
+              'popularity INTEGER, FOREIGN KEY(user_id) REFERENCES nutzer(id))')
+    # Table for History - Prompt Results, Time Data and Popularity (w/ References to User)
+    c.execute('CREATE TABLE IF NOT EXISTS temp_prompt_history (id INTEGER PRIMARY KEY, '
+              'user_id INTEGER, text_prompt TEXT, p1_found_entities TEXT, '
+              'p2_music_configurations TEXT, creation_date TEXT, saved_to_marketplace INTEGER, '
+              'FOREIGN KEY(user_id) REFERENCES nutzer(id))')
+    conn.commit()
+    conn.close()
+
+
+"""
+ APP START - "Interactive Webapplication for text-based music generation"
+"""
 if __name__ == "__main__":
+    create_tables_if_not_exist()
     app.run(debug=True, port=9875)

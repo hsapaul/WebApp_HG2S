@@ -117,7 +117,7 @@ HG2S - Text Prompt Song Generation
 
 <!-------------------------------------------------------------->
 <!--                        Form II                           -->
-<!--     POST RESULTS TO MARKETPLACE OR ENTER PLAYGROUND      -->
+<!--     POST RESULTS TO MARKTPLATZ OR ENTER PLAYGROUND      -->
 <!--     (mit Logik, ob Nutzer eingeloggt ist oder nicht)     -->
 <!-------------------------------------------------------------->
 
@@ -126,7 +126,7 @@ HG2S - Text Prompt Song Generation
         {% if session['session_user'] %}
         <button type="submit" name="post_button" value="Generate"
                 class="btn mt-2 own-btn d-inline px-4 btn-outline-light">Post to
-            Marketplace
+            Marktplatz
         </button>
         {% else %}
         <h4>Share and Save this great Prompt Result with others!</h4>
@@ -166,7 +166,7 @@ HG2S - Text Prompt Song Generation
                 <li>“a 8 Bit version of a Eminem Type Beat with Rihanna Vocals on top”</li>
                 <li>“A Violin playing Mozart with a Rock Band out of the 2000’s”</li>
                 <li>“Nirvana collaborating with a Berlin Techno DJ in the 90’s””</li>
-                <li><a href="{{ url_for('marketplace')}}">Check what Users came up with</a></li>
+                <li><a href="{{ url_for('marktplatz')}}">Check what Users came up with</a></li>
             </ul>
         </div>
         <div class="col-6">
@@ -181,7 +181,7 @@ HG2S - Text Prompt Song Generation
                 <li title="Database includes ">location {{ location }}</li>
                 <li title="Database includes ">musical key {{ musical_key }}</li>
                 <li title="Database includes ">bpm {{ bpm }}</li>
-                <li><a href="{{ url_for('marketplace')}}">Learn more about writing better Prompts</a></li>
+                <li><a href="{{ url_for('marktplatz')}}">Learn more about writing better Prompts</a></li>
             </ul>
         </div>
     </div>
