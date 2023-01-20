@@ -123,7 +123,7 @@ def index():
         # Responsible Button: "Enter Playground"
         elif 'playground_button' in request.form:
             text_prompt = session['text_prompt']
-            return redirect(url_for('jstest', text_prompt=text_prompt))
+            return redirect(url_for('playground', text_prompt=text_prompt))
 
 
 
@@ -259,20 +259,11 @@ def change_password():
 Authentication Logic & Routing
 """
 
-
-@app.route('/users')
-def users():
-    db = get_db(db_path)
-    db_nutzer = db.execute('SELECT username, password, theme FROM nutzer').fetchall()
-    return render_template('auth_login.html', theme=session['theme'])
-
-
 @app.route('/sign_up', methods=['POST', 'GET'])
 def sign_up():
     if request.method == 'POST':
         username, email, password, repeat_password = request.form['username'], request.form['email'], request.form[
             'password'], request.form['repeat_password']
-        role = "admin"
         if password == repeat_password:
             db = get_db(db_path)
             db_nutzer = db.execute('SELECT username, password, email FROM nutzer').fetchall()
@@ -284,20 +275,18 @@ def sign_up():
                     flash("Email already taken")
                     return render_template('auth_signup.html', error='Email already taken!')
             db.execute(
-                'INSERT INTO nutzer (username, email, password, role, posted_prompt_ids, liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [request.form['username'], request.form['email'], request.form['password'], role, None, None, "default",
+                'INSERT INTO nutzer (username, email, password, posted_prompt_ids, liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [request.form['username'], request.form['email'], request.form['password'], None, None, "default",
                  0])
             db.commit()
             session['session_id'] = \
                 db.execute('SELECT id FROM nutzer WHERE username = ?', [request.form['username']]).fetchone()[0]
             session['session_user'] = request.form['username']
             session['session_password'] = request.form['password']
-            session['session_role'] = role
             session['session_email'] = request.form['email']
             session['session_theme'] = "default"
             flash("Signed up successfully!")
             flash("You get to the Main Page by pressing the Logo in the upper left")
-            flash("On the current page, you can change your user data and the theme of the website")
             return redirect(url_for('profile', username=session['session_user']))
         else:
             flash("Passwords don't match")
@@ -429,14 +418,6 @@ def service_download():
         return render_template("services.html", song_json=song_json)
 
 
-@app.route('/playground/<string:text_prompt>')
-def playground(text_prompt):
-    # return text_prompt
-    db = get_db(db_path)
-    text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
-    popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]
-    return render_template('js_test.html', id=id, text_prompt=text_prompt, popularity=popularity)
-
 
 @app.route('/research')
 def research():
@@ -451,8 +432,8 @@ def vstplugins():
     return render_template('vstplugins.html')
 
 
-@app.route('/jstest/<string:text_prompt>')
-def jstest(text_prompt):
+@app.route('/playground/<string:text_prompt>')
+def playground(text_prompt):
     # Get sample_paths from database
     conn = sqlite3.connect(sample_db_path)
     c = conn.cursor()
@@ -463,21 +444,15 @@ def jstest(text_prompt):
         sample_dict[sub_folder] = c.execute(f'SELECT name FROM {sub_folder}').fetchall()
     conn.close()
     static_url = url_for('static', filename='samples/drum_samples/')
-    # {{ url_for('static', filename='samples/drum_samples/kick/' + kick) }}
-    # return sample_dict
-    # if 'session_user' in session:
-    #     text_prompt = session['text_prompt']
-    return render_template('js_test.html', sample_dict=sample_dict, static_url=static_url, text_prompt=text_prompt)
+    return render_template('playground.html', sample_dict=sample_dict, static_url=static_url, text_prompt=text_prompt)
 
-
-@app.route('/jstest2')
-def jstest2():
-    return render_template('js_test_2.html')
-
-
-@app.route('/jstest3')
-def jstest3():
-    return render_template('js_test_3.html')
+# @app.route('/playground/<string:text_prompt>')
+# def playground(text_prompt):
+#     # return text_prompt
+#     db = get_db(db_path)
+#     text_prompt = db.execute(f'SELECT text_prompt FROM marketplace_posts WHERE id = {id}').fetchone()[0]
+#     popularity = db.execute(f'SELECT popularity FROM marketplace_posts WHERE id = {id}').fetchone()[0]
+#     return render_template('playground.html', id=id, text_prompt=text_prompt, popularity=popularity)
 
 
 if __name__ == "__main__":
