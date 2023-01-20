@@ -35,9 +35,6 @@
                         <li><a href="{{ url_for('documentation')}}">Documentation</a></li>
                         {% if session['session_user'] %}
                         <li><a href="{{ url_for('profile', username=session['session_user'])}}">Profile</a></li>
-                        {% if session['session_id'] == 1 %}
-                        <li><a href="{{ url_for('admin')}}">Admin</a></li>
-                        {% endif %}
                         <li><a href="{{ url_for('logout')}}">Logout</a></li>
                         {% else %}
                         <li><a href="{{ url_for('login')}}">Login</a></li>

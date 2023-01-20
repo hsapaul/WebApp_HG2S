@@ -107,8 +107,8 @@ Algorithms
 """
 
 
-# Input: Integer Dictionary e.g. ["Pop": 5, "Rock": 3, "Jazz": 2]
-# Output: Percentage-Probability Dictionary e.g. ["Pop": 50%, "Rock": 30%, "Jazz": 20%]
+# Input: Integer Dictionary e.g. ["Pop":5,"Rock":3,"Jazz":2]
+# Output: Percentage-Probability Dict. ["Pop":50%,"Rock":30%,"Jazz":20%]
 def calc_probabilities(dict):
     total = sum(dict.values())
     for key in dict:

@@ -156,13 +156,14 @@ def get_chords(url):
 
 def main(artist_name):
     start_time = time.time()
-    #print(f'-----{str(artist_name)}-----')
+    print(f'-----{str(artist_name)}-----')
     list_of_chord_dicts = []
     # Get Top 5 Songs by Artist
     songs = get_top_songs(artist_name)
     print(f"Top 5 Songs : {', '.join(songs)}")
     # Get URL for each Song
     urls = get_chord_urls(artist_name, songs)
+    # print(f"URLs : {', '.join(urls)}")
     # Get Chords for each Song
     for index, url in enumerate(urls):
         chord_dict = get_chords(url)

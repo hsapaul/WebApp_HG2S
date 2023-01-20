@@ -15,8 +15,8 @@ HG2S - Profile
 
 <div class="user-profile">
 
-    <div class="row h-100">
-        <div class="col-6">
+    <div class="row">
+        <div class="col-6 py-4">
             <div class="card bg-dark text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>User Settings</h4>
@@ -52,7 +52,7 @@ HG2S - Profile
                 </div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 py-4">
             <div class="card bg-dark text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>Appearence</h4>
@@ -91,17 +91,19 @@ HG2S - Profile
                     <div class="rounded border border-white bg-dark text-light py-1 m-1">
                         <h6 class="">"{{ prompt.text_prompt }}"</h6>
                         <p class="d-inline m-1 small-font">{{ prompt.creation_date }}</p>
-                        <p class="d-inline float-end left_bottom m-1 small-font"><a href="{{ url_for('playground', text_prompt = prompt.text_prompt) }}">Playground</a></p>
+                        <p class="d-inline float-end left_bottom m-1 small-font"><a
+                                href="{{ url_for('playground', text_prompt = prompt.text_prompt) }}">Playground</a>
+                        </p>
                     </div>
                     {% endfor %}
                     <p style="line-height: 90%">Post your Prompt Creations to the Marketplace</p>
                     <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
                     {% else %}
                     <p class="">You didn't prompt yet!</p>
-                    <div><p>Start <a class="d-inline" href="{{ url_for('index')}}">your first Prompt Creation</a> Right
+                    <div><p>Start <a class="d-inline" href="{{ url_for('index')}}">your first Prompt Creation</a>
+                        Right
                         now!</p></div>
                     {% endif %}
-
                 </div>
             </div>
         </div>

@@ -139,9 +139,9 @@ def marktplatz():
     # Get data from database
     db = get_db(db_path)
     cur = db.execute('select * from marktplatz_posts')
-    cur2 = db.execute('select * from artists')
+    # cur2 = db.execute('select * from artists')
     posts = cur.fetchall()
-    artists = cur2.fetchall()
+    # artists = cur2.fetchall()
     if request.method == 'GET':
         return render_template('marketplace.html', posts=posts, artists_db=artists,
                                today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
@@ -282,9 +282,9 @@ def sign_up():
                     flash("Email already taken")
                     return render_template('auth_signup.html', error='Email already taken!')
             db.execute(
-                'INSERT INTO nutzer (username, email, password, posted_prompt_ids, '
-                'liked_post_ids, theme, appearance_mode) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [request.form['username'], request.form['email'], request.form['password'], None, None, "default",
+                'INSERT INTO nutzer (username, email, password, marketplace_post_ids, temp_post_ids, '
+                'liked_post_ids, appearance_theme, appearance_light_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [request.form['username'], request.form['email'], request.form['password'], None, None, None, "default",
                  0])
             db.commit()
             session['session_id'] = db.execute('SELECT id FROM nutzer WHERE username = ?',
@@ -292,7 +292,7 @@ def sign_up():
             session['session_user'], session['session_password'] = request.form['username'], request.form['password']
             session['session_email'], session['session_theme'] = request.form['email'], "default"
             flash("Signed up successfully!")
-            flash("You get to the Main Page by pressing the Logo in the upper left")
+            flash("Access the Main Home Page by pressing the Logo in the upper left")
             return redirect(url_for('profile', username=session['session_user']))
         else:
             flash("Passwords don't match")
@@ -344,8 +344,9 @@ def logout():
 def profile(username):
     # Get Temp Prompt History
     db = get_db(db_path)
-    prompts_for_user_id = db.execute('SELECT temp_post_id, text_prompt, creation_date, saved_to_marketplace '
-        f'FROM temp_prompt_history WHERE user_id = {session["session_id"]}').fetchall()
+    prompts_for_user_id = db.execute('SELECT id, text_prompt, p1_found_entities, p2_music_configurations, '
+                                     'creation_date, saved_to_marketplace FROM temp_prompt_history '
+                                     f'WHERE user_id = {session["session_id"]}').fetchall()
     # Chech if post and if submit name is submit_theme
     if request.method == 'GET':
         if 'session_user' in session:
