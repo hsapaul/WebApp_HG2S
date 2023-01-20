@@ -270,9 +270,9 @@ HG2S - Text Prompt Song Generation
 
     var show_only_once = 0;
     gallery_scroller.addEventListener("mouseover", function () {
-        if (show_only_once === 0) {
+        if (show_only_once <= 2) {
             document.getElementById("experience_aid").style.display = "block";
-            show_only_once = 1;
+            show_only_once += 1;
         }
     });
     gallery_scroller.addEventListener("mouseleave", function () {

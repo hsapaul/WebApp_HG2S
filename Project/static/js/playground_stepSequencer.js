@@ -35,9 +35,9 @@ function stepSequencer(static_url) {
             if (Tone.Transport.state === "started") {
                 // clear the schedule repeat event and set index to 0
                 Tone.Transport.clear(Tone.Transport.scheduleRepeat);
-                Tone.Transport.position = 0;
-                Tone.Transport.stop(0);
-                Tone.Transport.cancel();
+                // Tone.Transport.position = 0;
+                // Tone.Transport.stop(0);
+                // Tone.Transport.cancel();
                 set_index_to_zero = true;
                 step_counter.innerText = "0";
                 for (const $row of $rows) {
@@ -46,9 +46,8 @@ function stepSequencer(static_url) {
             } else {
                 initializeSamples();
                 // start scheduleRepeat at index 0
-                Tone.Transport.start(0);
-                Tone.Transport.scheduleRepeat(repeat, "16n", startTime = 0);
-
+                Tone.Transport.start();
+                Tone.Transport.scheduleRepeat(repeat, "16n");
             }
         }
 
@@ -93,8 +92,6 @@ function stepSequencer(static_url) {
         let set_index_to_zero = false;
 
         function repeat(time) {
-            // Setzen des Index auf 0 bei Neustart
-            if (set_index_to_zero) {index = 0; set_index_to_zero = false;}
             // Modulo 16 damit der Index immer zwischen 0 und 15 bleibt
             let step = index % 16;
             // Anzeige des Steps
@@ -106,16 +103,18 @@ function stepSequencer(static_url) {
                 $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_avenue'));
                 $row.querySelector(`span:nth-child(${step + 1})`).classList.add('bgcolor_avenue');
                 if ($input.checked) {
-                    try {
-                        drum_samples[i].start(time);
-                    } catch (e) {
-                        drum_samples[i].stop(time);
-                        console.log(e);
-                        continue;
+                    if (sample) {
+                        console.log("Playing sample", sample);
+                        sample.start(time);
                     }
                 }
             }
             index++;
+            // Setzen des Index auf 0 bei Neustart
+            if (set_index_to_zero) {
+                index = 0;
+                set_index_to_zero = false;
+            }
         }
 
         // Mixer Sliders
