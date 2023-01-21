@@ -2,14 +2,14 @@
 /*               COLOR SCHEME                  */
 /*---------------------------------------------*/
 
+/* Color Variables */
 :root {
     --yellow: #FFDCA8;
     --pink: #e4a5d4;
     --white: #EEE;
-    --black: #1e1e1e;
     --light-grey: #E9EAEC;
     --middle-grey: #282828;
-    --dark-grey: #27262C;
+    --dark-grey: #212529;
     --black: #1e1e1e;
     --green: #50FFAF;
     --dark-green: #10A957;
@@ -20,6 +20,7 @@
     --red: #D11D1C;
 }
 
+/* Color Scheme */
 .bgcolor_original {
     background-color: var(--yellow);
 }
@@ -34,6 +35,32 @@
 
 .bgcolor_warning {
     background-color: var(--red);
+}
+
+/* Dark Scheme */
+.bgcolor_black {
+    background-color: var(--black) !important;
+}
+
+.color_black {
+    color: var(--black) !important;
+}
+
+.bgcolor_darkgrey {
+    background-color: var(--dark-grey) !important;
+}
+
+/* Bright Scheme */
+.bgcolor_white {
+    background-color: var(--white) !important;
+}
+
+.color_white {
+    color: var(--white) !important;
+}
+
+.bgcolor_lightgrey {
+    background-color: var(--light-grey) !important;
 }
 
 /*---------------------------------------------*/
@@ -125,8 +152,6 @@ input {
 }
 
 
-
-
 /*---------------------------------------------*/
 /*   SLIDER, COUNTER, BUTTONS, RESIZABLE       */
 /*---------------------------------------------*/
@@ -150,14 +175,16 @@ input {
 }
 
 .scrollbars::-webkit-scrollbar {
-  width: 10px; /* Mostly for vertical scrollbars */
-  height: 10px; /* Mostly for horizontal scrollbars */
+    width: 10px; /* Mostly for vertical scrollbars */
+    height: 10px; /* Mostly for horizontal scrollbars */
 }
+
 .scrollbars::-webkit-scrollbar-thumb { /* Foreground */
-  background: #999;
+    background: #999;
 }
+
 .scrollbars::-webkit-scrollbar-track { /* Background */
-  background: #333;
+    background: #333;
 }
 
 /*.slidecontainer {*/
@@ -280,10 +307,6 @@ footer p a:hover {
     position: relative;
     /*left: -0px;*/
     bottom: 0px;
-}
-
-.bg-step {
-    background-color: var(--yellow);
 }
 
 
@@ -486,7 +509,7 @@ footer p a:hover {
 /**!*/
 
 .background-header {
-    background-color: #fff !important;
+    background-color: var(--white) !important;
     height: 70px !important;
     position: fixed !important;
     top: 0 !important;
@@ -806,7 +829,7 @@ footer p a:hover {
 
     .header-area.header-sticky .nav li a:hover,
     .header-area.header-sticky .nav li a.active {
-        color: #e4a5d4 !important;
+        color: var(--pink) !important;
         opacity: 1;
     }
 
@@ -859,12 +882,12 @@ footer p a:hover {
     }
 
     .header-area .main-nav .nav li:first-child {
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--light-grey);
     }
 
     .header-area .main-nav .nav li {
         width: 100%;
-        background: #fff;
+        background: var(--white);
         border-bottom: 1px solid #eee;
         padding-left: 0px !important;
         padding-right: 0px !important;
@@ -889,7 +912,7 @@ footer p a:hover {
     }
 
     .header-area .main-nav .nav li:last-child a:hover {
-        color: #e4a5d4 !important;
+        color: var(--pink) !important;
         background-color: transparent !important;
     }
 
@@ -920,7 +943,7 @@ footer p a:hover {
     }
 
     .header-area .main-nav .nav li.has-sub:after {
-        color: #3B566E;
+        color: var(--light-blue);
         right: 30px;
         font-size: 14px;
         top: 15px;
@@ -930,7 +953,6 @@ footer p a:hover {
         height: 0px;
     }
 }
-
 
 
 /*!* */

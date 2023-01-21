@@ -194,20 +194,7 @@ def upvote(id):
 
 @app.route('/change_theme')
 def change_theme():
-    theme = request.form.get('form-select')
-    light_mode = request.form.get('dark_mode_checkbox')
-    # DB Executions
-    db = get_db(db_path)
-    if light_mode is None:
-        db.execute(f'update nutzer set appearance_mode = 1 where username = "{session["session_user"]}"')
-    elif light_mode == "on":
-        db.execute(f'update nutzer set appearance_mode = 0 where username = "{session["session_user"]}"')
-    db.execute(f'update nutzer set theme = "{theme}" where username = "{session["session_user"]}"')
-    db.commit()
-    session['session_theme'] = theme
-    session['appearance_mode'] = light_mode
-    flash("Appearance Changed Successfully")
-    return render_template('profile.html')
+    return "lol"
 
 
 @app.route('/change_user_name', methods=['GET', 'POST'])
@@ -304,18 +291,18 @@ def sign_up():
 def login():
     if request.method == 'POST':
         db = get_db(db_path)
-        db_nutzer = db.execute('SELECT id, email, username, password FROM nutzer').fetchall()
+        db_nutzer = db.execute('SELECT id, username, email, password FROM nutzer').fetchall()
         username_or_email = request.form['username_or_email']
         for nutzer in db_nutzer:
+            # Check for each User: Username or Email must be correct and the password as well
             if username_or_email in (nutzer['username'], nutzer['email']) \
                     and nutzer['password'] == request.form['password']:
-                user, password, email, role, theme, appearance_mode = db.execute(
-                    f'select username, password, email, role, theme, appearance_mode '
-                    f'from nutzer where id = {nutzer["id"]}').fetchone()
-                session['session_id'], session['session_user'] = nutzer['id'], user
+                username, password, email, appearance_theme, appearance_light_mode = db.execute(
+                    f'SELECT username, password, email, appearance_theme, appearance_light_mode '
+                    f'FROM nutzer WHERE id = {nutzer["id"]}').fetchone()
+                session['session_id'], session['session_user'] = nutzer['id'], username
                 session['session_password'], session['session_email'] = password, email
-                session['session_role'], session['session_theme'] = role, theme
-                session['appearance_mode'] = appearance_mode
+                session['session_theme'], session['session_light_mode'] = appearance_theme, appearance_light_mode
                 flash(f"Welcome {session['session_user']}! You were successfully logged in. ")
                 flash("By pressing on the logo icon on the upper left you get to the Prompt Area")
                 return redirect(url_for('profile', username=session['session_user']))
@@ -354,6 +341,23 @@ def profile(username):
                                    your_last_prompts=prompts_for_user_id)
         else:
             return redirect(url_for('login'))
+    elif request.method == 'POST':
+        if "submit_theme" in request.form:
+            # Get requested Theme and Mode
+            theme = request.form.get('form-select')
+            light_mode = request.form.get('dark_mode_checkbox')
+            print(theme, light_mode)
+            # Update Theme and Mode in DB
+            db = get_db(db_path)
+            light_mode = 1 if light_mode == "on" else 0
+            db.execute(f'UPDATE nutzer SET appearance_theme = "{theme}", appearance_light_mode = {light_mode} '
+                       f'WHERE id = {session["session_id"]}')
+            db.commit()
+            # Set Session Data and Redirect to Profile
+            session['session_theme'], session['session_light_mode'] = theme, light_mode
+            flash("Appearance Changed Successfully")
+            print(session['session_theme'], session['session_light_mode'])
+            return redirect(url_for('profile', username=session['session_user']))
 
 
 """
