@@ -16,44 +16,52 @@ HG2S - Profile
 <div class="user-profile">
 
     <div class="row">
-        <div class="col-6 py-4">
-            <div class="card bgcolor_black text-white" style="border-radius: 1rem;">
+        <div class="col-7 py-4">
+            <div class="card bgcolor_black text-white shadow-sm" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>User Settings</h4>
-                    <div class="my-3">
-                        <img class="" width="150" height="150"
-                             src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}"
-                             alt="user" class="shadow">
+                    <div class="row">
+                        <div class="my-3 d-inline-block col-4">
+                            <img class="" width="150" height="150"
+                                 src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}"
+                                 alt="user" class="shadow">
+                        </div>
+                        <div class="col-8 py-4">
+                            <div class="d-inline-block">
+                                <h4 class="d-inline">Username: </h4>
+                                <p class="d-inline-block">{{ session_user }}</p>
+                                <a href="/change_user_name">
+                                    <button class="btn p-0 m-0">(Change User Name)</button>
+                                </a>
+                            </div>
+                            <div class="d-inline-block">
+                                <h4 class="d-inline-block">E-Mail: </h4>
+                                {% if session['session_email'] %}
+                                <p class="d-inline">{{ session['session_email'] }}</p>
+                                <!--<a href="" class="d-inline"><button>Change E-Mail</button></a>-->
+                                {% else %}
+                                <p class="d-inline">No E-Mail given</p>
+                                <a href="">
+                                    <button>Add</button>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="d-inline-block">
+                                <h4 class="d-inline-block">Password: </h4>
+                                <p class="d-inline">************</p>
+                                <a href="/change_password">
+                                    <button class="btn p-0 m-0">(Change Password)</button>
+                                </a>
+                                </form>
+                                <a class="d-block" href='/logout'>Logout</a>
+                            </div>
+                        </div>
                     </div>
-                    <h4 class="d-inline">Username: </h4>
-                    <p class="d-inline">{{ session_user }}</p>
-                    <a href="/change_user_name">
-                        <button class="btn p-0 m-0">(Change User Name)</button>
-                    </a>
-                    <br>
-                    <h4 class="d-inline">E-Mail: </h4>
-                    {% if session['session_email'] %}
-                    <p class="d-inline">{{ session['session_email'] }}</p>
-                    <!--<a href="" class="d-inline"><button>Change E-Mail</button></a>-->
-                    {% else %}
-                    <p class="d-inline">No E-Mail given</p>
-                    <a href="">
-                        <button>Add</button>
-                    </a>
-                    {% endif %}
-                    <br>
-                    <h4 class="d-inline">Password: </h4>
-                    <p class="d-inline">************</p>
-                    <a href="/change_password">
-                        <button class="btn p-0 m-0">(Change Password)</button>
-                    </a>
-                    </form>
-                    <a class="d-block mt-4" href='/logout'>Logout</a>
                 </div>
             </div>
         </div>
-        <div class="col-6 py-4">
-            <div class="card bgcolor_black text-white h-100" style="border-radius: 1rem;">
+        <div class="col-5 py-4">
+            <div class="card bgcolor_black text-white h-100 shadow-sm" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>Appearence</h4>
                     <form action="#" method="post">
@@ -84,7 +92,7 @@ HG2S - Profile
             </div>
         </div>
         <div class="col-12">
-            <div class="card bgcolor_black text-white" style="border-radius: 1rem;">
+            <div class="card bgcolor_black text-white shadow-sm" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>Prompt History</h4>
                     {% if your_last_prompts|length > 0%}
