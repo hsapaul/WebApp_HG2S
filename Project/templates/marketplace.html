@@ -13,20 +13,23 @@ HG2S - Marktplatz
 
 <div class="col-3 py-3">
     <form action="#" method="post">
-            <select class="p-1" name="form-select" aria-label="Default select example">
-                <option selected>{{ sort_alg }}</option>
-                {% if sort_alg == "Popular Posts" %}
-                <option>Recently Posted</option>
-                {% elif sort_alg == "Recently Posted" %}
-                <option>Popular Posts</option>
-                {% endif %}
-            </select>
-            <button class="main-btn btn btn-lg w-70 d-inline py-0 px-4" id="submit_sort" name="submit_theme" type="submit">
-                Sort
-            </button>
+        <select class="p-1" name="form-select" aria-label="Default select example">
+            <option selected>{{ sort_alg }}</option>
+            {% if sort_alg == "Popular Posts" %}
+            <option>Recently Posted</option>
+            {% elif sort_alg == "Recently Posted" %}
+            <option>Popular Posts</option>
+            {% endif %}
+        </select>
+        <button class="main-btn btn btn-lg w-70 d-inline py-0 px-4" id="submit_sort" name="submit_theme" type="submit">
+            Sort
+        </button>
     </form>
 </div>
 
+{% set icon_folder = "black" if session['session_light_mode'] else "white" %}
+{% set delete_icon = 'img/icons/' + icon_folder + '/delete.png' %}
+{% set like_icon = 'img/icons/' + icon_folder + '/like.png' %}
 
 <!-- Render all Marketplace posts -->
 {% if posts %}
@@ -43,16 +46,22 @@ HG2S - Marktplatz
     <p class="d-inline">{{ post.post_datum[:10] }}</p>
     {% endif %}
 
-    <a href="/upvote_post/{{post.id}}">
-        <button>Upvote ({{post.popularity}})</button>
+    <a title="Upvote this Post to the Top!" href="/upvote_post/{{post.id}}">
+        <button class="btn"><img class="icons" src="{{ url_for('static', filename=like_icon)}}" alt="">
+            ({{post.popularity}})
+        </button>
     </a>
     <a href="/jstest/{{post.text_prompt}}">
         <button>Enter Dimension</button>
     </a>
     {% if session['session_user'] == post.user_name %}
     <p class="d-inline float-end">Author: YOU</p>
-    <a href="/delete_post/{{post.id}}">
-        <button class="d-inline float-end">delete</button>
+    {% set icon_folder = "black" if session['session_light_mode'] else "white" %}
+    {% set string = 'img/icons/' + icon_folder + '/delete.png' %}
+    <a title="Deleted posts cannot be restored." href="/delete_post/{{post.id}}"><img class="icons"
+                                                                                      src="{{ url_for('static', filename=delete_icon)}}"
+                                                                                      alt="">
+        <!--        <button class="d-inline float-end">delete</button>-->
     </a>
     {% else %}
     <p class="d-inline float-end">Author: {{ post.user_name }}</p>
@@ -60,6 +69,10 @@ HG2S - Marktplatz
 
 </div>
 {% endfor %}
+<div class="px-1 py-2 my-4">
+    <p style="line-height: 90%">Inspired to Prompt Yourself?</p>
+    <a class="d-block mt-2" href="{{ url_for('index')}}">Prompt Now!</a>
+</div>
 {% else %}
 <div class="mt-5">
     <p>There are no items in the marketplace.</p>

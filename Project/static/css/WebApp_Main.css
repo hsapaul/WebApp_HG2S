@@ -202,7 +202,7 @@ input {
 
 
 /*---------------------------------------------*/
-/*   SLIDER, COUNTER, BUTTONS, RESIZABLE       */
+/* SLIDER, COUNTER, BUTTONS, RESIZABLE, ICONS  */
 /*---------------------------------------------*/
 
 .vertical-slider {
@@ -236,25 +236,15 @@ input {
     background: #333;
 }
 
-/*.slidecontainer {*/
-/*    width: 100%;*/
-/*}*/
-
 .slider-prefix {
     width: 50px;
 }
 
-/*#step-counter {*/
-/*    position: absolute;*/
-/*    top: 10px;*/
-/*    right: 10px;*/
-/*}*/
+.icons {
+    width: 20px;
+    height: 20px;
+}
 
-/*#startSequencerButton {*/
-/*    position: absolute;*/
-/*    top: 10px;*/
-/*    right: 10px;*/
-/*}*/
 
 /*---------------------------------------------*/
 /*           GENERAL POSITIONING & SIZING             */

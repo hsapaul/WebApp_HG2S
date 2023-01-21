@@ -167,11 +167,13 @@ CRUD Operations & Changes by User & Upvotes
 def delete(id):
     try:
         db = get_db(db_path)
-        db.execute(f'delete from marketplace_posts where id = {id}')
+        db.execute('DELETE FROM marktplatz_posts WHERE id = ?', (id,))
         db.commit()
-        return redirect(url_for('marketplace'))
+        flash("Successfully deleted Post!")
+        return redirect(url_for('marktplatz'))
     except:
-        return "There was a problem deleting that post"
+        flash("Something went wrong. Please try again.")
+        return redirect(url_for('marktplatz'))
 
 
 @app.route('/upvote_post/<int:id>')
@@ -183,16 +185,16 @@ def upvote(id):
         flash("You need to be logged in to upvote!")
         return redirect(url_for('login'))
     else:
-        cur = db.execute(f'select liked_post_ids from nutzer where id = "{session["session_id"]}"')
+        cur = db.execute(f'SELECT liked_post_ids FROM nutzer WHERE id = "{session["session_id"]}"')
         if str(id) in str(cur).split(","):
             flash("You have already upvoted this post!")
             return redirect(url_for('marketplace'))
         else:
-            db.execute(f'update marketplace_posts set popularity = popularity + 1 where id = {id}')
+            db.execute(f'UPDATE marktplatz_posts SET popularity = popularity + 1 WHERE id = {id}')
             db.execute(
-                f'update nutzer set liked_post_ids = "{str(cur) + str(id) + ","}" where id = "{session["session_id"]}"')
+                f'UPDATE nutzer SET liked_post_ids = "{str(cur) + str(id) + ","}" WHERE id = "{session["session_id"]}"')
             db.commit()
-        return redirect(url_for('marketplace'))
+        return redirect(url_for('marktplatz'))
 
 
 @app.route('/change_user_name', methods=['GET', 'POST'])

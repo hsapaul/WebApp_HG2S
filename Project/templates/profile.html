@@ -23,7 +23,7 @@ HG2S - Profile
                     <div class="row">
                         <div class="my-3 d-inline-block col-4">
                             <img class="" width="150" height="150"
-                                 src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}"
+                                 src="{{ url_for('static', filename='img/profile_pictures/profile_picture_default.jpg') }}"
                                  alt="user" class="shadow">
                         </div>
                         <div class="col-8 py-4">
@@ -62,7 +62,7 @@ HG2S - Profile
         </div>
         <div class="col-5 py-4">
             <div class="card bgcolor_black text-white h-100 shadow-sm" style="border-radius: 1rem;">
-                <div class="card-body p-5">
+                <div title="Don't forget to commit" class="card-body p-5">
                     <h4>Appearence</h4>
                     <form action="#" method="post">
                         <div class="outer_dark_mode_class mb-4 mt-3">
@@ -98,11 +98,18 @@ HG2S - Profile
                     {% if your_last_prompts|length > 0%}
                     {% for prompt in your_last_prompts %}
                     <div class="border border-white text-light col-5-6 d-inline-block px-2 mx-1 my-1 prompt_history_item">
-                        <h6 class="mt-2">"{{ prompt.text_prompt }}"</h6>
-                        <h6>Music Configurations: </h6>
+                        <h6 class="mt-2 d-inline">"{{ prompt.text_prompt }}"</h6>
+                        <p class="d-inline float-end m-1 small-font"><a
+                                href="{{ url_for('marktplatz', text_prompt = prompt.text_prompt) }}">Post to
+                            Marketplace</a>
+                        </p>
+                        <div class="my-2">
+                            <h6 class="mb-5">Music Configurations: </h6>
+                        </div>
                         <p class="d-inline m-1 small-font">{{ prompt.creation_date }}</p>
                         <p class="d-inline float-end left_bottom m-1 small-font"><a
-                                href="{{ url_for('playground', text_prompt = prompt.text_prompt) }}">Playground</a>
+                                href="{{ url_for('playground', text_prompt = prompt.text_prompt) }}">Enter
+                            Playground</a>
                         </p>
                     </div>
                     {% endfor %}
@@ -170,7 +177,7 @@ HG2S - Profile
 
     var prompt_history_items = document.querySelectorAll(".prompt_history_item").forEach(function (item) {
         var random_color = Math.floor(Math.random() * 16772523).toString(16);
-        item.style.backgroundColor = "#" + random_color + "20";
+        item.style.backgroundColor = "#" + random_color + "26";
     });
 
 
