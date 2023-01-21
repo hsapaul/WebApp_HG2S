@@ -20,15 +20,15 @@ HG2S - Profile
             <div class="card bgcolor_black text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>User Settings</h4>
-                    <div class="">
+                    <div class="my-3">
                         <img class="" width="150" height="150"
                              src="{{ url_for('static', filename='img/profile_picture_default.jpg') }}"
-                             alt="user">
+                             alt="user" class="shadow">
                     </div>
                     <h4 class="d-inline">Username: </h4>
                     <p class="d-inline">{{ session_user }}</p>
                     <a href="/change_user_name">
-                        <button>Change User Name</button>
+                        <button class="btn p-0 m-0">(Change User Name)</button>
                     </a>
                     <br>
                     <h4 class="d-inline">E-Mail: </h4>
@@ -45,15 +45,15 @@ HG2S - Profile
                     <h4 class="d-inline">Password: </h4>
                     <p class="d-inline">************</p>
                     <a href="/change_password">
-                        <button>Change Password</button>
+                        <button class="btn p-0 m-0">(Change Password)</button>
                     </a>
                     </form>
-                    <a class="d-block mt-5" href='/logout'>Logout</a>
+                    <a class="d-block mt-4" href='/logout'>Logout</a>
                 </div>
             </div>
         </div>
         <div class="col-6 py-4">
-            <div class="card bgcolor_black text-white" style="border-radius: 1rem;">
+            <div class="card bgcolor_black text-white h-100" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>Appearence</h4>
                     <form action="#" method="post">
@@ -74,7 +74,7 @@ HG2S - Profile
                             {% endif %}
                             {% endfor %}
                         </select>
-                        <button class="btn btn-outline-light btn-lg px-5 mt-4"
+                        <button class="main-btn btn btn-lg px-5 mt-4"
                                 id="submit_theme"
                                 name="submit_theme" type="submit">
                             Commit
@@ -83,22 +83,25 @@ HG2S - Profile
                 </div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-12">
             <div class="card bgcolor_black text-white" style="border-radius: 1rem;">
                 <div class="card-body p-5">
                     <h4>Prompt History</h4>
                     {% if your_last_prompts|length > 0%}
                     {% for prompt in your_last_prompts %}
-                    <div class="rounded border border-white text-light py-1 m-1">
-                        <h6 class="">"{{ prompt.text_prompt }}"</h6>
+                    <div class="border border-white text-light col-5-6 d-inline-block px-2 mx-1 my-1 prompt_history_item">
+                        <h6 class="mt-2">"{{ prompt.text_prompt }}"</h6>
+                        <h6>Music Configurations: </h6>
                         <p class="d-inline m-1 small-font">{{ prompt.creation_date }}</p>
                         <p class="d-inline float-end left_bottom m-1 small-font"><a
                                 href="{{ url_for('playground', text_prompt = prompt.text_prompt) }}">Playground</a>
                         </p>
                     </div>
                     {% endfor %}
-                    <p style="line-height: 90%">Post your Prompt Creations to the Marketplace</p>
-                    <a class="d-block" href="{{ url_for('index')}}">Prompt something new!</a>
+                    <div class="px-1 py-2 my-4">
+                        <p style="line-height: 90%">Post your Prompt Creations to the Marketplace</p>
+                        <a class="d-block mt-2" href="{{ url_for('index')}}">Prompt something new!</a>
+                    </div>
                     {% else %}
                     <p class="">You didn't prompt yet!</p>
                     <div><p>Start <a class="d-inline" href="{{ url_for('index')}}">your first Prompt Creation</a>
@@ -116,18 +119,9 @@ HG2S - Profile
     var theme_selector = document.getElementsByClassName("form-select")[0];
 
     theme_selector.onchange = function () {
-        if (this.value == "HG2S Original") {
-            document.body.classList.remove("bgcolor_purple", "bgcolor_avenue");
-            document.body.classList.add('bgcolor_original');
-        } else if (this.value == "Purple Darkness") {
-            document.body.classList.remove("bgcolor_original", "bgcolor_avenue");
-            document.body.classList.add('bgcolor_purple');
-        } else if (this.value == "Sunlight Avenue") {
-            document.body.classList.remove("bgcolor_original", "bgcolor_purple");
-            document.body.classList.add('bgcolor_avenue');
-        }
+        console.log(theme_selector.value);
+        configure_theme_appearance(theme_selector.value);
     };
-
 
     ///////////////////////////////////////////////
     //////////// DARK MODE SWITCH /////////////////
@@ -150,44 +144,27 @@ HG2S - Profile
         modeLabel.innerHTML = "Dark Mode";
     }
 
-
     // Temporary direct Preview of the selected Theme and Mode
     modeSwitch.addEventListener("change", function () {
         // Change Dark Mode Label
         if (modeSwitch.checked == false) {
             modeLabel.innerHTML = "Dark Mode";
-            change_appearance(false);
+            configure_mode_appearance(false);
         } else {
             modeLabel.innerHTML = "Light Mode";
-            change_appearance(true);
+            configure_mode_appearance(true);
         }
     });
 
-    function change_appearance(bool) {
-        // Switches
-        var textColor = !bool ? "color_white" : "color_black";
-        var bgColor = !bool ? "bgcolor_black" : "bgcolor_white";
-        var bgColor_secondary = !bool ? "bgcolor_darkgrey" : "bgcolor_lightgrey";
-        var remove_secondary = !bool ? "bgcolor_lightgrey" : "bgcolor_darkgrey";
+    ///////////////////////////////////////////////
+    //////// COLORFUL PROMPT HISTORY //////////////
+    ///////////////////////////////////////////////
 
-        // Change Body BG Color
-        var pageContent = document.getElementsByClassName("page-content")[0];
-        pageContent.classList.add(bgColor);
-        pageContent.classList.remove("bg" + textColor);
+    var prompt_history_items = document.querySelectorAll(".prompt_history_item").forEach(function (item) {
+        var random_color = Math.floor(Math.random() * 16772523).toString(16);
+        item.style.backgroundColor = "#" + random_color + "20";
+    });
 
-        // Change paragraph and all headings text color
-        pageContent.querySelectorAll("p, h1, h2, h3, h4, h5, h6").forEach(function (el) {
-            el.classList.add(textColor);
-            el.classList.remove(bgColor.replace("bg", ""));
-        });
-
-        // Change Card BG color
-        document.querySelectorAll(".card").forEach(function (card) {
-            card.classList.add(bgColor_secondary);
-            card.classList.remove(remove_secondary);
-        });
-
-    }
 
 </script>
 

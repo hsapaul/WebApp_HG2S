@@ -34,11 +34,13 @@ HG2S - Text Prompt Song Generation
             <input type="text_prompt" name="text_prompt"
                    placeholder="Start with a detailed description of the Song you wanna hear" class="form-control">
             <button type="submit" name="submit_button" value="Generate"
-                    class="btn btn-outline-light own-btn btn-lg px-5 mt-4">Submit
+                    class="main-btn btn btn-lg px-5 mt-4 btn-outline-light mx-2">Submit
             </button>
         </div>
     </form>
 </div>
+
+<div class="seperator-line bdcolor-original my-3 rounded-2"></div>
 
 <!-------------------------------------------------------------->
 <!--        SHOW RESULTS AFTER TEXT PROMPT SUBMISSION         -->
@@ -46,75 +48,76 @@ HG2S - Text Prompt Song Generation
 
 <!-- STEP 1 - Show Results of nlp.py -->
 {% if text_prompt %}
-<h3><em>Prompt - </em> "{{ text_prompt }}"</h3><br>
-<h2 class="mb-1">Step 1 - Text Comprehension <p>({{ end_time }} seconds)</p></h2><br>
-<ul>
-    <!-- If an ARTIST was found in the Prompt -->
-    {% if artist_objects %}
-    <h3>- Artist(s):</h3>
-    <div class="container">
-        <div class="row">
-            {% for artist in artist_objects %}
-            <div class="d-inline-block rounded-2 border p-1 col-6" style="border-color: var(--light-grey)">
-                <h5 class="">{{ artist_objects[loop.index - 1].name }}: </h5>
-                <p class=""><em>year:</em> {{ artist_objects[loop.index - 1].year }}</p>
-                <p class=""><em>occupations:</em> {{ artist_objects[loop.index - 1].occupation }}</p>
-                <p class=""><em>genres:</em> {{ artist_objects[loop.index - 1].genres }}</p>
-                <p class=""><em>instruments:</em> {{ artist_objects[loop.index - 1].instruments }}</p>
+<div class="mt-4"><h1>"{{ text_prompt }}"</h1></div>
+<div class="border border-3 rounded-2 my-4 bdcolor-indicator contrast-appearance py-4 px-2">
+    <h2 class="mb-1">Step 1 - Text Comprehension <p>({{ end_time }} seconds)</p></h2>
+    <ul>
+        <!-- If an ARTIST was found in the Prompt -->
+        {% if artist_objects %}
+        <h3>- Artist(s):</h3>
+        <div class="container">
+            <div class="row">
+                {% for artist in artist_objects %}
+                <div class="d-inline-block rounded-2 border p-1 col-6" style="border-color: var(--light-grey)">
+                    <h5 class="">{{ artist_objects[loop.index - 1].name }}: </h5>
+                    <p class=""><em>year:</em> {{ artist_objects[loop.index - 1].year }}</p>
+                    <p class=""><em>occupations:</em> {{ artist_objects[loop.index - 1].occupation }}</p>
+                    <p class=""><em>genres:</em> {{ artist_objects[loop.index - 1].genres }}</p>
+                    <p class=""><em>instruments:</em> {{ artist_objects[loop.index - 1].instruments }}</p>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    <!-- If an INSTRUMENT was found in the Prompt -->
-    {% if instruments %}
-    <h3>- Instrument(s):</h3>
-    <div class="container">
-        <div class="row">
-            {% for instrument in instruments %}
-            <div class="d-inline-block border p-1 col-6">
-                <h5 class="">{{ instrument}} </h5>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    <!-- If a GENRE was found in the Prompt -->
-    {% if genres %}
-    <h3>- Genre(s):</h3>
-    <div class="container">
-        <div class="row">
-            {% for genre in genres %}
-            <div class="d-inline-block border p-1 col-6">
-                <h5 class="">{{ genre }} </h5>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    <!-- If EXTRA INFORMATION was found in the Prompt -->
-    {% if key_and_bpm %}
-    <h3>- Key and BPM:</h3>
-    <div class="container">
-        {% if key_and_bpm["Tonic"]%}
-        <div class="row border p-1 col-3">
-            <h5 class="">Tonic: {{ key_and_bpm["Tonic"] }} </h5>
         </div>
         {% endif %}
-        {% if key_and_bpm["Mode"]%}
-        <div class="row border p-1 col-3">
-            <h5 class="">Mode: {{ key_and_bpm["Mode"] }} </h5>
+        <!-- If an INSTRUMENT was found in the Prompt -->
+        {% if instruments %}
+        <h3>- Instrument(s):</h3>
+        <div class="container">
+            <div class="row">
+                {% for instrument in instruments %}
+                <div class="d-inline-block border p-1 col-6">
+                    <h5 class="">{{ instrument}} </h5>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
-        {% if key_and_bpm["BPM"]%}
-        <div class="row border p-1 col-3">
-            <h5 class="">BPM: {{ key_and_bpm["BPM"] }} </h5>
+        <!-- If a GENRE was found in the Prompt -->
+        {% if genres %}
+        <h3>- Genre(s):</h3>
+        <div class="container">
+            <div class="row">
+                {% for genre in genres %}
+                <div class="d-inline-block border p-1 col-6">
+                    <h5 class="">{{ genre }} </h5>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
-    </div>
-    {% endif %}
-</ul>
-
+        <!-- If EXTRA INFORMATION was found in the Prompt -->
+        {% if key_and_bpm %}
+        <h3>- Key and BPM:</h3>
+        <div class="container">
+            {% if key_and_bpm["Tonic"]%}
+            <div class="row border p-1 col-3">
+                <h5 class="">Tonic: {{ key_and_bpm["Tonic"] }} </h5>
+            </div>
+            {% endif %}
+            {% if key_and_bpm["Mode"]%}
+            <div class="row border p-1 col-3">
+                <h5 class="">Mode: {{ key_and_bpm["Mode"] }} </h5>
+            </div>
+            {% endif %}
+            {% if key_and_bpm["BPM"]%}
+            <div class="row border p-1 col-3">
+                <h5 class="">BPM: {{ key_and_bpm["BPM"] }} </h5>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </ul>
+</div>
 <!-------------------------------------------------------------->
 <!--                        Form II                           -->
 <!--     POST RESULTS TO MARKTPLATZ OR ENTER PLAYGROUND      -->
@@ -125,20 +128,27 @@ HG2S - Text Prompt Song Generation
     <div class="form-group_2">
         {% if session['session_user'] %}
         <button type="submit" name="post_button" value="Generate"
-                class="btn mt-2 own-btn d-inline px-4 btn-outline-light">Post to
+                class="main-btn btn btn-lg btn-outline-light d-inline mx-2">Post to
             Marktplatz
         </button>
+        <h5 class="d-inline">Share with the Community! 👾</h5>
         {% else %}
-        <h4>Share and Save this great Prompt Result with others!</h4>
-        <p class="">Don't have an account? <a href="{{ url_for('sign_up') }}">Sign Up</a></p>
-        <p class="">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+        <div class="border bdcolor-warning border-2 d-inline-block p-3 rounded-3">
+            <h4>>> Share with others! <<</h4>
+            <p class="">Don't have an account? <a href="{{ url_for('sign_up') }}">Sign Up</a></p>
+            <p class="">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+        </div>
         {% endif %}
-        <button title="Play in your individual Configuration" type="submit" name="playground_button"
-                value="enter_playground"
-                class="btn mt-2 own-btn px-4 d-inline">Enter Playground
-        </button>
+        <div>
+            <button title="Play in your individual Configuration" type="submit" name="playground_button"
+                    value="enter_playground"
+                    class="main-btn btn btn-lg btn-outline-light d-inline-block my-3 mx-2">Enter Playground
+            </button>
+            <h5 class="d-inline">Start a Music Session in this Context 🥶</h5>
+        </div>
     </div>
 </form>
+<div class="seperator-line bdcolor-original my-3 rounded-2"></div>
 {% endif %}
 
 <!-------------------------------------------------------------->
@@ -149,40 +159,42 @@ HG2S - Text Prompt Song Generation
 <div class="container mt-5 py-2">
     <div class="row">
         <div class="">
-            <h1 class="headline">Prompt Documentation</h1>
-            <p class="subheadline">Get a glimpse of what is possible and recommended</p>
+            <h1 class="headline">🤜 Prompt Documentation</h1>
+            <p class="subheadline float-right positioning_1">Get a glimpse of what is possible and recommended</p>
         </div>
-        <div class="col-6">
-            <!-- Indicate Text Prompt Spectrum -->
-            <h4 class="mt-4">Example Prompts / Try Something like</h4>
-            <ul class="second-font">
-                <li>“Nicki Minaj with Lil Wayne on an Instrumental inspired from the Beatles”</li>
-                <li>“Lady Gaga / Beethoven Mashup”</li>
-                <li>“The Beatles making Hip Hop with Timbaland”</li>
-                <li>"Michael Jackson and Fugazi collaborate with banjos"</li>
-                <li>“a synthesizer playing happy birthday”</li>
-                <li>“deadmau5 remixing a jazz song with double-time Hip Hop from Busta Rhymes about depression”</li>
-                <li>“Super Mario as a composer of a cute Heavy Metal tune”</li>
-                <li>“a 8 Bit version of a Eminem Type Beat with Rihanna Vocals on top”</li>
-                <li>“A Violin playing Mozart with a Rock Band out of the 2000’s”</li>
-                <li>“Nirvana collaborating with a Berlin Techno DJ in the 90’s””</li>
-                <li><a href="{{ url_for('marktplatz')}}">Check what Users came up with</a></li>
-            </ul>
-        </div>
-        <div class="col-6">
-            <!-- Indicate Text Prompt Spectrum -->
-            <h4 class="mt-4">Recommended Word Categories</h4>
-            <ul class="second-font">
-                <li title="Database includes 10.000 Top Artists">Artist {{ artist }}</li>
-                <li title="Database includes over 1000 Instruments">Instrument {{ instrument }}</li>
-                <li title="Database includes ">Genre {{ genre }}</li>
-                <li title="Database includes ">Decade {{ decade }}</li>
-                <li title="Database includes ">year {{ year }}</li>
-                <li title="Database includes ">location {{ location }}</li>
-                <li title="Database includes ">musical key {{ musical_key }}</li>
-                <li title="Database includes ">bpm {{ bpm }}</li>
-                <li><a href="{{ url_for('marktplatz')}}">Learn more about writing better Prompts</a></li>
-            </ul>
+        <div class="positioning_1">
+            <div class="col-5 py-2 mb-5 mt-2">
+                <!-- Indicate Text Prompt Spectrum -->
+                <h4 class="mt-4">Recommended Word Categories</h4>
+                <ul class="second-font">
+                    <li title="Database includes 10.000 Top Artists">Artist {{ artist }}</li>
+                    <li title="Database includes over 1000 Instruments">Instrument {{ instrument }}</li>
+                    <li title="Database includes ">Genre {{ genre }}</li>
+                    <li title="Database includes ">Decade {{ decade }}</li>
+                    <li title="Database includes ">year {{ year }}</li>
+                    <li title="Database includes ">location {{ location }}</li>
+                    <li title="Database includes ">musical key {{ musical_key }}</li>
+                    <li title="Database includes ">bpm {{ bpm }}</li>
+                </ul>
+                <h5><a href="{{ url_for('documentation')}}">>> Learn writing Prompts <<</a></h5>
+            </div>
+            <div class="col-5">
+                <!-- Indicate Text Prompt Spectrum -->
+                <h4 class="mt-4">Example Prompts / Try Something like</h4>
+                <ul class="second-font">
+                    <li>“Nicki Minaj with Lil Wayne on an Instrumental inspired from the Beatles”</li>
+                    <li>“Lady Gaga / Beethoven Mashup”</li>
+                    <li>“The Beatles making Hip Hop with Timbaland”</li>
+                    <li>"Michael Jackson and Fugazi collaborate with banjos"</li>
+                    <li>“a synthesizer playing happy birthday”</li>
+                    <li>“deadmau5 remixing a jazz song with double-time Hip Hop from Busta Rhymes about depression”</li>
+                    <li>“Super Mario as a composer of a cute Heavy Metal tune”</li>
+                    <li>“a 8 Bit version of a Eminem Type Beat with Rihanna Vocals on top”</li>
+                    <li>“A Violin playing Mozart with a Rock Band out of the 2000’s”</li>
+                    <li>“Nirvana collaborating with a Berlin Techno DJ in the 90’s””</li>
+                </ul>
+                <h5 class="mt-0"><a href="{{ url_for('marktplatz')}}">>> Check what Users came up with <<</a></h5>
+            </div>
         </div>
     </div>
 </div>

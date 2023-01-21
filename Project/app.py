@@ -85,10 +85,9 @@ def index():
             if 'session_id' in session:
                 user_id = session['session_id']
                 db = get_db(db_path)
-                db.execute(
-                    'INSERT INTO temp_prompt_history (id, user_id, text_prompt, p1_found_entities, p2_music_configurations,'
-                    f'creation_date, saved_to_marketplace) VALUES ("{user_id}", "{text_prompt}", '
-                    f'"{p1_found_entities}", "{p2_music_configurations}", "{creation_date}", 0)')
+                db.execute('INSERT INTO temp_prompt_history (user_id, text_prompt, p1_found_entities, '
+                           f'p2_music_configurations, creation_date, saved_to_marketplace) VALUES ("{user_id}", '
+                           f'"{text_prompt}", "{p1_found_entities}", "{p2_music_configurations}", "{creation_date}", 0)')
                 db.commit()
             return render_template('index.html', text_prompt=text_prompt, artist_objects=artist_objects,
                                    instruments=found_instruments, key_and_bpm=key_and_bpm, genres=found_genres,
@@ -103,26 +102,27 @@ def index():
             datum = str(datetime.datetime.now())[:-10]
             # Save data to database
             db = get_db(db_path)
+            p1_found_entities = [artist_names, instruments, genres, key_and_bpm]
+            p2_music_configurations = []
             # Get if user is logged in
             if 'session_user' in session:
                 user_name = session['session_user']
             else:
                 user_name = "Guest"
             db.execute(
-                'INSERT INTO marketplace_posts (text_prompt, user_name, datum, '
-                'artists, instruments, genres, key_and_bpm, popularity) VALUES '
-                f'("{text_prompt}", "{user_name}", "{datum}", "{artist_names}", '
-                f'"{instruments}", "{genres}", "{key_and_bpm}", 0)')
+                'INSERT INTO marktplatz_posts (user_name, text_prompt, p1_found_entities, p2_music_configurations, '
+                f'post_datum, creation_date, popularity) VALUES ("{user_name}", "{text_prompt}", '
+                f'"{p1_found_entities}", "{p2_music_configurations}", "{datum}", "{datum}", 0)')
             for artist in artists:
                 print(artist)
                 name, genres, instruments, occupation, year = artist["name"], artist["genres"], artist["instruments"], \
                                                               artist["occupation"], artist["year"]
                 db.execute(
-                    f'INSERT INTO artists (name, genres, instruments, occupations, year) VALUES '
-                    f'("{name}", "{genres}", "{instruments}", "{occupation}", "{year}")')
+                    f'INSERT INTO found_artists (artist_name, artist_year, occupations, genres, instruments) VALUES '
+                    f'("{name}", "{year}", "{occupation}", "{genres}", "{instruments}")')
             db.commit()
             flash("Your post was successfully submitted!")
-            return redirect(url_for('marketplace'))
+            return redirect(url_for('marktplatz'))
         # Responsible Button: "Enter Playground"
         elif 'playground_button' in request.form:
             text_prompt = session['text_prompt']
@@ -138,20 +138,23 @@ def documentation():
 def marktplatz():
     # Get data from database
     db = get_db(db_path)
-    cur = db.execute('select * from marktplatz_posts')
-    # cur2 = db.execute('select * from artists')
-    posts = cur.fetchall()
-    # artists = cur2.fetchall()
+    all_posts = db.execute('select * from marktplatz_posts').fetchall()
+    # post_user_names = db.execute('select user_id from marktplatz_posts').fetchall()
+    all_found_artists = db.execute('select * from found_artists').fetchall()
+    # Regular page call
     if request.method == 'GET':
-        return render_template('marketplace.html', posts=posts, artists_db=artists,
+        return render_template('marketplace.html', posts=all_posts,
+                               artists_db=all_found_artists,
                                today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
+    # Resort the posts
     elif request.method == 'POST':
         sort_alg = request.form.get('form-select')
         if sort_alg == 'Recently Posted':
-            posts = sorted(posts, key=lambda x: x[3], reverse=True)
+            posts = sorted(all_posts, key=lambda x: x[3], reverse=True)
         elif sort_alg == 'Most Popular':
-            posts = sorted(posts, key=lambda x: x[8], reverse=True)
-        return render_template('marketplace.html', posts=posts, artists_db=artists,
+            posts = sorted(all_posts, key=lambda x: x[8], reverse=True)
+            print(posts)
+        return render_template('marketplace.html', posts=posts, artists_db=all_found_artists,
                                today=str(datetime.datetime.now())[:10], sort_alg=sort_alg)
 
 
@@ -190,11 +193,6 @@ def upvote(id):
                 f'update nutzer set liked_post_ids = "{str(cur) + str(id) + ","}" where id = "{session["session_id"]}"')
             db.commit()
         return redirect(url_for('marketplace'))
-
-
-@app.route('/change_theme')
-def change_theme():
-    return "lol"
 
 
 @app.route('/change_user_name', methods=['GET', 'POST'])
@@ -346,7 +344,6 @@ def profile(username):
             # Get requested Theme and Mode
             theme = request.form.get('form-select')
             light_mode = request.form.get('dark_mode_checkbox')
-            print(theme, light_mode)
             # Update Theme and Mode in DB
             db = get_db(db_path)
             light_mode = 1 if light_mode == "on" else 0
@@ -389,20 +386,23 @@ def create_tables_if_not_exist():
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     # Table for Users - General Settings, Interaction&Activity and Appearance Settings
-    c.execute('CREATE TABLE IF NOT EXISTS nutzer (id INTEGER PRIMARY KEY, '
-              'username TEXT, email TEXT, password TEXT, '
+    c.execute('CREATE TABLE IF NOT EXISTS nutzer (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, '
+              'username TEXT UNIQUE, email TEXT UNIQUE, password TEXT, '
               'marketplace_post_ids TEXT, temp_post_ids TEXT, liked_post_ids TEXT, '
               'appearance_theme TEXT, appearance_light_mode INTEGER)')
     # Table for Posts - Prompt Results, Time Data and Popularity (w/ References to User)
-    c.execute('CREATE TABLE IF NOT EXISTS marktplatz_posts (id INTEGER PRIMARY KEY, '
-              'user_id INTEGER, text_prompt TEXT, p1_found_entities TEXT, '
+    c.execute('CREATE TABLE IF NOT EXISTS marktplatz_posts (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, '
+              'user_name TEXT, text_prompt TEXT, p1_found_entities TEXT, '
               'p2_music_configurations TEXT, post_datum TEXT, creation_date TEXT, '
-              'popularity INTEGER, FOREIGN KEY(user_id) REFERENCES nutzer(id))')
+              'popularity INTEGER, FOREIGN KEY(user_name) REFERENCES nutzer(username))')
     # Table for History - Prompt Results, Time Data and Popularity (w/ References to User)
-    c.execute('CREATE TABLE IF NOT EXISTS temp_prompt_history (id INTEGER PRIMARY KEY, '
+    c.execute('CREATE TABLE IF NOT EXISTS temp_prompt_history (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, '
               'user_id INTEGER, text_prompt TEXT, p1_found_entities TEXT, '
               'p2_music_configurations TEXT, creation_date TEXT, saved_to_marketplace INTEGER, '
               'FOREIGN KEY(user_id) REFERENCES nutzer(id))')
+    # Table for Found Artists
+    c.execute('CREATE TABLE IF NOT EXISTS found_artists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, '
+              'artist_name TEXT, artist_year INT, occupation TEXT, genres TEXT, instruments TEXT)')
     conn.commit()
     conn.close()
 

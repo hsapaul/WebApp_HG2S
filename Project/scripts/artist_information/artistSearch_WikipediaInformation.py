@@ -110,11 +110,9 @@ def print_artist_object(artist_object):
 def add_to_database(artist_object):
     conn = sqlite3.connect("musicgallery.db")
     c = conn.cursor()
-    c.execute(
-        "CREATE TABLE IF NOT EXISTS artist_new (artist_name TEXT, artist_year INT, occupation TEXT, genres TEXT, instruments TEXT)")
-    c.execute("INSERT INTO artist_new VALUES (?, ?, ?, ?, ?)", (
-    str(artist_object.name), str(artist_object.year), str(artist_object.occupation), str(artist_object.genres),
-    str(artist_object.instruments)))
+    name, year, occupation,  = artist_object.name, artist_object.year, artist_object.occupation
+    genres, instruments = artist_object.genres, artist_object.instruments
+    c.execute("INSERT INTO found_artists VALUES (?, ?, ?, ?, ?)", (name, year, occupation, genres, instruments))
     conn.commit()
     conn.close()
 
@@ -123,13 +121,11 @@ def wikipedia_search(artist):
     start_time = time.time()
     try:
         artist = " ".join([word.capitalize() for word in artist.split(" ")])
-        # print(artist)
         print(f'-------{str(artist)}-------')
         html = get_wiki_html(artist)
-        # print(html.text())
         artist_object = parse_data(html, artist)
         print_artist_object(artist_object)
-        # add_to_database(artist_object)
+        add_to_database(artist_object)
         print(f"✅ [{round(time.time() - start_time, 2)}s] - Scraping of '{artist.upper()}'-Data ")
         print('------------------------')
         return artist_object
@@ -154,5 +150,4 @@ if __name__ == "__main__":
 
 # Bug Fixing:
 # Nirvana --> wrong page
-# Killerpilze --> gibt keine genres zurück
 # Drake --> musician fehlt

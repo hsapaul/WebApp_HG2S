@@ -19,6 +19,7 @@
             src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
     <!--    <script type="text/javascript" src="{{ url_for('static', filename='js/soundfont-player.min.js')}}"></script>-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/index_appearance.js')}}"></script>
 </head>
 
 <body>
@@ -88,49 +89,18 @@
     //////////// THEME CONFIGURATION //////////////
     ///////////////////////////////////////////////
 
-    // function ThemeConfigurator() {
-    //     // Get theme from session
-    //     let theme = document.getElementById('theme_exchange_with_js').innerHTML;
-    //     let light_mode = document.getElementById('mode_exchange_with_js').innerHTML;
-    //     console.log("ThemeConfigurator()");
-    //     console.log("theme: " + theme);
-    //     console.log("light mode: " + light_mode);
-    //
-    //     if (theme == "HG2S Original") {
-    //         document.body.classList.remove("bgcolor_purple", "bgcolor_avenue");
-    //         document.body.classList.add('bgcolor_original');
-    //     } else if (theme == "Purple Darkness") {
-    //         document.body.classList.remove("bgcolor_original", "bgcolor_avenue");
-    //         document.body.classList.add('bgcolor_purple');
-    //     } else if (theme == "Sunlight Avenue") {
-    //         document.body.classList.remove("bgcolor_original", "bgcolor_purple");
-    //         document.body.classList.add('bgcolor_avenue');
-    //     }
-    //
-    //     if (light_mode == 0) {
-    //         console.log("Light Mode is off");
-    //         document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--black)";
-    //         document.getElementsByClassName("page-content")[0].style.color = "var(--white)";
-    //         // document.getElementsByClassName("card")[0].style.backgroundColor = "var(--light-grey)";
-    //         paragraphs = document.getElementsByTagName("p")
-    //         for (var i = 0; i < paragraphs.length; i++) {
-    //             paragraphs[i].style.color = "var(--white) !important";
-    //         }
-    //     } else if (light_mode == 1) {
-    //         console.log("Light Mode is on");
-    //         document.getElementsByClassName("page-content")[0].style.backgroundColor = "var(--white)";
-    //         document.getElementsByClassName("page-content")[0].style.color = "var(--black)";
-    //         // document.getElementsByClassName("card")[0].style.backgroundColor = "var(--light-grey)";
-    //         paragraphs = document.getElementsByTagName("p")
-    //         for (var i = 0; i < paragraphs.length; i++) {
-    //             paragraphs[i].style.color = "var(--black) !important";
-    //         }
-    //     }
-    // }
-    //
-    // // Call Function
-    // ThemeConfigurator();
+    let light_mode = document.getElementById('mode_exchange_with_js').innerHTML;
+    if (light_mode == "0") {
+        console.log("nö");
+        light_mode = false;
+    } else {
+        console.log("ja");
+        light_mode = true;
+    }
+    configure_mode_appearance(light_mode); // calling function in index_appearance.js
 
+    let theme = document.getElementById('theme_exchange_with_js').innerHTML;
+    configure_theme_appearance(theme); // calling function in index_appearance.js
 
 </script>
 </html>
