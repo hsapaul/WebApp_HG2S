@@ -34,39 +34,44 @@ HG2S - Marktplatz
 <!-- Render all Marketplace posts -->
 {% if posts %}
 {% for post in posts %}
-<div class="post border rounded p-2">
-    <h4>"{{ post.text_prompt }}"</h4>
+<div class="always_white">
+    <div class="post border rounded px-2 pb-0 pt-2 colorful_content">
+        <h4>"{{ post.text_prompt }}"</h4>
 
-    <!-- Here it was -->
+        <!-- Here it was -->
 
-    <!-- Post Datum -->
-    {% if post.post_datum[:10] == today %}
-    <p class="d-inline">{{ post.post_datum[10:] }}</p>
-    {% else %}
-    <p class="d-inline">{{ post.post_datum[:10] }}</p>
-    {% endif %}
+        <div>
+            <!-- Post Datum -->
+            {% if post.post_datum[:10] == today %}
+            <p class="d-inline">{{ post.post_datum[10:] }}</p>
+            {% else %}
+            <p class="d-inline">{{ post.post_datum[:10] }}</p>
+            {% endif %}
 
-    <a title="Upvote this Post to the Top!" href="/upvote_post/{{post.id}}">
-        <button class="btn"><img class="icons" src="{{ url_for('static', filename=like_icon)}}" alt="">
-            ({{post.popularity}})
-        </button>
-    </a>
-    <a href="/jstest/{{post.text_prompt}}">
-        <button>Enter Dimension</button>
-    </a>
-    {% if session['session_user'] == post.user_name %}
-    <p class="d-inline float-end">Author: YOU</p>
-    {% set icon_folder = "black" if session['session_light_mode'] else "white" %}
-    {% set string = 'img/icons/' + icon_folder + '/delete.png' %}
-    <a title="Deleted posts cannot be restored." href="/delete_post/{{post.id}}"><img class="icons"
-                                                                                      src="{{ url_for('static', filename=delete_icon)}}"
-                                                                                      alt="">
-        <!--        <button class="d-inline float-end">delete</button>-->
-    </a>
-    {% else %}
-    <p class="d-inline float-end">Author: {{ post.user_name }}</p>
-    {% endif %}
+            <a title="Upvote this Post to the Top!" href="/upvote_post/{{post.id}}">
+                <button class="btn px-1 py-0 mb-1"><img class="icons" src="{{ url_for('static', filename=like_icon)}}"
+                                                        alt="">
+                    ({{post.popularity}})
+                </button>
+            </a>
+            <a href="/jstest/{{post.text_prompt}}">
+                <button class="btn px-1 py-0 mb-1">Enter Dimension</button>
+            </a>
+            {% if session['session_user'] == post.user_name %}
+            <p class="d-inline float-end">Author: YOU</p>
+            {% set icon_folder = "black" if session['session_light_mode'] else "white" %}
+            {% set string = 'img/icons/' + icon_folder + '/delete.png' %}
+            <a title="Deleted posts cannot be restored." href="/delete_post/{{post.id}}">
+                <button class="btn px-1 py-0 mb-1"><img class="icons" src="{{ url_for('static', filename=delete_icon)}}"
+                                                        alt="">
+                </button>
+            </a>
+            {% else %}
+            <p class="d-inline float-end">Author: {{ post.user_name }}</p>
 
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endfor %}
 <div class="px-1 py-2 my-4">

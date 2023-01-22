@@ -97,7 +97,7 @@ HG2S - Profile
                     <h4>Prompt History</h4>
                     {% if your_last_prompts|length > 0%}
                     {% for prompt in your_last_prompts %}
-                    <div class="border border-white text-light col-5-6 d-inline-block px-2 mx-1 my-1 prompt_history_item">
+                    <div class="border border-white text-light col-5-6 d-inline-block px-2 mx-1 my-1 prompt_history_item colorful_content">
                         <h6 class="mt-2 d-inline">"{{ prompt.text_prompt }}"</h6>
                         <p class="d-inline float-end m-1 small-font"><a
                                 href="{{ url_for('marktplatz', text_prompt = prompt.text_prompt) }}">Post to
@@ -169,15 +169,6 @@ HG2S - Profile
             modeLabel.innerHTML = "Light Mode";
             configure_mode_appearance(true);
         }
-    });
-
-    ///////////////////////////////////////////////
-    //////// COLORFUL PROMPT HISTORY //////////////
-    ///////////////////////////////////////////////
-
-    var prompt_history_items = document.querySelectorAll(".prompt_history_item").forEach(function (item) {
-        var random_color = Math.floor(Math.random() * 16772523).toString(16);
-        item.style.backgroundColor = "#" + random_color + "26";
     });
 
 

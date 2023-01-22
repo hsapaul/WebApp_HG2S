@@ -20,9 +20,11 @@ function configure_mode_appearance(bool) {
 
     pageContent.querySelectorAll("a").forEach(function (el) {
         if (textColor == "color_white") {
-            el.classList.add("a_dark"); el.classList.remove("a_light");
+            el.classList.add("a_dark");
+            el.classList.remove("a_light");
         } else {
-            el.classList.add("a_light"); el.classList.remove("a_dark");
+            el.classList.add("a_light");
+            el.classList.remove("a_dark");
         }
     });
 
@@ -82,4 +84,16 @@ function configure_theme_appearance(theme) {
         });
     }
 
+}
+
+function colorize_content() {
+    // var white_background_for_shine = document.querySelectorAll(".always_white")
+    //     .forEach(function (item) {
+    //         item.classList.add("bgcolor_white")
+    //     });
+    var prompt_history_items = document.querySelectorAll(".colorful_content").forEach(function (item) {
+        //
+        var random_color = Math.floor(Math.random() * 16772523).toString(16);
+        item.style.backgroundColor = "#" + random_color + "26";
+    });
 }

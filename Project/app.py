@@ -1,5 +1,5 @@
 """
-Rahmen: Werkstück einer Bachelorarbeit (B.Sc.)
+Rahmen: Werkstück - Bachelorarbeit (B.Sc.)
 Studium: Interaktive Medien, Hochschule Augsburg
 Titel: 'INTERAKTIVE WEBAPPLIKATION ZUR TEXTBASIERTEN MUSIKKOMPOSITION'
 Autor: Paul Hitzler
