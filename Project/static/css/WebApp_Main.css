@@ -1,3 +1,7 @@
+/*@import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');*/
+/* body {*/
+/*   font-family: 'Roboto', sans-serif;*/
+
 /*---------------------------------------------*/
 /*               COLOR SCHEME                  */
 /*---------------------------------------------*/
@@ -18,6 +22,7 @@
     --light-orange: #FF8377;
     --dark-orange: #F34E1E;
     --red: #D11D1C;
+    --second-font: Poppins, sans-serif !important;
 }
 
 /* MAIN SCHEME - Background Colors */
@@ -141,7 +146,8 @@ p {
 }
 
 p {
-    font-family: Arial;
+    font-family: var(--second-font);
+    font-weight: 200;
 }
 
 a {
@@ -177,11 +183,12 @@ a {
 }
 
 .second-font {
-    font-family: Arial !important;
+    font-family: var(--second-font);
+    font-weight: 200;
 }
 
 input {
-    font-family: Arial !important;
+    font-family: var(--second-font);
     font-weight: bold !important;
 }
 
