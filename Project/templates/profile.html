@@ -100,7 +100,7 @@ HG2S - Profile
                     <div class="border border-white text-light col-5-6 d-inline-block px-2 mx-1 my-1 prompt_history_item colorful_content">
                         <h6 class="mt-2 d-inline">"{{ prompt.text_prompt }}"</h6>
                         <p class="d-inline float-end m-1 small-font"><a
-                                href="{{ url_for('marktplatz', text_prompt = prompt.text_prompt) }}">Post to
+                                href="{{ url_for('post_to_marketplace', id=prompt.id) }}">Post to
                             Marketplace</a>
                         </p>
                         <div class="my-2">

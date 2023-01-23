@@ -33,17 +33,19 @@ function stepSequencer(static_url) {
 
         function startSequencer() {
             if (Tone.Transport.state === "started") {
+                console.log("stop stepSequencer");
                 // clear the schedule repeat event and set index to 0
                 Tone.Transport.clear(Tone.Transport.scheduleRepeat);
-                // Tone.Transport.position = 0;
-                // Tone.Transport.stop(0);
-                // Tone.Transport.cancel();
+                Tone.Transport.position = 0;
+                Tone.Transport.stop(0);
+                Tone.Transport.cancel();
                 set_index_to_zero = true;
                 step_counter.innerText = "0";
                 for (const $row of $rows) {
-                    $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_avenue'));
+                    $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_warning'));
                 }
             } else {
+                console.log("start stepSequencer");
                 initializeSamples();
                 // start scheduleRepeat at index 0
                 Tone.Transport.start();
@@ -100,12 +102,15 @@ function stepSequencer(static_url) {
                 let sample = drum_samples[i],
                     $row = $rows[i],
                     $input = $row.querySelector(`span:nth-child(${step + 1}) > input`);
-                $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_avenue'));
-                $row.querySelector(`span:nth-child(${step + 1})`).classList.add('bgcolor_avenue');
+                $row.querySelectorAll('span').forEach($span => $span.classList.remove('bgcolor_warning'));
+                $row.querySelector(`span:nth-child(${step + 1})`).classList.add('bgcolor_warning');
                 if ($input.checked) {
                     if (sample) {
-                        console.log("Playing sample", sample);
-                        sample.start(time);
+                        try {
+                            sample.start(time);
+                        } catch (e) {
+                            console.log(e);
+                        }
                     }
                 }
             }

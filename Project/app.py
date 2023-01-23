@@ -13,6 +13,7 @@ import time  # Measuring of Execution Times
 from scripts.nlp import main as nlp_task
 import scripts.artist_information.artistSearch_WikipediaInformation as artist_wiki
 from dotenv import load_dotenv
+import scripts.music_gallery_creation as mgc
 
 # GLOBAL CONFIGURATIONS
 load_dotenv()
@@ -176,6 +177,29 @@ def delete(id):
         return redirect(url_for('marktplatz'))
 
 
+# Post to Marketplace from temp_prompt_history (Profile)
+@app.route('/post_to_marketplace/<int:id>')
+def post_to_marketplace(id):
+    try:
+        db = get_db(db_path)
+        # Get data from database
+        post = db.execute('select * from temp_prompt_history WHERE id = ?', (id,)).fetchone()
+        # Get date and time
+        datum = str(datetime.datetime.now())[:-10]
+        # Save data to database
+        username = session['session_user']
+        db.execute(
+            'INSERT INTO marktplatz_posts (user_name, text_prompt, p1_found_entities, p2_music_configurations, '
+            f'post_datum, creation_date, popularity) VALUES ("{username}", "{post[2]}", '
+            f'"{post[3]}", "{post[4]}", "{datum}", "{datum}", 0)')
+        db.commit()
+        flash("Your post was successfully submitted!")
+        return redirect(url_for('marktplatz'))
+    except:
+        flash("Something went wrong. Please try again.")
+        return redirect(url_for('marktplatz'))
+
+
 @app.route('/upvote_post/<int:id>')
 def upvote(id):
     # try:
@@ -212,7 +236,7 @@ def change_user_name():
                 return redirect(url_for('profile'))
             except:
                 flash("There was a problem changing your username")
-                return redirect(url_for('profile'))
+                return redirect(url_for('profile', username=session['session_user']))
         else:
             flash("Wrong Password")
             return redirect(url_for('change_user_name'))
@@ -414,4 +438,5 @@ def create_tables_if_not_exist():
 """
 if __name__ == "__main__":
     create_tables_if_not_exist()
+    mgc.fill_sample_db(sample_db_path)
     app.run(debug=True, port=9875)

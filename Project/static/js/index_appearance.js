@@ -60,11 +60,16 @@ function configure_mode_appearance(bool) {
 function configure_theme_appearance(theme) {
 
     var seperators = document.querySelectorAll(".seperator-line")
+    var main_buttons = document.querySelectorAll(".main-btn")
 
     if (theme == "HG2S Original") {
         document.body.classList.remove("bgcolor_purple", "bgcolor_avenue");
         document.body.classList.add('bgcolor_original');
         seperators.forEach(function (el) {
+            el.classList.remove("bdcolor_purple", "bdcolor_avenue");
+            el.classList.add("bdcolor_original");
+        });
+        main_buttons.forEach(function (el) {
             el.classList.remove("bdcolor_purple", "bdcolor_avenue");
             el.classList.add("bdcolor_original");
         });
@@ -75,11 +80,19 @@ function configure_theme_appearance(theme) {
             el.classList.remove("bdcolor_original", "bdcolor_avenue");
             el.classList.add("bdcolor_purple");
         });
+        main_buttons.forEach(function (el) {
+            el.classList.remove("bdcolor_original", "bdcolor_avenue");
+            el.classList.add("bdcolor_purple");
+        });
     } else if (theme == "Sunlight Avenue") {
         document.body.classList.remove("bgcolor_original", "bgcolor_purple");
         document.body.classList.add('bgcolor_avenue');
         seperators.forEach(function (el) {
             el.classList.remove("bdcolor_original", "bdcolor_purple");
+            el.classList.add("bdcolor_avenue");
+        });
+        main_buttons.forEach(function (el) {
+            el.classList.remove("bdcolor_purple", "bdcolor_original");
             el.classList.add("bdcolor_avenue");
         });
     }

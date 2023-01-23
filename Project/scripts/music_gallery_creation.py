@@ -11,12 +11,11 @@ def get_absolute_paths():
     print("MOMENTARY PATH: ", momentary_path)  # DEBUG
 
     # Drum Sample Path
-    project_folder = os.path.dirname(momentary_path)
-    drum_sample_path = os.path.join(project_folder, "static", "samples", "drum_samples")
+    drum_sample_path = os.path.join(momentary_path, "static", "samples", "drum_samples")
     print("DRUM SAMPLE PATH:", drum_sample_path)  # DEBUG
 
     # Database Path
-    music_gallery_db_path = os.path.join(project_folder, "models", "music_gallery.db")
+    music_gallery_db_path = os.path.join(momentary_path, "models", "music_gallery.db")
     print("DATABASE PATH:", music_gallery_db_path)  # DEBUG
 
     return [drum_sample_path, music_gallery_db_path]
@@ -42,9 +41,9 @@ def fill_database(args):
     db.close()
 
 
-def main():
+def fill_sample_db(sample_db_path):
     fill_database(get_absolute_paths())
 
 
 if __name__ == "__main__":
-    main()
+    fill_sample_db()

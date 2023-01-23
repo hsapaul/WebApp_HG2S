@@ -14,10 +14,6 @@ HG2S - Text Prompt Song Generation
 
 {% block content %}
 <div class="col-12">
-<!--    <h1 class="headline mb-3 px-0 rounded"-->
-<!--        style="text-align: center; background-color: var(&#45;&#45;middle-grey); color: var(&#45;&#45;light-blue)">-->
-<!--        {% if text_prompt%}{{text_prompt}}{% else %}}NO PROMPT SELECTED{% endif %}-->
-<!--    </h1>-->
     <!-- TOP ROW -->
     <div class="card-deck row" style="border-radius: 10px;">
         <!-- UPPER LEFT -->
@@ -50,14 +46,14 @@ HG2S - Text Prompt Song Generation
         </div>
         <!-- UPPER MIDDLE -->
         <div class="card p-2 col-4 bg-dark text-white d-inline-block">
-            <div class="card-title">Song Configurations</div>
+            <div class="card-title"><h6>Song Configurations</h6></div>
             <div class="card-body">
-                <p>KEY:</p>
+                <!--                <p>KEY:</p>-->
             </div>
         </div>
         <!-- UPPER RIGHT -->
         <div class="card p-2 col-4 bg-dark text-white d-inline-block">
-            <div id="testor" class="card-title">Mixer</div>
+            <div id="testor" class="card-title"><h6>Mixer</h6></div>
             <div class="card-body">
                 <div class="slidecontainer">
                     <div class="slider">
@@ -130,20 +126,18 @@ HG2S - Text Prompt Song Generation
                     {% for i in range(4) %}
                     {% set list = ['', '', '', ''] %}
                     <div class="sequencer-row row">
-                        <div class="col-2 border rounded draggables px-0" style="overflow: hidden">
-                            <p class="draggable_hint"
-                               style="color:var(--light-grey); line-height: 15px; font-family: Arial; font-size: 8px; opacity: 0.2">
+                        <div class="col-2 border rounded draggables px-0 py-1 mx-2" style="overflow: hidden">
+                            <p class="draggable_hint" class="mx-2"
+                               style="color:var(--dark-grey); line-height: 15px; font-family: Arial; font-size: 8px; opacity: 0.75">
                                 Drag the Samples on the Left in here</p>
-                            <!--                            <h6 class="d-inline mx-2">{{list[loop.index-1]}}</h6>-->
-                            <!--                            <h6 id="{{list[loop.index-1]}}_sample_name" class="d-inline mx-2"></h6>-->
                         </div>
                         <div class="$row col-7">
                             {% for i in range(16) %}
                             <span class="d-inline">
                                 {% if i % 4 == 3 %}
-                                <input class="d-inline me-1 bg-danger border-danger sequencer-step" type="checkbox">
+                                <input class="d-inline me-1 bg-danger border-danger sequencer-step align-bottom" type="checkbox">
                                 {% else %}
-                                <input class="d-inline sequencer-step" type="checkbox">
+                                <input class="d-inline sequencer-step align-bottom" type="checkbox">
                                 {% endif %}
                                  </span>
                             {% endfor %}
@@ -175,14 +169,7 @@ HG2S - Text Prompt Song Generation
                                          value="60"></webaudio-slider>
                     </div>
                     <button id="play_melody_button" style="display: none">Play</button>
-                    <select name="osc_type" id="osc_type">
-                        <option value="sine" selected>sine</option>
-                        <option value="square">square</option>
-                        <option value="sawtooth">sawtooth</option>
-                        <option value="triangle">triangle</option>
-                    </select>
                     <select name="soundfont_select" id="soundfont_select"></select>
-
                 </div>
             </div>
         </div>
@@ -190,7 +177,7 @@ HG2S - Text Prompt Song Generation
         <div class="card p-2 col-3 bg-dark text-white d-inline-block">
             <div class="card-title">
                 <h4 class="d-inline">Instruments</h4>
-                <p class="subheadline block">Drag&Drop that!</p>
+                <p class="subheadline block">Coming Soon!</p>
             </div>
             <div class="card-body">
 
@@ -204,7 +191,7 @@ HG2S - Text Prompt Song Generation
             <div class="card-title p-2 h-100">
                 <div>
                     <h4 class="">MIDI Gallery</h4>
-                    <p class="subheadline">Drag&Drop that!</p>
+                    <p class="subheadline">Coming Soon!</p>
                 </div>
             </div>
         </div>
@@ -212,10 +199,6 @@ HG2S - Text Prompt Song Generation
 </div>
 
 <script type="text/javascript">
-
-    // var page_content = document.getElementsByClassName("page-content")[0];
-    // page_content.classList.add("p-3");
-    // page_content.classList.add("m-2");
 
     actx = new AudioContext();
 
@@ -352,9 +335,7 @@ HG2S - Text Prompt Song Generation
             buttons[i].remove();
         }
 
-        // this.querySelector("button").remove();
-        // console.log("drop" + this.id);
-        this.style.backgroundColor = "var(--black)";
+        this.style.backgroundColor = "var(--light-grey)";
 
         this.append(dragItem);
         var hints = document.getElementsByClassName("draggable_hint");
@@ -365,7 +346,7 @@ HG2S - Text Prompt Song Generation
 
     function dragOver(e) {
         e.preventDefault();
-        this.style.backgroundColor = "var(--light-grey)";
+        // this.style.backgroundColor = "var(--light-grey)";
     }
 
     function dragEnter(e) {
@@ -374,7 +355,7 @@ HG2S - Text Prompt Song Generation
 
     function dragLeave() {
         this.style.border = "none";
-        this.style.backgroundColor = "var(--black)";
+        // this.style.backgroundColor = "var(--black)";
     }
 
 

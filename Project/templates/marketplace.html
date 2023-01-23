@@ -54,7 +54,7 @@ HG2S - Marktplatz
                     ({{post.popularity}})
                 </button>
             </a>
-            <a href="/jstest/{{post.text_prompt}}">
+            <a href="{{ url_for('playground', text_prompt=post.text_prompt) }}">
                 <button class="btn px-1 py-0 mb-1">Enter Dimension</button>
             </a>
             {% if session['session_user'] == post.user_name %}
