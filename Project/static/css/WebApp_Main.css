@@ -6,7 +6,7 @@
 /*               COLOR SCHEME                  */
 /*---------------------------------------------*/
 
-/* Color Variables */
+/* Variables */
 :root {
     --yellow: #FFDCA8;
     --pink: #e4a5d4;
@@ -22,6 +22,7 @@
     --light-orange: #FF8377;
     --dark-orange: #F34E1E;
     --red: #D11D1C;
+    --main-font: bebas-kai, sans-serif !important;
     --second-font: Poppins, sans-serif !important;
 }
 

@@ -1,3 +1,5 @@
+// Anmerkung: Diese Code wurde nicht von mir geschrieben --> Mehr Information in der README.md
+
 customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement {
     constructor() {
         super();

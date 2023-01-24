@@ -4,7 +4,7 @@
 
 function pianoRoll() {
 
-    const fluidr3_path = "/static/music_gallery/json_soundfonts/fluidR3.json";
+    const fluidr3_path = "/static/music_gallery/soundfonts/fluidR3.json";
 
     // read the fluidr3 soundfont names and place them in a select dropdown
     fetch(fluidr3_path)
