@@ -148,7 +148,7 @@ p {
 
 p {
     font-family: var(--second-font);
-    font-weight: 200;
+    font-weight: 300;
 }
 
 a {
@@ -190,7 +190,7 @@ a {
 
 input {
     font-family: var(--second-font);
-    font-weight: bold !important;
+    font-weight: 400;
 }
 
 .icon_set_imgs {

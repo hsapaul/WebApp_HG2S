@@ -122,7 +122,6 @@ def word_categories(keywords):
                         'Percussion Instrument', 'Fretted Instrument',  # Instruments
                         'Genre', 'musical style',  # Categories
                         'Decade', 'year', 'era',  # Time
-                        'city', 'country', 'continent', 'culture',  # Locations
                         'Musical Key', 'Musical Mode', 'BPM', 'Time Signature']  # Musical Terms
 
     classified_word_dict = {}

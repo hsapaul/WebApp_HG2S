@@ -28,6 +28,7 @@ HG2S - Marktplatz
 </div>
 
 {% set icon_folder = "black" if session['session_light_mode'] else "white" %}
+
 {% set delete_icon = 'img/icons/' + icon_folder + '/delete.png' %}
 {% set like_icon = 'img/icons/' + icon_folder + '/like.png' %}
 
@@ -37,9 +38,6 @@ HG2S - Marktplatz
 <div class="always_white">
     <div class="post border rounded px-2 pb-0 pt-2 colorful_content">
         <h4>"{{ post.text_prompt }}"</h4>
-
-        <!-- Here it was -->
-
         <div>
             <!-- Post Datum -->
             {% if post.post_datum[:10] == today %}

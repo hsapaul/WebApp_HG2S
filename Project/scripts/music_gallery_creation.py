@@ -11,7 +11,7 @@ def get_absolute_paths():
     print("MOMENTARY PATH: ", momentary_path)  # DEBUG
 
     # Drum Sample Path
-    drum_sample_path = os.path.join(momentary_path, "static", "samples", "drum_samples")
+    drum_sample_path = os.path.join(momentary_path, "static", "music_gallery", "drum_samples")
     print("DRUM SAMPLE PATH:", drum_sample_path)  # DEBUG
 
     # Database Path

@@ -142,19 +142,20 @@ def marktplatz():
     all_posts = db.execute('select * from marktplatz_posts').fetchall()
     # post_user_names = db.execute('select user_id from marktplatz_posts').fetchall()
     all_found_artists = db.execute('select * from found_artists').fetchall()
+    # By Default sort by popularity
+    posts = sorted(all_posts, key=lambda x: x['popularity'], reverse=True)
     # Regular page call
     if request.method == 'GET':
         return render_template('marketplace.html', posts=all_posts,
                                artists_db=all_found_artists,
                                today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
-    # Resort the posts
+    # Sort the posts
     elif request.method == 'POST':
         sort_alg = request.form.get('form-select')
         if sort_alg == 'Recently Posted':
-            posts = sorted(all_posts, key=lambda x: x[3], reverse=True)
-        elif sort_alg == 'Most Popular':
-            posts = sorted(all_posts, key=lambda x: x[8], reverse=True)
-            print(posts)
+            posts = sorted(all_posts, key=lambda x: x['post_datum'], reverse=True)
+        elif sort_alg == 'Popular Posts':
+            posts = sorted(all_posts, key=lambda x: x['popularity'], reverse=True)
         return render_template('marketplace.html', posts=posts, artists_db=all_found_artists,
                                today=str(datetime.datetime.now())[:10], sort_alg=sort_alg)
 
@@ -202,9 +203,7 @@ def post_to_marketplace(id):
 
 @app.route('/upvote_post/<int:id>')
 def upvote(id):
-    # try:
     db = get_db(db_path)
-    # Look if user has already upvoted
     if 'session_user' not in session:
         flash("You need to be logged in to upvote!")
         return redirect(url_for('login'))
@@ -437,6 +436,6 @@ def create_tables_if_not_exist():
  APP START - "Interactive Webapplication for text-based music generation"
 """
 if __name__ == "__main__":
-    create_tables_if_not_exist()
-    mgc.fill_sample_db(sample_db_path)
+    # create_tables_if_not_exist()
+    # mgc.fill_sample_db(sample_db_path)
     app.run(debug=True, port=9875)
