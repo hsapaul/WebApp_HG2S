@@ -12,8 +12,6 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/WebApp_Main.css') }}">
     {% block extra_head_configs %} {% endblock %} <!-- Space for extra site intern CSS and JavaScript -->
-
-    <script type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/index_appearance.js')}}"></script>
 </head>
