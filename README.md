@@ -1,3 +1,9 @@
+Webapp "HG2S" 
+=========================================
+Autor: Paul Hitzler,
+Rahmen: Werkstück für Bachelorarbeit
+
+
 Quellen und Credits zur Nutzung von externem Material
 =========================================
 
