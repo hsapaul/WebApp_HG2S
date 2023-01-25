@@ -20,6 +20,7 @@ NLP-Models:
 - https://huggingface.co/bert-base-uncased *
 - https://huggingface.co/facebook/bart-large-mnli
 
+--> Python Libraries and extra JavaScript packages can be looked up in the files
 
 Schriftarten
 =========================================
