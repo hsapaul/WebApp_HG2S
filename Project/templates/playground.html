@@ -8,9 +8,9 @@ HG2S - Text Prompt Song Generation
 <script src="{{ url_for('static', filename='js/playground_pianoRoll.js') }}"></script>
 <script src="{{ url_for('static', filename='js/playground_stepSequencer.js') }}"></script>
 <script src="{{ url_for('static', filename='js/webaudio-pianoroll.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename = 'node_modules/tone/build/Tone.js')}}"></script>
+<script type="module" src="{{ url_for('static', filename = 'integrated_modules/tone/build/Tone.js')}}"></script>
 <script id="module_sf_player" type="module"
-        src="{{ url_for('static', filename = 'node_modules/soundfont-player/dist/soundfont-player.min.js')}}"></script>
+        src="{{ url_for('static', filename = 'integrated_modules/soundfont-player/dist/soundfont-player.min.js')}}"></script>
 {% endblock %}
 
 {% block content %}
