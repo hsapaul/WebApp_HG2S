@@ -107,17 +107,18 @@ def print_artist_object(artist_object):
             print()
 
 
-def add_to_database(artist_object):
-    conn = sqlite3.connect("musicgallery.db")
+def add_to_database(artist_object, db_path):
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     name, year, occupation,  = artist_object.name, artist_object.year, artist_object.occupation
     genres, instruments = artist_object.genres, artist_object.instruments
-    c.execute("INSERT INTO found_artists VALUES (?, ?, ?, ?, ?)", (name, year, occupation, genres, instruments))
+    c.execute('INSERT INTO found_artists (artist_name, artist_year, occupation, genres, instruments) VALUES'
+                f'("{name}", "{year}", "{occupation}", "{genres}", "{instruments}")')
     conn.commit()
     conn.close()
 
 
-def wikipedia_search(artist):
+def wikipedia_search(artist, db_path):
     start_time = time.time()
     try:
         artist = " ".join([word.capitalize() for word in artist.split(" ")])
@@ -125,7 +126,7 @@ def wikipedia_search(artist):
         html = get_wiki_html(artist)
         artist_object = parse_data(html, artist)
         print_artist_object(artist_object)
-        add_to_database(artist_object)
+        add_to_database(artist_object, db_path)
         print(f"✅ [{round(time.time() - start_time, 2)}s] - Scraping of '{artist.upper()}'-Data ")
         print('------------------------')
         return artist_object

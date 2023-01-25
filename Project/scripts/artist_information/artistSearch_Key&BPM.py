@@ -1,9 +1,8 @@
 import httpx
 from selectolax.parser import HTMLParser
-from dataclasses import dataclass, asdict
-import sqlite3
 import time
 
+# !!! This file is not implemented in the final version !!!
 
 def get_keys_and_bpms(artist):
     url = f"https://www.notediscover.com/search?q={'+'.join(artist.split(' '))}"

@@ -2,11 +2,10 @@
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 from transformers import pipeline
 import time
-import pandas as pd
 import requests
 
 # global variables and lists
-tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb', ' a ',
+tonic = [' c ', ' c# ', ' cb', ' d ', ' d# ', ' db ', ' e ', ' eb', ' f ', ' f# ', ' fb', ' g ', ' g# ', ' gb',
          ' a# ', ' ab', ' b ', ' bb']
 mode = ['major', 'minor', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian']
 decades_year_era = ['1920s', '1930s', '1940s', '1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s',
@@ -135,7 +134,6 @@ def word_categories(keywords):
 def main(text_prompt, static_url_path=None):
     # Test
     method = True
-
     # EXECUTION SCRIPT
     start_time = time.time()  # start timer
     if method:

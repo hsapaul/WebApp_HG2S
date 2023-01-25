@@ -1,5 +1,7 @@
 """ --------------------------------- '''
 
+!!! This file is not implemented in the final version !!!
+
 artistSearch_ChordProgressions.py
 Input: Artist Name
 Output: List of Chord Dictionaries

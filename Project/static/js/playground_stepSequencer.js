@@ -74,6 +74,7 @@ function stepSequencer(static_url) {
                         category_classes = ["kick_item", "snare_item", "clap_item", "hihat_item", "percussion_item"];
                         for (category in category_classes) {
                             if (classList.contains(category_classes[category])) {
+                                static_url = static_url.replace("/samples/", "/music_gallery/")
                                 var element_category = category_classes[category].slice(0, -5) + "s";
                                 var element_url = static_url + element_category + "/" + element_name;
                                 console.log("Sequencer Slot:", i);

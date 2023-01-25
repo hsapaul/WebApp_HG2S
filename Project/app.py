@@ -68,9 +68,8 @@ def index():
             if len(found_artists) >= 1:
                 for artist in found_artists:
                     print(artist)
-                    artist_objects.append(artist_wiki.wikipedia_search(artist))
+                    artist_objects.append(artist_wiki.wikipedia_search(artist, db_path))
                 # Clear out empty artist objects
-            print(artist_objects)
             artist_objects = [x for x in artist_objects if x != None]
             # Save Session Data so it can be accessed when posting to marketplace/databse
             session['text_prompt'] = text_prompt
@@ -119,7 +118,7 @@ def index():
                 name, genres, instruments, occupation, year = artist["name"], artist["genres"], artist["instruments"], \
                                                               artist["occupation"], artist["year"]
                 db.execute(
-                    f'INSERT INTO found_artists (artist_name, artist_year, occupations, genres, instruments) VALUES '
+                    f'INSERT INTO found_artists (artist_name, artist_year, occupation, genres, instruments) VALUES '
                     f'("{name}", "{year}", "{occupation}", "{genres}", "{instruments}")')
             db.commit()
             flash("Your post was successfully submitted!")
@@ -146,7 +145,7 @@ def marktplatz():
     posts = sorted(all_posts, key=lambda x: x['popularity'], reverse=True)
     # Regular page call
     if request.method == 'GET':
-        return render_template('marketplace.html', posts=all_posts,
+        return render_template('marketplace.html', posts=posts,
                                artists_db=all_found_artists,
                                today=str(datetime.datetime.now())[:10], sort_alg='Popular Posts')
     # Sort the posts
@@ -436,6 +435,6 @@ def create_tables_if_not_exist():
  APP START - "Interactive Webapplication for text-based music generation"
 """
 if __name__ == "__main__":
-    # create_tables_if_not_exist()
-    # mgc.fill_sample_db(sample_db_path)
+    create_tables_if_not_exist()
+    mgc.fill_sample_db(sample_db_path)
     app.run(debug=True, port=9875)

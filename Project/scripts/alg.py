@@ -1,5 +1,6 @@
 """
 This File contains the "decision algorithms" for the project.
+!!!! Those are not fully implemented yet !!!!
 1. The first algorithm decides which key and bpm the song is mostly expected to be in.
 
 
@@ -129,6 +130,7 @@ def decide_on_tonic(song_info_dict):
             for song in top_songs:
                 tonic = get_tonic_of_song(song)
                 tonic_dict[tonic] += 1
+
 
 def get_artist_genres(artist):
     client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
